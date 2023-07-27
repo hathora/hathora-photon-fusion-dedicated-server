@@ -250,31 +250,50 @@ namespace Hathora.Core.Scripts.Runtime.Server
             PickRoomExcludeKeyofRoomAllocations firstActiveRoom = activeRooms?.FirstOrDefault();
             if (firstActiveRoom == null || _cancelToken.IsCancellationRequested)
             {
-                Debug.LogError(_cancelToken.IsCancellationRequested ? "Cancelled" : "!firstActiveRoom");
-                return null;
+                Debug.LogError(_cancelToken.IsCancellationRequested 
+                    ? "Cancelled - Still returning Process" 
+                    : "!firstActiveRoom - Still returning Process");
+                
+                return getDeployInfoResult; // Contains Process
             }
 
             getDeployInfoResult.ActiveRoomsForProcess = activeRooms;
 			
             // ----------------
             // We have Room info, but we may need Lobby: Get from RoomId =>
-            Lobby lobby = await ServerApis.ServerLobbyApi.GetLobbyInfoAsync(
-                firstActiveRoom.RoomId,
-                _cancelToken);
+            Lobby lobby = null;
+            bool throwMissingLobby;
 
-            bool throwMissingLobby = lobby == null && _throwIfNoLobby;
-            if (throwMissingLobby || _cancelToken.IsCancellationRequested)
+            try
             {
-                Debug.LogError(_cancelToken.IsCancellationRequested 
-                    ? "Cancelled" 
-                    : "!lobby (expecting one)");
-                return null;
+                lobby = await ServerApis.ServerLobbyApi.GetLobbyInfoAsync(
+                    firstActiveRoom.RoomId,
+                    _cancelToken);
             }
-
+            catch (TaskCanceledException)
+            {
+                Debug.LogError("Cancelled: Still returning Process+Room");
+                return getDeployInfoResult; // Contains Process, Room
+            }
+            finally
+            {
+                // We don't care if this fails (other than cancel/timeout);
+                // only if Lobby is null or not - errs already logged within ^
+                throwMissingLobby = lobby == null && _throwIfNoLobby;
+            }
+            
+            if (throwMissingLobby)
+            {
+                Debug.LogError("!lobby && throwMissingLobby: Still returning Process+Room");
+                return getDeployInfoResult; // Contains Process, Room
+            }
+            
+            // Found a Lobby >>
             getDeployInfoResult.Lobby = lobby;
 
             // Done
-            return getDeployInfoResult;
+            Debug.Log("[HathoraServerMgr] ServerGetDeployedInfoAsync - Done (got Process+Room+Lobby)");
+            return getDeployInfoResult; // Contains Process, Room, Lobby
         }
         #endregion // Chained API calls
     }
