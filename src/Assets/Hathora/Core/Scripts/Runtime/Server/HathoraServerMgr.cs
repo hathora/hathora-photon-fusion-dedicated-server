@@ -71,7 +71,9 @@ namespace Hathora.Core.Scripts.Runtime.Server
         
         /// <summary>Set @ Awake, and only if deployed on Hathora</summary>
         private string serverDeployedProcessId;
-        private bool hasServerDeployedProcessId =>
+        
+        /// <summary>If true, we're a server deployed on Hathora</summary>
+        public bool HasServerDeployedProcessId =>
             !string.IsNullOrEmpty(serverDeployedProcessId);
         #endregion // Vars
 
@@ -179,7 +181,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// <returns></returns>
         public async Task<Process> GetCachedHathoraProcessAsync()
         {
-            if (hathoraServerConfig == null || !hasServerDeployedProcessId)
+            if (hathoraServerConfig == null || !HasServerDeployedProcessId)
                 return null;
 
             // If we already have a cached Process, return it now ->

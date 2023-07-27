@@ -13,52 +13,36 @@ namespace Fusion.Sample.DedicatedServer
   /// </summary>
   public class ServerManagerDefault : ServerManagerBase
   {
-
-    #region Hathora - Editor Debugging as Server
-    private enum EditorStartType
-    {
-      Client,
-      Server,
-    }
-
-    [SerializeField]
-    private EditorStartType editorStartType = EditorStartType.Client;
-    #endregion // Hathora - Editor Debugging as Server
-
-
     #region Start Wrapper
     // ########################################################################################
-    async void Start()
+    private async void Start()
     {
       await Task.Yield();
-
-#if UNITY_EDITOR // --Hathora
-      bool isEditorClient = Application.isEditor && editorStartType == EditorStartType.Client;
-      if (isEditorClient)
-        loadMenuAsClient();
-      return;
-#endif // --Hathora
-
+      await OnStart();
+    }
+    
+    protected virtual async Task OnStart()
+    {
 #if UNITY_SERVER
-      loadGameAsDedicatedServer();
+      await LoadGameAsDedicatedServer();
 #else
-      loadMenuAsClient();
+      LoadMenuAsClient();
 #endif
-    } // Start
+    }
     // ########################################################################################
     #endregion // Start Wrapper
 
 
     #region Utils
     /// <summary>Load scene 1 (Menu) as Client</summary>
-    private void loadMenuAsClient()
+    protected virtual void LoadMenuAsClient()
     {
       Debug.Log("[ServerManagerDefault] loadMenuAsClient (`1.Menu` scene)");
       SceneManager.LoadScene((int)SceneDefs.MENU, LoadSceneMode.Single);
     }
 
     /// <summary>Load scene 2 (Game) as Client</summary>
-    private async Task loadGameAsDedicatedServer()
+    protected virtual async Task LoadGameAsDedicatedServer()
     {
       // Continue with start the Dedicated Server
       Debug.Log("[ServerManagerDefault] loadGameAsDedicatedServer (`2.Game` scene)");
