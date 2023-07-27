@@ -61,8 +61,15 @@ namespace HathoraPhoton
             // Validate reqs
             assertHathoraDeployServerReqs();
             
-            // Get Hathora init deploy info (Process => Room => Lobby)
-            HathoraGetDeployInfoResult deployInfo = await hathoraServerMgr.ServerGetDeployedInfoAsync();
+            // ##################################################################################################
+            // Get Hathora init deploy info (Process => Room => Lobby).
+            // If we made the Room via Hathora web console || HathoraServerConfig, we have !Lobby.
+            // No Lobby (for +arbitrary props like room display name to show to other players in a room browser)
+            // is ok if we only want to just minimally test, but we should probably add a lobby later.
+            // ##################################################################################################
+            
+            HathoraGetDeployInfoResult deployInfo = await hathoraServerMgr.ServerGetDeployedInfoAsync(
+                _throwIfNoLobby: false);
             
             Assert.IsNotNull(deployInfo, $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +
