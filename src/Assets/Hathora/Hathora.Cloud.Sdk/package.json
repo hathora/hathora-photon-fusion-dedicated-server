@@ -1,0 +1,32 @@
+{
+  "name": "com.hathora.hathora-sdk",
+  "version": "v1.0.8",
+  "displayName": "Hathora Unity SDK",
+  "description": "Serverless cloud hosting for multiplayer games: Seamlessly build, deploy, and scale game servers globally.",
+  "unity": "2021.3",
+  "changelogUrl": "https://github.com/hathora/hathora-cloud-sdks/activity",
+  "documentationUrl": "https://hathora.dev/docs",
+  "type": "sdk_unity",
+  "keywords": [
+    "Hathora",
+    "client",
+    "multiplayer",
+    "server",
+    "game server",
+    "net",
+    "netcode",
+    "host",
+    "online multiplayer"
+  ],
+  "author": {
+    "name": "Hathora, Inc.",
+    "email": "hello@hathora.dev",
+    "url": "https://hathora.dev"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  },
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
+  }
+}

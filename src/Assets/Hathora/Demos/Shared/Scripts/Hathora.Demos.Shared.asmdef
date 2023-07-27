@@ -1,0 +1,19 @@
+{
+    "name": "Hathora.Demos.Shared",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f1759c9426648704a865065a6b2c1624",
+        "GUID:0e3fc80fc04a96743bef4dc13d47ec4e",
+        "GUID:34d82f58914fd384e8979ab3a457e9f3",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
