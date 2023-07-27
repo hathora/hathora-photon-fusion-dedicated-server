@@ -262,8 +262,6 @@ namespace Hathora.Core.Scripts.Runtime.Server
             // ----------------
             // We have Room info, but we may need Lobby: Get from RoomId =>
             Lobby lobby = null;
-            bool throwMissingLobby;
-
             try
             {
                 lobby = await ServerApis.ServerLobbyApi.GetLobbyInfoAsync(
@@ -273,26 +271,24 @@ namespace Hathora.Core.Scripts.Runtime.Server
             catch (TaskCanceledException)
             {
                 Debug.LogError("Cancelled: Still returning Process+Room");
-                return getDeployInfoResult; // Contains Process, Room
+                return null;
             }
-            finally
+            catch (Exception e)
             {
-                // We don't care if this fails (other than cancel/timeout);
-                // only if Lobby is null or not - errs already logged within ^
-                throwMissingLobby = lobby == null && _throwIfNoLobby;
-            }
-            
-            if (throwMissingLobby)
-            {
-                Debug.LogError("!lobby && throwMissingLobby: Still returning Process+Room");
-                return getDeployInfoResult; // Contains Process, Room
+                if (_throwIfNoLobby)
+                {
+                    Debug.LogError("!lobby && throwMissingLobby: Still returning Process+Room");
+                    return getDeployInfoResult; // Contains Process, Room
+                }
             }
             
             // Found a Lobby >>
             getDeployInfoResult.Lobby = lobby;
 
             // Done
-            Debug.Log("[HathoraServerMgr] ServerGetDeployedInfoAsync - Done (got Process+Room+Lobby)");
+            string gotLobbyStr = lobby != null ? "true" : "false";
+            Debug.Log($"[HathoraServerMgr] ServerGetDeployedInfoAsync - GotLobby? {gotLobbyStr}" );
+            Debug.Log("[HathoraServerMgr] ServerGetDeployedInfoAsync - Done");
             return getDeployInfoResult; // Contains Process, Room, Lobby
         }
         #endregion // Chained API calls
