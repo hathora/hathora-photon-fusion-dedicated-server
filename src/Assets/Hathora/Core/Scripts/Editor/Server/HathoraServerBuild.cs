@@ -18,6 +18,9 @@ using Debug = UnityEngine.Debug;
 namespace Hathora.Core.Scripts.Editor.Server
 {
     /// <summary>
+    /// High-level server build logic, bundling several steps around
+    /// the Hathora Build API.
+    /// 
     /// Contains build + deploy methods for Hathora Server.
     /// Trigger these from HathoraServerConfig ScriptableObject buttons.
     ///

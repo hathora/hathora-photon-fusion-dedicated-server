@@ -87,9 +87,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
 
             Debug.Log("[HathoraServerMgr] Awake");
             setSingleton();
-            
-            if (!validateReqs())
-                return;
+            validateReqs();
             
             // Unlike Client calls, we can init immediately @ Awake
             initApis(_hathoraSdkConfig: null); // Base will create this
@@ -129,17 +127,14 @@ namespace Hathora.Core.Scripts.Runtime.Server
             Singleton = this;
         }
 
-        private bool validateReqs()
+        private void validateReqs()
         {
             if (hathoraServerConfig == null)
             {
                 Debug.LogError("[HathoraServerMgr] !HathoraServerConfig; " +
                     $"Serialize to {gameObject.name}.{nameof(HathoraServerMgr)} (if you want " +
-                    "server runtime calls from Server standalone || Editor)");
-                return false;
+                    $"server runtime calls from Server standalone || Editor");
             }
-
-            return true;
         }
         
         /// <summary>

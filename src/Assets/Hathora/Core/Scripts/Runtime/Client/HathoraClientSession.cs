@@ -52,9 +52,11 @@ namespace Hathora.Core.Scripts.Runtime.Client
         
         private void setSingleton()
         {
+            Debug.Log("[HathoraClientSession] setSingleton");
+            
             if (Singleton != null)
             {
-                Debug.LogError("[HathoraClientSession]**ERR @ setSingleton: Destroying dupe");
+                Debug.LogError("[HathoraClientSession.setSingleton] Error: Destroying dupe");
                 Destroy(gameObject);
                 return;
             }

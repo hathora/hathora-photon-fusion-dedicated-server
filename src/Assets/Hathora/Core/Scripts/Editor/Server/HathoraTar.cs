@@ -14,6 +14,10 @@ using Debug = UnityEngine.Debug;
 
 namespace Hathora.Core.Scripts.Editor.Server
 {
+    /// <summary>
+    /// High-level wrappers for bundling build files + Dockerfile into a
+    /// .tar.gz (gzipped tarball), in order to deploy to Hathora Cloud.   
+    /// </summary>
     public static class HathoraTar
     {
         /// <summary>Overwrites any existing</summary>

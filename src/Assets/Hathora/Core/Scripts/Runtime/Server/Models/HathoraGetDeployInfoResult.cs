@@ -9,12 +9,11 @@ using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Hathora.Core.Scripts.Runtime.Server.Models
 {
     /// <summary>
-    /// For use with HathoraServerLobbyApi.ServerGetDeployedInfoAsync.
+    /// Result model for HathoraServerLobbyApi.ServerGetDeployedInfoAsync().
     /// </summary>
     public class HathoraGetDeployInfoResult
     {
@@ -45,6 +44,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         }
         
         /// <summary>
+        /// Gets host:port from ProcessInfo.ExposedPort, then converts host to IP.
         /// Async since we use Dns to translate the Host to IP.
         /// </summary>
         /// <returns></returns>
@@ -79,39 +79,12 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
 
         /// <summary>
         /// You probably want to parse the InitialConfig to your own model.
+        /// Forwards Lobby to Hathora util
         /// </summary>
         /// <typeparam name="TInitConfig"></typeparam>
         /// <returns></returns>
-        public TInitConfig GetLobbyInitConfig<TInitConfig>()
-        {
-            string logPrefix = $"[HathoraGetDeployInfoResult.{nameof(GetLobbyInitConfig)}]";
-
-            object initConfigObj = Lobby?.InitialConfig;
-            if (initConfigObj == null)
-            {
-                Debug.LogError($"{logPrefix} !initConfigObj");
-                return default;
-            }
-
-            try
-            {
-                string jsonString = initConfigObj as string;
-                
-                if (string.IsNullOrEmpty(jsonString))
-                {
-                    Debug.LogError($"{logPrefix} !jsonString");
-                    return default;
-                }
-                
-                TInitConfig initConfigParsed = JsonConvert.DeserializeObject<TInitConfig>(jsonString);
-                return initConfigParsed;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"{logPrefix} Error parsing initConfigObj: {e}");
-                throw;
-            }
-        }
+        public TInitConfig GetLobbyInitConfig<TInitConfig>() =>
+            HathoraUtils.GetLobbyInitConfig<TInitConfig>(this.Lobby);
         #endregion // Utils
 
         

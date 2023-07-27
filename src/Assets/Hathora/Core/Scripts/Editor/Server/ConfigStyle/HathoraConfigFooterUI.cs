@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 {
+    /// <summary>
+    /// For the styling of HathoraServerConfig's bottom Footer UI.
+    /// </summary>
     public class HathoraConfigFooterUI : HathoraConfigUIBase
     {
         /// <summary>

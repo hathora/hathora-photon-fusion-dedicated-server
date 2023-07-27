@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 {
+    /// <summary>
+    /// For the styling of HathoraServerConfig's pre-authentication UI.
+    /// </summary>
     public class HathoraConfigPreAuthBodyUI : HathoraConfigUIBase
     {
         // Declare an event to trigger a repaint

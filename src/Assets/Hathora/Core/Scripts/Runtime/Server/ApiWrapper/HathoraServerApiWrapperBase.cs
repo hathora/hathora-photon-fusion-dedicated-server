@@ -23,8 +23,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
                 if (HathoraServerConfig == null)
                 {
                     Debug.LogError("[HathoraServerApiWrapper.AppId.get] !HathoraServerConfig: " +
-                        "Did you forget to add init a newly-added API @ HathoraServerMgr.initApis()?" +
-                        "**For Non-host Clients (or Servers that don't have runtime Server API calls), you may ignore this**");
+                        "Did you forget to add init a newly-added API @ HathoraServerMgr.initApis() ?");
                     return null;
                 }
 
@@ -79,7 +78,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             string _funcName,
             ApiException _apiException)
         {
-            UnityEngine.Debug.LogError($"[{_className}.{_funcName}] API Error: " +
+            Debug.LogError($"[{_className}.{_funcName}] API Error: " +
                 $"{_apiException.ErrorCode} {_apiException.ErrorContent} | {_apiException.Message}");
 
             throw _apiException;

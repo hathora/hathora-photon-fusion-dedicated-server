@@ -6,6 +6,10 @@ using UnityEditor;
 
 namespace Hathora.Core.Scripts.Editor.Server
 {
+    /// <summary>
+    /// Hathora ConfigFinder window refresher,
+    /// for if we refresh something outside the window.
+    /// </summary>
     public class HathoraServerAssetPostprocessor : AssetPostprocessor
     {
         /// <summary>

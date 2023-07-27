@@ -13,7 +13,7 @@ using UnityEngine.Networking;
 namespace Hathora.Core.Scripts.Editor.Server.Auth0
 {
     /// <summary>
-    /// 1. Get device auth code from 
+    /// Custom Auth0 (OAuth2) handling for Hathora. 
     /// </summary>
     public class Auth0Login
     {

@@ -10,6 +10,9 @@ using UnityEngine;
 namespace Hathora.Core.Scripts.Editor.Server
 {
     /// <summary>
+    /// High-level server auth logic, bundling several steps around
+    /// the Hathora Auth API.
+    /// 
     /// Dev auth to get a dev token. Browser will launch to OAuth (via Auth0) and we'll
     /// tell the server we want a code. After a code, we'll launch a browser for the user
     /// to auth (via UI) and poll every 5s until we are authed.

@@ -219,9 +219,13 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         private void generateDockerfileIfNotExists(HathoraServerPaths _paths)
         {
             bool dockerfileExists = HathoraServerBuild.CheckIfDockerfileExists(_paths);
-            
+
             if (!dockerfileExists)
+            {
+                // TODO: Add UI opts within HathoraServerConfig.Build >>
                 HathoraDocker.GenerateDockerFileStr(_paths);
+                // HathoraDocker.GenerateDockerFileStr(_paths);
+            }
         }
         
         private void onServerBuildDirChanged(string _inputStr)

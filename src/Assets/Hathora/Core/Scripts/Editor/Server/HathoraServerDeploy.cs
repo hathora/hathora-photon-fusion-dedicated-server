@@ -22,6 +22,10 @@ namespace Hathora.Core.Scripts.Editor.Server
     public delegate void OnBuildReqComplete(Build _buildInfo);
     public delegate void OnUploadComplete();
     
+    /// <summary>
+    /// High-level server deploy logic, bundling several steps around
+    /// the Hathora Server Deploy API.
+    /// </summary>
     public static class HathoraServerDeploy
     {   
         /// <summary>

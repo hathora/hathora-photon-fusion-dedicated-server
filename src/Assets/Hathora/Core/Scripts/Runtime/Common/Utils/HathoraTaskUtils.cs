@@ -16,7 +16,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.Utils
         /// <summary>
         /// WaitUntil something, with timeout (to prevent infinite loops).
         /// - Default 5s with 0.1s intervals.
-        /// - Example: `await TaskExtensions.WaitUntil(() => foo != null);`
+        /// - Example: `await HathoraTaskUtils.WaitUntil(() => foo != null);`
         /// </summary>
         /// <param name="_condition"></param>
         /// <param name="_intervalMs"></param>

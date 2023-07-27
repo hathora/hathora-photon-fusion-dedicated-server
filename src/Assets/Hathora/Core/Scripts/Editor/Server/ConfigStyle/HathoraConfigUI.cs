@@ -8,7 +8,8 @@ using UnityEngine;
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 {
     /// <summary>
-    /// The main editor for HathoraServerConfig, including all the button clicks and extra UI.
+    /// For the styling of HathoraServerConfig's UI - the main entry point,
+    /// including all the button clicks and extra UI wrapped within it.
     /// </summary>
     [CustomEditor(typeof(HathoraServerConfig))]
     public class HathoraConfigUI : UnityEditor.Editor
