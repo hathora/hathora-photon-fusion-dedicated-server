@@ -215,14 +215,21 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// From this, we can get Process, Room and Lobby info.
         /// - Note the GetLobbyInitConfig() call: Parse this `object` to your own model.
         /// </summary>
+        /// <param name="_throwIfNoLobby">
+        /// If we created the Room from Hathora Console || HathoraServerConfig,
+        /// we'll only have a Room (no Lobby).
+        /// </param>
         /// <param name="_cancelToken"></param>
         /// <returns></returns>
         public async Task<HathoraGetDeployInfoResult> ServerGetDeployedInfoAsync(
+            bool _throwIfNoLobby,
             CancellationToken _cancelToken = default)
         {
             Debug.Log("[HathoraServerMgr] ServerGetDeployedInfoAsync");
 
-            HathoraGetDeployInfoResult getDeployInfoResult = new(serverDeployedProcessId);
+            HathoraGetDeployInfoResult getDeployInfoResult = new(
+                serverDeployedProcessId, 
+                _throwIfNoLobby);
             
             // ----------------
             // Get Process from env var "HATHORA_PROCESS_ID" => We probably cached this, already, @ OnAwake()
@@ -250,14 +257,17 @@ namespace Hathora.Core.Scripts.Runtime.Server
             getDeployInfoResult.ActiveRoomsForProcess = activeRooms;
 			
             // ----------------
-            // We have Room info, but we need Lobby: Get from RoomId =>
+            // We have Room info, but we may need Lobby: Get from RoomId =>
             Lobby lobby = await ServerApis.ServerLobbyApi.GetLobbyInfoAsync(
                 firstActiveRoom.RoomId,
                 _cancelToken);
 
-            if (lobby == null || _cancelToken.IsCancellationRequested)
+            bool throwMissingLobby = lobby == null && _throwIfNoLobby;
+            if (throwMissingLobby || _cancelToken.IsCancellationRequested)
             {
-                Debug.LogError(_cancelToken.IsCancellationRequested ? "Cancelled" : "!lobby");
+                Debug.LogError(_cancelToken.IsCancellationRequested 
+                    ? "Cancelled" 
+                    : "!lobby (expecting one)");
                 return null;
             }
 

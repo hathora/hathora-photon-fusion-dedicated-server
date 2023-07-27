@@ -18,6 +18,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
     public class HathoraGetDeployInfoResult
     {
         #region Vars
+        public bool ExpectingLobby;
         public string EnvVarProcessId { get; private set; }
         public Process ProcessInfo { get; set; }
         public Lobby Lobby { get; set; }
@@ -70,11 +71,14 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         public PickRoomExcludeKeyofRoomAllocations FirstActiveRoomForProcess => 
             ActiveRoomsForProcess?.FirstOrDefault();
         
-        /// <summary>Checks for (Process, Room and Lobby) != null.</summary>
+        /// <summary>
+        /// Checks for (Process, Room and Lobby) != null.
+        /// Lobby doesn't have to be null, if !ExpectingLobby.
+        /// </summary>
         /// <returns>isValid</returns>
         public bool CheckIsValid() => 
             ProcessInfo != null && 
-            Lobby != null && 
+            (!ExpectingLobby || Lobby != null) && 
             FirstActiveRoomForProcess != null;
 
         /// <summary>
@@ -89,11 +93,27 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
 
         
         #region Constructors
-        public HathoraGetDeployInfoResult(string _envVarProcessId)
+        /// <summary>
+        /// You are about to get Process => Room [=> Lobby]. 
+        /// </summary>
+        /// <param name="_envVarProcessId"></param>
+        /// <param name="_expectingLobby">Affects CheckIsValid()</param>
+        public HathoraGetDeployInfoResult(
+            string _envVarProcessId, 
+            bool _expectingLobby)
         {
+            this.ExpectingLobby = _expectingLobby;
             this.EnvVarProcessId = _envVarProcessId;
         }
 
+        /// <summary>
+        /// You already have the info and you want to combine it into a single Result.
+        /// - ExpectingLobby assumed if Lobby != null.
+        /// </summary>
+        /// <param name="_envVarProcessId"></param>
+        /// <param name="_processInfo"></param>
+        /// <param name="_activeRoomsForProcess"></param>
+        /// <param name="_lobby"></param>
         public HathoraGetDeployInfoResult(
             string _envVarProcessId,
             Process _processInfo,
@@ -103,7 +123,9 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
             this.EnvVarProcessId = _envVarProcessId;
             this.ProcessInfo = _processInfo;
             this.ActiveRoomsForProcess = _activeRoomsForProcess;
+            
             this.Lobby = _lobby;
+            this.ExpectingLobby = Lobby != null;
         }
         #endregion // Constructors
     }
