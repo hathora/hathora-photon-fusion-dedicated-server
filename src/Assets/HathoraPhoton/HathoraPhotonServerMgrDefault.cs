@@ -70,11 +70,12 @@ namespace HathoraPhoton
             
             HathoraGetDeployInfoResult deployInfo = await hathoraServerMgr.ServerGetDeployedInfoAsync(
                 _throwIfNoLobby: false);
-            
-            Assert.IsNotNull(deployInfo, $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
+
+            string deployErrMsg = $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +
-                "Inactive Processes despawn in 5m.");
-            Assert.IsTrue(deployInfo.CheckIsValid(), $"{logPrefix} Expected deployInfo IsValid");
+                "Inactive Processes despawn in 5m - perhaps timed out?";
+            Assert.IsNotNull(deployInfo, deployErrMsg);
+            Assert.IsTrue(deployInfo.CheckIsValid(), deployErrMsg);
 
             throw new NotImplementedException("TODO: Set the public IP:port to the Photon config - where is this?");
             
