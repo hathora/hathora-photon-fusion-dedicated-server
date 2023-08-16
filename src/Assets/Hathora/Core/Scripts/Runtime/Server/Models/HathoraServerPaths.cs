@@ -5,7 +5,7 @@ using Hathora.Core.Scripts.Runtime.Common.Utils;
 
 namespace Hathora.Core.Scripts.Runtime.Server.Models
 {
-   /// <summary>
+    /// <summary>
     /// Container for all the many paths to prep/upload/deploy a Hathora server build.
     /// </summary>
     public class HathoraServerPaths

@@ -67,9 +67,9 @@ namespace HathoraPhoton
             // No Lobby (for +arbitrary props like room display name to show to other players in a room browser)
             // is ok if we only want to just minimally test, but we should probably add a lobby later.
             // ##################################################################################################
-            
-            HathoraGetDeployInfoResult deployInfo = await hathoraServerMgr.ServerGetDeployedInfoAsync(
-                _throwIfNoLobby: false);
+
+            // deployInffo.Lobby will be null (expected)
+            HathoraGetDeployInfoResult deployInfo = await hathoraServerMgr.ServerGetDeployedInfoAsync();
 
             string deployErrMsg = $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +

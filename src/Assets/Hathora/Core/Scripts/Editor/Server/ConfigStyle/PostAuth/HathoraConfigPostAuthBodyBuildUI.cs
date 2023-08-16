@@ -144,9 +144,8 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         private static void insertGenerateServerBuildBtnInfoHelpbox()
         {
             // Post the help box *before* we disable the button so it's easier to see (if toggleable)
-            const string labelStr = "This will generate a Linux Server Build for your game. " +
-                "It will also generate the Dockerfile for that build " +
-                "(located in <project>/.hathora directory)";
+            string labelStr = "This will generate a Linux Server Build for your game. " +
+                "It will also generate a /{Application.productName}/.hathora/Dockerfile";
             
             EditorGUILayout.HelpBox(labelStr, MessageType.Info);
         }
@@ -219,13 +218,9 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         private void generateDockerfileIfNotExists(HathoraServerPaths _paths)
         {
             bool dockerfileExists = HathoraServerBuild.CheckIfDockerfileExists(_paths);
-
+            
             if (!dockerfileExists)
-            {
-                // TODO: Add UI opts within HathoraServerConfig.Build >>
                 HathoraDocker.GenerateDockerFileStr(_paths);
-                // HathoraDocker.GenerateDockerFileStr(_paths);
-            }
         }
         
         private void onServerBuildDirChanged(string _inputStr)

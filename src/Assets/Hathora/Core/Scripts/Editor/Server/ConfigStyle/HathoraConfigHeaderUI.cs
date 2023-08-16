@@ -7,9 +7,6 @@ using UnityEngine;
 
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 {
-    /// <summary>
-    /// For the styling of HathoraServerConfig's top Header UI.
-    /// </summary>
     public class HathoraConfigHeaderUI : HathoraConfigUIBase
     {
         public HathoraConfigHeaderUI(

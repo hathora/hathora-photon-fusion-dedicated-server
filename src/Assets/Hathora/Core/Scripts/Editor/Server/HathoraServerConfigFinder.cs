@@ -9,9 +9,6 @@ using UnityEngine;
 
 namespace Hathora.Core.Scripts.Editor.Server
 {
-    /// <summary>
-    /// Handles the ConfigFinder window @ top menu `Hathora/ConfigFinder`. 
-    /// </summary>
     [InitializeOnLoad]
     public class HathoraServerConfigFinder : EditorWindow
     {

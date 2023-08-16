@@ -25,7 +25,7 @@ namespace Hathora.Cloud.Sdk.Api
 
     /// <summary>
     /// Represents a collection of functions to interact with the API endpoints
-    /// </summary> 
+    /// </summary>
     public interface IBuildV1ApiSync : IApiAccessor
     {
         #region Synchronous Operations

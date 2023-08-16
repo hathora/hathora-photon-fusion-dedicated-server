@@ -6,7 +6,6 @@ using System.Net;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
-using Hathora.Cloud.Sdk.Model;
 using Newtonsoft.Json;
 using UnityEngine;
 using Application = UnityEngine.Application;
@@ -119,41 +118,12 @@ namespace Hathora.Core.Scripts.Runtime.Common.Utils
             IPAddress[] ips = await Dns.GetHostAddressesAsync(_host);
             return ips.FirstOrDefault();
         }
-        
+
         /// <summary>
-        /// You probably want to parse the InitialConfig to your own model.
+        /// eg: "127.0.0.1:7777", "localhost:7777", "1.proxy.hathora.dev:7777",
         /// </summary>
-        /// <typeparam name="TInitConfig"></typeparam>
         /// <returns></returns>
-        public static TInitConfig GetLobbyInitConfig<TInitConfig>(Lobby _lobby)
-        {
-            string logPrefix = $"[HathoraUtils.{nameof(GetLobbyInitConfig)}]";
-
-            object initConfigObj = _lobby?.InitialConfig;
-            if (initConfigObj == null)
-            {
-                Debug.LogError($"{logPrefix} !initConfigObj");
-                return default;
-            }
-
-            try
-            {
-                string jsonString = initConfigObj as string;
-                
-                if (string.IsNullOrEmpty(jsonString))
-                {
-                    Debug.LogError($"{logPrefix} !jsonString");
-                    return default;
-                }
-                
-                TInitConfig initConfigParsed = JsonConvert.DeserializeObject<TInitConfig>(jsonString);
-                return initConfigParsed;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"{logPrefix} Error parsing initConfigObj: {e}");
-                throw;
-            }
-        }
+        public static string GetHostIpPortPatternStr() =>
+            @"^((localhost:[0-9]{1,5})|(([\w-]+(\.\w+)*\.[a-zA-Z]{2,})|(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)):[0-9]{1,5})$";
     }
 }

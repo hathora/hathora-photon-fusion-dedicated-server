@@ -13,10 +13,6 @@ using UnityEngine.Assertions;
 
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 {
-    /// <summary>
-    /// HathoraServerConfig's style is broken up into multiple parts,
-    /// but they all share certain props/funcs.
-    /// </summary>
     public abstract class HathoraConfigUIBase
     {
         #region Vars

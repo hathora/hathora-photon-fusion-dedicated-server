@@ -34,8 +34,8 @@ namespace Hathora.Core.Scripts.Editor.Server
             // TODO: if (!overwriteDockerfile)
             if (File.Exists(pathToDockerfile))
             {
-                Debug.LogWarning("[HathoraServerDeploy.WriteDockerFileAsync] " +
-                    "Deleting old Dockerfile...");
+                Debug.Log("[HathoraServerDeploy.WriteDockerFileAsync] " +
+                    "<color=orange>(!)</color> Deleting old Dockerfile...");
                 File.Delete(pathToDockerfile);
             }
             
@@ -147,8 +147,8 @@ CMD [ \
 ]
 ";
     
-            Debug.Log($"[GenerateDockerFileStr] Generated: <color=yellow>\n" +
-                $"`{dockerStr}`</color> ...");
+            Debug.Log($"[GenerateDockerFileStr] Generated string (not yet written): " +
+                $"<color=yellow>\n`{dockerStr}`</color> ...");
 
             return dockerStr;
         }

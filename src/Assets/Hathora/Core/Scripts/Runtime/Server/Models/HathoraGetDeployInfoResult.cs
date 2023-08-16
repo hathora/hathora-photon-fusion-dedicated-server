@@ -9,16 +9,16 @@ using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Hathora.Core.Scripts.Runtime.Server.Models
 {
     /// <summary>
-    /// Result model for HathoraServerLobbyApi.ServerGetDeployedInfoAsync().
+    /// For use with HathoraServerLobbyApi.ServerGetDeployedInfoAsync.
     /// </summary>
     public class HathoraGetDeployInfoResult
     {
         #region Vars
-        public bool ExpectingLobby;
         public string EnvVarProcessId { get; private set; }
         public Process ProcessInfo { get; set; }
         public Lobby Lobby { get; set; }
@@ -45,7 +45,6 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         }
         
         /// <summary>
-        /// Gets host:port from ProcessInfo.ExposedPort, then converts host to IP.
         /// Async since we use Dns to translate the Host to IP.
         /// </summary>
         /// <returns></returns>
@@ -71,49 +70,57 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         public PickRoomExcludeKeyofRoomAllocations FirstActiveRoomForProcess => 
             ActiveRoomsForProcess?.FirstOrDefault();
         
-        /// <summary>
-        /// Checks for (Process, Room and Lobby) != null.
-        /// Lobby doesn't have to be null, if !ExpectingLobby.
-        /// </summary>
+        /// <summary>Checks for (Process, Room and Lobby) != null.</summary>
         /// <returns>isValid</returns>
         public bool CheckIsValid() => 
             ProcessInfo != null && 
-            (!ExpectingLobby || Lobby != null) && 
+            Lobby != null && 
             FirstActiveRoomForProcess != null;
 
         /// <summary>
         /// You probably want to parse the InitialConfig to your own model.
-        /// Forwards Lobby to Hathora util
         /// </summary>
         /// <typeparam name="TInitConfig"></typeparam>
         /// <returns></returns>
-        public TInitConfig GetLobbyInitConfig<TInitConfig>() =>
-            HathoraUtils.GetLobbyInitConfig<TInitConfig>(this.Lobby);
+        public TInitConfig GetLobbyInitConfig<TInitConfig>()
+        {
+            string logPrefix = $"[HathoraGetDeployInfoResult.{nameof(GetLobbyInitConfig)}]";
+
+            object initConfigObj = Lobby?.InitialConfig;
+            if (initConfigObj == null)
+            {
+                Debug.LogError($"{logPrefix} !initConfigObj");
+                return default;
+            }
+
+            try
+            {
+                string jsonString = initConfigObj as string;
+                
+                if (string.IsNullOrEmpty(jsonString))
+                {
+                    Debug.LogError($"{logPrefix} !jsonString");
+                    return default;
+                }
+                
+                TInitConfig initConfigParsed = JsonConvert.DeserializeObject<TInitConfig>(jsonString);
+                return initConfigParsed;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"{logPrefix} Error parsing initConfigObj: {e}");
+                throw;
+            }
+        }
         #endregion // Utils
 
         
         #region Constructors
-        /// <summary>
-        /// You are about to get Process => Room [=> Lobby]. 
-        /// </summary>
-        /// <param name="_envVarProcessId"></param>
-        /// <param name="_expectingLobby">Affects CheckIsValid()</param>
-        public HathoraGetDeployInfoResult(
-            string _envVarProcessId, 
-            bool _expectingLobby)
+        public HathoraGetDeployInfoResult(string _envVarProcessId)
         {
-            this.ExpectingLobby = _expectingLobby;
             this.EnvVarProcessId = _envVarProcessId;
         }
 
-        /// <summary>
-        /// You already have the info and you want to combine it into a single Result.
-        /// - ExpectingLobby assumed if Lobby != null.
-        /// </summary>
-        /// <param name="_envVarProcessId"></param>
-        /// <param name="_processInfo"></param>
-        /// <param name="_activeRoomsForProcess"></param>
-        /// <param name="_lobby"></param>
         public HathoraGetDeployInfoResult(
             string _envVarProcessId,
             Process _processInfo,
@@ -123,9 +130,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
             this.EnvVarProcessId = _envVarProcessId;
             this.ProcessInfo = _processInfo;
             this.ActiveRoomsForProcess = _activeRoomsForProcess;
-            
             this.Lobby = _lobby;
-            this.ExpectingLobby = Lobby != null;
         }
         #endregion // Constructors
     }

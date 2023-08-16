@@ -98,19 +98,27 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
 
             return enumerable?.ToList();
         }
-        
-        
-#if UNITY_SERVER || UNITY_EDITOR
+
         /// <summary>Doc | https://hathora.dev/docs/guides/generate-admin-token</summary>
+#if UNITY_SERVER || UNITY_EDITOR
         [SerializeField, Tooltip("Set earlier from log in button")]
         private HathoraDevAuthTokenOpts _devAuthOpts = new();
+#endif
         
         /// <summary>Doc | https://hathora.dev/docs/guides/generate-admin-token</summary>
         public HathoraDevAuthTokenOpts DevAuthOpts
         {
-            get => _devAuthOpts;
+            get {
+#if UNITY_SERVER || UNITY_EDITOR
+                return _devAuthOpts;
+#endif
+                
+                // Client >>
+                return null;
+            }
+#if UNITY_SERVER || UNITY_EDITOR
             set => _devAuthOpts = value;
+#endif
         }
-#endif // UNITY_SERVER || UNITY_EDITOR
     }
 }
