@@ -1,7 +1,6 @@
 // Created by dylan@hathora.dev
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,23 +14,6 @@ namespace Hathora.Demos.Shared.Scripts.Common
     /// </summary>
     public abstract class HathoraArgHandlerBase : MonoBehaviour
     {
-        #region Mock Testing
-        [SerializeField, Tooltip("For mock -arg testing within the Editor")]
-        private bool mockArgsInEditor;
-        protected bool MockArgsInEditor => mockArgsInEditor;
-        
-        /// <summary>Keys already include the `-` prefix.</summary>
-        private static readonly Dictionary<string, string> MOCK_ARGS_DICT = new()
-        {
-            {"-scene", "HathoraDemoScene-Mirror"}, // "HathoraDemoScene-FishNet" || "HathoraDemoScene-Mirror"
-            {"-mode", "server"}, // "server" || "client" || "host
-        };
-
-        readonly string MOCK_ARGS_DICT_STR = string.Join(" ", MOCK_ARGS_DICT.Select(kvp => 
-            $"{kvp.Key} {kvp.Value}"));
-        #endregion // Mock Testing
-        
-        
         #region vars
         private static bool _sceneArgConsumed = false;
         
@@ -72,22 +54,16 @@ namespace Hathora.Demos.Shared.Scripts.Common
         /// <summary>
         /// (!) Some args like `-scene` and `-mode` are statically consumed only once
         /// (eg: reloading the scene won't apply them).</summary>
-        protected virtual async Task InitArgs()
+        /// <param name="_cmdLineArgsOverrideList">Perhaps for mock testing</param>
+        protected virtual async Task InitArgs(Dictionary<string, string> _cmdLineArgsOverrideList = null)
         {
-            string logPrefix = $"[HathoraArgHandlerBase.{nameof(InitArgs)}]";
-            
-            Dictionary<string, string> args = GetCommandlineArgs();
-
-            if (Application.isEditor && mockArgsInEditor)
-            {
-                Debug.LogWarning($"{logPrefix} (!) Init: <color=yellow>" +
-                    $"MOCK_ARG_IN_EDITOR</color>: `{MOCK_ARGS_DICT_STR}`");
-               
-                args = MOCK_ARGS_DICT; // Override for debugging
-            }
-            
-            Debug.Log($"{logPrefix} scene: {gameObject.scene.name} " +
+            Debug.Log($"[HathoraArgHandlerBase] Init @ scene: {gameObject.scene.name} " +
                 "(before consuming `-scene` arg, if exists)");
+            
+            if (Application.isEditor && _cmdLineArgsOverrideList == null)
+                return;
+
+            Dictionary<string, string> args = _cmdLineArgsOverrideList ?? GetCommandlineArgs();
 
             // -scene {string} // Load scene by name
             if (args.TryGetValue("-scene", out string sceneName) && !string.IsNullOrEmpty(sceneName))

@@ -13,6 +13,8 @@ using Hathora.Core.Scripts.Runtime.Server;
 using Hathora.Core.Scripts.Runtime.Server.Models;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
 namespace Hathora.Core.Scripts.Editor.Server
@@ -70,7 +72,29 @@ namespace Hathora.Core.Scripts.Editor.Server
             
             cleanCreateBuildDir(_serverConfig, configPaths.PathToBuildDir);
             _cancelToken.ThrowIfCancellationRequested();
+            
+            #region bug (when restored later): Recompiles - you lose all logs [including HathoraServerConfig logs]
+            // // ----------------
+            // // This will change your selected build setting: Cache here, revert later
+            // BuildTarget originalBuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            // BuildTargetGroup originalBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(originalBuildTarget);
+            // int originalArchitecture = PlayerSettings.GetArchitecture(originalBuildTargetGroup);
+            // ScriptingImplementation originalScriptingBackend = PlayerSettings.GetScriptingBackend(originalBuildTargetGroup);
+            // ApiCompatibilityLevel originalApiCompatibility = PlayerSettings.GetApiCompatibilityLevel(originalBuildTargetGroup);
+            //
+            // // Sanity check: Does the 1st scene match the current scene we're on?
+            // // Many devs intend to build on the scene they're working on 1st, but forget to swap the order
+            // EditorBuildSettingsScene firstSceneInBuildSettings = EditorBuildSettings.scenes[0]; 
+            // if (firstSceneInBuildSettings.path != SceneManager.GetActiveScene().path)
+            // {
+            //     Debug.Log($"{logPrefix} <color=orange>(!)</color> The 1st scene in build " +
+            //         $"settings ({firstSceneInBuildSettings.path}) !matches the current Editor " +
+            //         $"scene ({SceneManager.GetActiveScene().path}); intended?");
+            // }
+            #endregion // bug (when restored later): Recompiles - you lose all logs [including HathoraServerConfig logs]
 
+            // ----------------
+            // Generate build opts
             BuildPlayerOptions buildPlayerOptions = generateBuildPlayerOptions(
                 _serverConfig,
                 configPaths.PathToBuildExe);
@@ -83,23 +107,9 @@ namespace Hathora.Core.Scripts.Editor.Server
                 .AppendLine("```")
                 .AppendLine();
             
-            BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
-            _cancelToken.ThrowIfCancellationRequested();
-            
-            // Did we fail? 
-            string resultStr = Enum.GetName(typeof(BuildResult), buildReport.summary.result);
-            if (buildReport.summary.result != BuildResult.Succeeded)
-            {
-                strb.AppendLine($"**BUILD FAILED: {resultStr}**");
-                
-                Selection.activeObject = previousSelection; // Restore focus
-                return buildReport; // fail
-            }
-            
-            strb.AppendLine($"**BUILD SUCCESS: {resultStr}**");
-            
             // ----------------
             // Generate the Dockerfile to `.hathora/`: Paths will be different for each collaborator
+            // Generate before the build in case we want to  *just* generate Dockerfile then cancel (generates fast).
             bool existingDockerfileExists = CheckIfDockerfileExists(configPaths);
             bool genDockerfile = buildOpts.OverwriteDockerfile || !existingDockerfileExists;
             if (genDockerfile)
@@ -124,18 +134,59 @@ namespace Hathora.Core.Scripts.Editor.Server
                 Debug.LogWarning($"{logPrefix} !buildOpts.OverwriteDockerfile: Leaving Dockerfile" +
                     "alone (to !overwrite customizations) at risk of desync, if any ServerConfig opts have changed.");
             }
+            
+            Debug.Log("BUILDING now (this may take a while): See HathoraServerConfig " +
+                "'Generate Server Build Logs'"); // To regular console
+            await Task.Delay(100, _cancelToken); // Give the logs a chance to update
+
+            BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            _cancelToken.ThrowIfCancellationRequested();
+            
+            // Did we fail? 
+            string resultStr = Enum.GetName(typeof(BuildResult), buildReport.summary.result);
+            if (buildReport.summary.result != BuildResult.Succeeded)
+            {
+                strb.AppendLine($"**BUILD FAILED: {resultStr}**");
+                
+                Selection.activeObject = previousSelection; // Restore focus
+                return buildReport; // fail
+            }
+            
+            #region bug: Recompiles - you lose all logs [including HathoraServerConfig logs]
+            // // ----------------
+            // // Delay since we don't want the rest of the block to cutoff (This causes a recompile)
+            // EditorApplication.delayCall += () =>
+            // {
+            //     // Revert build settings since we changed them to headless Linux server
+            //     EditorUserBuildSettings.SwitchActiveBuildTarget(originalBuildTargetGroup, originalBuildTarget);
+            //     PlayerSettings.SetArchitecture(originalBuildTargetGroup, originalArchitecture);
+            //     PlayerSettings.SetScriptingBackend(originalBuildTargetGroup, originalScriptingBackend);
+            //     PlayerSettings.SetApiCompatibilityLevel(originalBuildTargetGroup, originalApiCompatibility);
+            //
+            //     Debug.Log(
+            //         $"{logPrefix} Reverted build settings to original: " +
+            //         $"[BuildTarget: {originalBuildTarget}, " +
+            //         $"BuildTargetGroup: {originalBuildTargetGroup}, " +
+            //         $"Architecture: {originalArchitecture}, " +
+            //         $"ScriptingBackend: {originalScriptingBackend}, " +
+            //         $"ApiCompatibility: {originalApiCompatibility}");
+            // };
+            #endregion // bug: Recompiles - you lose all logs [including HathoraServerConfig logs]
+            
+            strb.AppendLine($"**BUILD SUCCESS: {resultStr}**");
 
             // ----------------
             // Open the build directory - this will lose focus of the inspector
             // TODO: Play a small, subtle chime sfx?
             strb.AppendLine("Opening build dir ...").AppendLine();
-            Debug.Log("[HathoraServerBuild.BuildHathoraLinuxServer] " +
-                $"Build succeeded @ path: `{configPaths.PathToBuildDir}`");
+            Debug.Log($"{logPrefix} Build succeeded @ path: `{configPaths.PathToBuildDir}`");
             
             EditorUtility.RevealInFinder(configPaths.PathToBuildExe);
             cacheFinishedBuildReportLogs(_serverConfig, buildReport);
 
-            Selection.activeObject = previousSelection; // Restore focus
+            // ----------------
+            // Restore focus and return the build report
+            Selection.activeObject = previousSelection;
             
             return buildReport;
         }

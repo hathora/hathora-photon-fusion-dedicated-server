@@ -5280,6 +5280,9 @@ GameObject:
   - component: {fileID: 6730436420827614695}
   - component: {fileID: 6730436420827614694}
   - component: {fileID: 6730436420827614718}
+  - component: {fileID: 1171821982866378484}
+  - component: {fileID: 7125548214976000354}
+  - component: {fileID: 5689559563356638787}
   - component: {fileID: 3964277563861138990}
   m_Layer: 5
   m_Name: HathoraManagerBase
@@ -5377,6 +5380,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dd49ec761771cd4494d6595d3ff2a49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1171821982866378484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6730436420827614691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 807f854ad356dd449a860674efb2752d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7125548214976000354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6730436420827614691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a3292944994a754fa2c0b79f6f580b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5689559563356638787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6730436420827614691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1476be9659562e840b7a4182de73554b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3964277563861138990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5389,9 +5428,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 896a08ad08518a146894b41d0e78aec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugEditorMockProcId: 
-  hathoraServerConfig: {fileID: 11400000, guid: c65599dda8f4a354aa2953bb4665a361,
-    type: 2}
+  hathoraServerConfig: {fileID: 11400000, guid: 548f8af0ca2741f4d95b2d7724eb01bc, type: 2}
 --- !u!1 &6730436420891535536
 GameObject:
   m_ObjectHideFlags: 0

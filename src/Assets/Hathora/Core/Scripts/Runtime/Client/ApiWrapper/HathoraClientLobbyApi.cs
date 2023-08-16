@@ -138,6 +138,7 @@ namespace Hathora.Core.Scripts.Runtime.Client.ApiWrapper
         }
 
         /// <summary>
+        /// Gets a list of active+public lobbies.
         /// </summary>
         /// <param name="_region">Leave null to return ALL Regions</param>
         /// <param name="_cancelToken"></param>
@@ -146,9 +147,10 @@ namespace Hathora.Core.Scripts.Runtime.Client.ApiWrapper
             Region? _region = null, // null == ALL regions
             CancellationToken _cancelToken = default)
         {
-            Debug.Log("[NetHathoraClientLobbyApi.ClientCreateLobbyAsync] " +
-                $"<color=yellow>region: {_region}</color> (This will exclude " +
-                $"private lobbies and server Rooms created without a lobby)");
+            string logsPrefix = $"[HathoraClientLobbyApi.{nameof(ClientListPublicLobbiesAsync)}]";
+            string regionStr = _region == null ? "any" : _region.ToString();
+            
+            Debug.Log($"{logsPrefix} <color=yellow>Getting public+active lobbies for '{regionStr}' region</color>");
             
             List<Lobby> lobbies;
             try
@@ -166,15 +168,13 @@ namespace Hathora.Core.Scripts.Runtime.Client.ApiWrapper
                     apiException);
                 
                 if (apiException.ErrorCode == 404)
-                    Debug.LogError("[404] Tip: If a server made a Room without a lobby, " +
+                    Debug.LogError($"{logsPrefix} 404: If a server made a Room without a lobby, " +
                         "instead use the Room api (rather than Lobby api)");
                 
                 return null; // fail
             }
 
-            Debug.Log($"[NetHathoraClientLobbyApi] ClientListPublicLobbiesAsync => " +
-                $"numLobbiesFound: {lobbies?.Count ?? 0}");
-            
+            Debug.Log($"{logsPrefix} => numLobbiesFound: {lobbies?.Count ?? 0}");
             return lobbies;
         }
         #endregion // Client Lobby Async Hathora SDK Calls

@@ -15,4 +15,4 @@ MonoBehaviour:
   LoggingEnabled: 1
   _developmentLogging: 3
   _guiLogging: 2
-  _headlessLogging: 1
+  _headlessLogging: 3

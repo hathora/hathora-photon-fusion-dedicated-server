@@ -95,6 +95,17 @@ namespace Hathora.Core.Scripts.Editor.Server
             Assert.IsNotNull(_serverConfig, $"{logPrefix} " +
                 "Cannot find HathoraServerConfig ScriptableObject");
             
+            #if UNITY_WEBGL
+            bool isTcpTransport = _serverConfig.HathoraDeployOpts.SelectedTransportType == TransportType.Tcp;
+            string selectedTransportTypeStr = Enum.GetName(typeof (TransportType), _serverConfig.HathoraDeployOpts.SelectedTransportType);
+            if (!isTcpTransport)
+            {
+                Debug.LogWarning($"{logPrefix} (!) Do you plan for your clients to connect with WebGL (TCP/WS)? " +
+                    "Your HathoraServerConfig's transport type should probably be set to `Tcp`. " +
+                    $"Currently, the selected transport type is set to: `{selectedTransportTypeStr}`");
+            }
+            #endif
+            
             StringBuilder strb = _serverConfig.HathoraDeployOpts.LastDeployLogsStrb;
             DateTime startTime = DateTime.Now;
             strb.Clear()
@@ -229,8 +240,10 @@ namespace Hathora.Core.Scripts.Editor.Server
                 HathoraServerDeployApi deployApi = new(_serverConfig);
 
                 Deployment deployment = null;
-
-                try { deployment = await deployBuildAsync(deployApi, buildInfo.BuildId); }
+                try
+                {
+                    deployment = await deployBuildAsync(deployApi, buildInfo.BuildId);
+                }
                 catch (TaskCanceledException e)
                 {
                     Debug.Log($"{logPrefix} deployBuildAsync => Task Cancelled");

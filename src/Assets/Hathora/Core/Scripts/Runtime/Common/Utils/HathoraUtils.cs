@@ -118,5 +118,12 @@ namespace Hathora.Core.Scripts.Runtime.Common.Utils
             IPAddress[] ips = await Dns.GetHostAddressesAsync(_host);
             return ips.FirstOrDefault();
         }
+
+        /// <summary>
+        /// eg: "127.0.0.1:7777", "localhost:7777", "1.proxy.hathora.dev:7777",
+        /// </summary>
+        /// <returns></returns>
+        public static string GetHostIpPortPatternStr() =>
+            @"^((localhost:[0-9]{1,5})|(([\w-]+(\.\w+)*\.[a-zA-Z]{2,})|(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)):[0-9]{1,5})$";
     }
 }
