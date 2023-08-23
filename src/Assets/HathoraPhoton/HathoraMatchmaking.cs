@@ -37,7 +37,7 @@
 //     
 //     
 //         private static HathoraRegion HATHORA_FALLBACK_REGION => HathoraRegion.WashingtonDC;
-//         private static HathoraPhotonClientMgr clientMgr => HathoraPhotonClientMgr.Singleton;
+//         private static PhotonStateMgr clientMgr => PhotonStateMgr.Singleton;
 //
 //     
 //         #region Base Overrides
@@ -63,7 +63,7 @@
 //                 // ##############################################################
 //                 // "Host" Acting as a Hathora Client:
 //                 //
-//                 // 1. Ensure authed; already via HathoraPhotonClientMgr.Awake()
+//                 // 1. Ensure authed; already via PhotonStateMgr.Awake()
 //                 // 2. Create Lobby (a Room with server browsing capabilities)
 //                 // 3. Wait for Lobby to be created
 //                 // 4. Hide the modal create settings window and show success status
@@ -87,7 +87,7 @@
 //             string logPrefix = $"[HathoraMatchmaking.{nameof(createHathoraSessionAsync)}]";
 //             Debug.Log($"{logPrefix} (as Photon 'Host')");
 //         
-//             // Ensure authed; already via HathoraPhotonClientMgr.Awake()
+//             // Ensure authed; already via PhotonStateMgr.Awake()
 //             if (clientMgr == null)
 //             {
 //                 Debug.LogError($"[HathoraMatchmaking.{nameof(createHathoraSessionAsync)}]: " +

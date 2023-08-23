@@ -46,6 +46,7 @@ namespace Hathora.Core.Scripts.Editor.Server
         
         public static DeploymentSteps DeploymentStep { get; private set; }
         
+        /// <summary>TODO: Rename to `OnZipComplete` to conform with sibling styles</summary>
         public static event ZipCompleteHandler OnZipComplete;
         public static event OnBuildReqComplete OnBuildReqComplete;
         public static event OnUploadComplete OnUploadComplete;

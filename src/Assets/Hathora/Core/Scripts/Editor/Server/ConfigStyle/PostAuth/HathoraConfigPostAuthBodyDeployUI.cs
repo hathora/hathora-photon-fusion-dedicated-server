@@ -468,5 +468,13 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             ServerConfig.HathoraDeployOpts.TransportTypeSelectedIndex >= HathoraUtils.SDK_ENUM_STARTING_INDEX;
 
         #endregion //Utils
+
+        
+        ~HathoraConfigPostAuthBodyDeployUI()
+        {
+            HathoraServerDeploy.OnZipComplete -= onDeployAppStatus_1ZipComplete;
+            HathoraServerDeploy.OnBuildReqComplete -= onDeployAppStatus_2BuildReqComplete;
+            HathoraServerDeploy.OnUploadComplete -= onDeployAppStatus_3UploadComplete;
+        }
     }
 }

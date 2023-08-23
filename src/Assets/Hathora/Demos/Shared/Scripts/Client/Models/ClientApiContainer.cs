@@ -11,7 +11,7 @@ namespace Hathora.Demos.Shared.Scripts.Client.Models
     /// Client API wrapper container to serialize in HathoraManager (in scene).
     /// 
     /// -> Have a new Hathora API to add?
-    /// 1. Serialize it here, and add to `HathoraClientMgrBase.InitApis()`
+    /// 1. Serialize it here, and add to `HathoraClientMgr.InitApis()`
     /// 2. Open scene `HathoraManager` GameObj (not prefab)
     /// 3. Add the new script component to HathoraManager.Hathora{Platform}ClientMgr.ClientApis
     /// 4. Add a new script[] to ClientApis container -> drag the script into the serialized field

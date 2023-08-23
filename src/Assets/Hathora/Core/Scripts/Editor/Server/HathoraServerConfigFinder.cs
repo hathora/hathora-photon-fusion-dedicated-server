@@ -40,6 +40,7 @@ namespace Hathora.Core.Scripts.Editor.Server
         private void OnDisable()
         {
             AssetDatabase.importPackageCompleted -= OnImportPackageCompleted;
+            EditorApplication.delayCall -= ShowWindowOnStartup;
         }
 
         /// <summary>

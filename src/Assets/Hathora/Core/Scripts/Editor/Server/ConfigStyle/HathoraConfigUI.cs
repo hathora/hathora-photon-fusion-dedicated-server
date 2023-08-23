@@ -183,5 +183,21 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
                 : icon; // our custom icon
         }
         #endregion // Meta
+
+
+        private void OnDisable()
+        {
+            if (headerUI != null)
+                headerUI.RequestRepaint -= Repaint;
+            
+            if (preAuthBodyUI != null)
+                preAuthBodyUI.RequestRepaint-= Repaint;
+            
+            if (postAuthBodyUI != null)
+                postAuthBodyUI.RequestRepaint -= Repaint;
+            
+            if (footerUI != null)
+                footerUI.RequestRepaint -= Repaint;
+        }
     }
 }
