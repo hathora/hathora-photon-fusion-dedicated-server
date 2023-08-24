@@ -1,21 +1,31 @@
 // Created by dylan@hathora.dev
 
-using System;
 using System.Threading.Tasks;
+using Fusion;
 using Fusion.Sample.DedicatedServer;
+using Fusion.Sample.DedicatedServer.Utils;
 using Hathora.Core.Scripts.Runtime.Server;
 using Hathora.Core.Scripts.Runtime.Server.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Assert = UnityEngine.Assertions.Assert;
 
 namespace HathoraPhoton
 {
     /// <summary>
-    /// Adds Editor debugging + Hathora logic to ServerManagerDefault.
+    /// Modified from the demo-included `ServerManagerDefault.cs` - Changes:
+    /// - Added `|| UNITY_EDITOR` to `#if UNITY_SERVER` to allow optional Editor debugging as server.
+    /// - Added server + client wrappers for clarity, since #if wrappers get confusing.
+    /// - Added Editor debugging + Hathora logic to ServerManagerDefault.
     /// </summary>
-    public class HathoraPhotonServerMgrDefault : ServerManagerDefault
+    public class HathoraPhotonServerMgrDefault : ServerManagerBase
     {
         #region vars
+        /// <summary>
+        /// When we validate the HathoraServerContext, should we expect a Lobby to exist?
+        /// </summary>
+        private const bool EXPECTING_HATHORA_LOBBY = false;
+        
         private enum EditorStartType
         {
             Client,
@@ -26,63 +36,115 @@ namespace HathoraPhoton
         private EditorStartType editorStartType = EditorStartType.Client;
 
         private HathoraServerMgr hathoraServerMgr => HathoraServerMgr.Singleton;
+        
+        /// <summary>
+        /// We can run server events if:
+        /// 1. We are UNITY_SERVER
+        /// 2. We are Editor && EditorStartType is Server (mocking Server)
+        /// </summary>
+        bool canRunServerEvents
+        {
+            get {
+#if UNITY_EDITOR
+                if (editorStartType != EditorStartType.Server)
+                    return false;
+#elif !UNITY_SERVER
+            return false;
+#endif
+
+                return true; // canRunServerEvents
+            }
+        }
         #endregion // vars
         
-        
-        /// <summary>Add Editor debug options for Server</summary>
-        protected override async Task OnStart()
+
+        #region Init
+        private void Awake()
         {
-            Debug.Log("[HathoraPhotonServerMgrDefault] @ OnStart");
+            Debug.Log($"[{nameof(HathoraPhotonServerMgrDefault)}] Awake: " +
+                $"canRunServerEvents? {canRunServerEvents}");
             
-#if !UNITY_EDITOR
-            // !Editor -- Continue as normal >>
-            await base.OnStart();
-#endif
+            if (!canRunServerEvents)
+                return;
             
-            // Allow us to debug Server (instead of just Client) within the Editor
-            bool isEditorMockedAsServer = Application.isEditor && editorStartType == EditorStartType.Server;
-            if (isEditorMockedAsServer)
-                await LoadGameAsDedicatedServer();
-            else
-                LoadMenuAsClient();
+            // Subscribe to Hathora server initd event
+            HathoraServerMgr.OnInitializedEvent += onHathoraServerInitd;
+        }
+
+        private void Start()
+        {
+            if (!canRunServerEvents)
+                startClient(); // onHathoraServerInitd() will never be called
         }
 
         /// <summary>
-        /// If we're deployed in Hathora, we have access to the ProcessId, where we may get:
-        /// 1. Process (host, ip, port)
-        /// 1. Room (RoomId)
-        /// 2. Lobby (InitialConfig for arbitrary data to show in a Lobby list of props)
+        /// Triggers when HathoraServerMgr finishes getting HathoraServerContext async.
+        /// - Subscribed @ Awake
+        /// - Unsubscribed @ OnDestroy
+        /// - VaLidates -> then curries to initDedicatedServer Task
         /// </summary>
-        /// <returns></returns>
-        protected override async Task LoadGameAsDedicatedServer()
+        /// <param name="hathoraServerContext"></param>
+        private void onHathoraServerInitd(HathoraServerContext hathoraServerContext)
         {
-            string logPrefix = $"[HathoraPhotonServerMgrDefault.{nameof(LoadGameAsDedicatedServer)}]";
-
-            // Validate reqs
+            string logPrefix = $"[{nameof(HathoraPhotonServerMgrDefault)}.{nameof(onHathoraServerInitd)}]";
+            
+            // Validate
             assertHathoraDeployServerReqs();
             
-            // ##################################################################################################
-            // Get Hathora init deploy info (Process => Room => Lobby).
-            // If we made the Room via Hathora web console || HathoraServerConfig, we have !Lobby.
-            // No Lobby (for +arbitrary props like room display name to show to other players in a room browser)
-            // is ok if we only want to just minimally test, but we should probably add a lobby later.
-            // ##################################################################################################
-
-            // deployInffo.Lobby will be null (expected)
-            HathoraServerContext serverContext = await hathoraServerMgr.GetCachedServerContextAsync();
-
             string deployErrMsg = $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +
                 "Inactive Processes despawn in 5m - perhaps timed out?";
-            Assert.IsNotNull(serverContext, deployErrMsg);
-            Assert.IsTrue(serverContext.CheckIsValid(), deployErrMsg);
-
-            throw new NotImplementedException("TODO: Set the public IP:port to the Photon config - where is this?");
+            Assert.IsNotNull(hathoraServerContext, deployErrMsg);
+            Assert.IsTrue(hathoraServerContext.CheckIsValid(EXPECTING_HATHORA_LOBBY), 
+                deployErrMsg); // TODO: Should we expect lobby later?
             
-            // Continue as normal @ base
-            await base.LoadGameAsDedicatedServer();
+            // Ready
+            _ = startPhotonDedicatedServer(hathoraServerContext);   
         }
+        
+        /// <summary>Load scene 2 (Game) as Dedicated Server</summary>
+        private async Task startPhotonDedicatedServer(HathoraServerContext hathoraServerContext)
+        {
+            // Continue with start the Dedicated Server
+            string logPrefix = $"[HathoraPhotonServerMgrDefault.{nameof(startPhotonDedicatedServer)}]";
+            Debug.Log($"{logPrefix} (`2.Game` scene)");
+            Application.targetFrameRate = 30;
 
+            // TODO: Hathora InitConfig vals?
+            Debug.LogError($"{logPrefix} TODO: Set InitConfig / Port / IP here from HathoraServerContext");
+            DedicatedServerConfig config = DedicatedServerConfig.Resolve();
+            Debug.Log(config);
+
+            // Start a new Runner instance
+            NetworkRunner runner = Instantiate(_runnerPrefab);
+
+            // Start the Server
+            StartGameResult result = await StartSimulation(runner, config);
+
+            // Check if all went fine
+            if (result.Ok)
+                Log.Debug($"{logPrefix} Runner Start DONE");
+            else
+            {
+                // Quit the application if startup fails
+                Log.Debug($"{logPrefix} Error while starting Server: {result.ShutdownReason}");
+
+                // it can be used any error code that can be read by an external application
+                // using 0 means all went fine
+                Application.Quit(1);
+            }
+        }
+        
+        /// <summary>Load scene 1 (Menu) as Client</summary>
+        private void startClient()
+        {
+            Debug.Log($"[HathoraPhotonServerMgrDefault] {nameof(startClient)} (`1.Menu` scene)");
+            SceneManager.LoadScene((int)SceneDefs.MENU, LoadSceneMode.Single);
+        }
+        #endregion // Init
+
+        
+        #region Utils
         /// <summary>Throws if !valid with verbose instructions on how to fix the issue</summary>
         private void assertHathoraDeployServerReqs()
         {
@@ -105,6 +167,14 @@ namespace HathoraPhoton
                 "(3) Paste the `ProcessId` to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId` " +
                 "(you only have 5m before the server Room Process idles out) =>\n" +
                 "This will go through the flow of getting Process=>Room=>Lobby");
+        }
+        #endregion // Utils
+
+
+        private void OnDestroy()
+        {
+            // Unsub to events
+            HathoraServerMgr.OnInitializedEvent -= onHathoraServerInitd;
         }
     }
 }
