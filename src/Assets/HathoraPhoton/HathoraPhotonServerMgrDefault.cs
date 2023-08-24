@@ -1,5 +1,6 @@
 // Created by dylan@hathora.dev
 
+using System.Net;
 using System.Threading.Tasks;
 using Fusion;
 using Fusion.Sample.DedicatedServer;
@@ -110,9 +111,18 @@ namespace HathoraPhoton
             Debug.Log($"{logPrefix} (`2.Game` scene)");
             Application.targetFrameRate = 30;
 
-            // TODO: Hathora InitConfig vals?
-            Debug.LogError($"{logPrefix} TODO: Set InitConfig / Port / IP here from HathoraServerContext");
             DedicatedServerConfig config = DedicatedServerConfig.Resolve();
+            
+            #region Hathora Edits
+            // Set public ip:port
+            (IPAddress ip, ushort port) ipPort = await hathoraServerContext.GetHathoraServerIpPortAsync();
+            config.PublicIP = ipPort.ip.ToString();
+            config.PublicPort = ipPort.port;
+            
+            Debug.Log($"{logPrefix} Used hathoraServerContext to set Photon public config.PublicIp and .PublicPort " +
+                $"to `{config.PublicIP}:{config.PublicPort}`");
+            #endregion // Hathora Edits
+            
             Debug.Log(config);
 
             // Start a new Runner instance
