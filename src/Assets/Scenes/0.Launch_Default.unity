@@ -281,3 +281,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b06b966039e0024c99fe527df9fc1a5, type: 3}
+--- !u!1 &2025822155 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 235978345099422418, guid: 6b06b966039e0024c99fe527df9fc1a5, type: 3}
+  m_PrefabInstance: {fileID: 2025822154}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2025822156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025822155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 896a08ad08518a146894b41d0e78aec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugEditorMockProcId: 
+  hathoraServerConfig: {fileID: 0}
