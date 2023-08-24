@@ -123,25 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1190425043 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9147515999474046547, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
-  m_PrefabInstance: {fileID: 1860835757}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1190425046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1190425043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b003cc66f2687e4096945a320bbdef8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _runnerPrefab: {fileID: 7026028574858575316, guid: 9ed152b92b9970d43b9f8ed05f0982ad, type: 3}
-  editorStartType: 1
 --- !u!1001 &1860835757
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -149,17 +130,9 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2354277117999626343, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
-      propertyPath: startType
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046547, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_Name
-      value: Server_Manager_Default
-      objectReference: {fileID: 0}
-    - target: {fileID: 9147515999474046547, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
-      propertyPath: m_IsActive
-      value: 1
+      value: ServerNetworkManager
       objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046549, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_RootOrder
@@ -205,8 +178,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2354277117999626343, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
 --- !u!1001 &2025822154
 PrefabInstance:
@@ -301,7 +273,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 235978345099422418, guid: 6b06b966039e0024c99fe527df9fc1a5, type: 3}
       propertyPath: m_Name
-      value: HathoraPhotonManager
+      value: HathoraManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5033795100960708483, guid: 6b06b966039e0024c99fe527df9fc1a5, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b06b966039e0024c99fe527df9fc1a5, type: 3}
