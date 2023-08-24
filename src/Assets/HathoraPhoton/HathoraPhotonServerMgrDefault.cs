@@ -1,5 +1,6 @@
 // Created by dylan@hathora.dev
 
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using Fusion;
@@ -129,7 +130,16 @@ namespace HathoraPhoton
             NetworkRunner runner = Instantiate(_runnerPrefab);
 
             // Start the Server
-            StartGameResult result = await StartSimulation(runner, config);
+            StartGameResult result = null;
+            try
+            {
+                result = await StartSimulation(runner, config);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"{logPrefix} StartSimulation => Error: {e}");
+                throw;
+            }
 
             // Check if all went fine
             if (result.Ok)

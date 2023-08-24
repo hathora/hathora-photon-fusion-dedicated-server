@@ -9,12 +9,14 @@ using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Hathora.Core.Scripts.Runtime.Server.Models
 {
     /// <summary>
-    /// For use with HathoraServerLobbyApi.ServerGetDeployedInfoAsync.
+    /// Result model for HathoraServerMgr.GetHathoraServerContextAsync().
+    /// - Can get Hathora Process, Room, [Lobby].
+    /// - Can quick check if valid via `CheckIsValid`.
+    /// - Contains utils to get "host:port" || "ip:port".
     /// </summary>
     public class HathoraServerContext
     {
@@ -50,19 +52,29 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         /// <returns></returns>
         public async Task<(IPAddress ip, ushort port)> GetHathoraServerIpPortAsync()
         {
+            string logPrefix = $"[{nameof(HathoraServerContext)}.{nameof(GetHathoraServerIpPortAsync)}]";
+            
             (IPAddress ip, ushort port) ipPort;
             
             ExposedPort connectInfo = ProcessInfo?.ExposedPort;
 
             if (connectInfo == null)
             {
-                UnityEngine.Debug.LogError("[HathoraGetDeployInfoResult.GetHathoraServerIpPortAsync] " +
-                    "!connectInfo from ProcessInfo.ExposedPort");
+                Debug.LogError($"{logPrefix} !connectInfo from ProcessInfo.ExposedPort");
                 return default;
             }
-
-            ipPort.ip = await HathoraUtils.ConvertHostToIpAddress(connectInfo.Host);
+            
             ipPort.port = (ushort)connectInfo.Port;
+
+            try
+            {
+                ipPort.ip = await HathoraUtils.ConvertHostToIpAddress(connectInfo.Host);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"{logPrefix} ConvertHostToIpAddress => Error: {e}");
+                throw;
+            }
 
             return ipPort;
         }
@@ -85,7 +97,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         /// <returns></returns>
         public TInitConfig GetLobbyInitConfig<TInitConfig>()
         {
-            string logPrefix = $"[HathoraGetDeployInfoResult.{nameof(GetLobbyInitConfig)}]";
+            string logPrefix = $"[{nameof(HathoraServerContext)}.{nameof(GetLobbyInitConfig)}]";
 
             object initConfigObj = Lobby?.InitialConfig;
             if (initConfigObj == null)
