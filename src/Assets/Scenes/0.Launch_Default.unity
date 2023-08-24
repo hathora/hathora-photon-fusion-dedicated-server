@@ -186,7 +186,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 347f3e6659d5cbc41a89870294e0dc16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verboseLogs: 1
 --- !u!1001 &1860835757
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -194,6 +193,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1190425046, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
+      propertyPath: editorStartType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046547, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_Name
       value: ServerNetworkManager

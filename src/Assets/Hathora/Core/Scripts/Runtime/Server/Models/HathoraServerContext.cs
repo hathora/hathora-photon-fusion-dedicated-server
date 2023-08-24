@@ -69,13 +69,14 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         
         public PickRoomExcludeKeyofRoomAllocations FirstActiveRoomForProcess => 
             ActiveRoomsForProcess?.FirstOrDefault();
-        
+
         /// <summary>Checks for (Process, Room and Lobby) != null.</summary>
         /// <returns>isValid</returns>
-        public bool CheckIsValid() => 
-            ProcessInfo != null && 
-            Lobby != null && 
-            FirstActiveRoomForProcess != null;
+        public bool CheckIsValid(bool _expectingLobby) =>
+            ProcessInfo != null &&
+            ProcessInfo.StoppingAt == null &&
+            FirstActiveRoomForProcess != null &&
+            (!_expectingLobby || Lobby != null);
 
         /// <summary>
         /// You probably want to parse the InitialConfig to your own model.

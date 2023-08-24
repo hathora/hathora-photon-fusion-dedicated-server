@@ -41,10 +41,12 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
         /// <param name="_processId">
         /// The process running the Room; find it in web console or GetRunningProcesses().
         /// </param>
+        /// <param name="_returnNullOnStoppedProcess">If the Process stopped (no Rooms inside), just return null</param>
         /// <param name="_cancelToken"></param>
         /// <returns>Returns Process on success</returns>
         public async Task<Process> GetProcessInfoAsync(
             string _processId,
+            bool _returnNullOnStoppedProcess = true,
             CancellationToken _cancelToken = default)
         {
             const string logPrefix = "[HathoraServerProcessApi.GetProcessInfoAsync]";
@@ -69,6 +71,14 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
 
             Debug.Log($"{logPrefix} Success: <color=yellow>" +
                 $"getProcessInfoResult: {getProcessInfoResult.ToJson()}</color>");
+            
+            
+            if (getProcessInfoResult.StoppingAt != null)
+            {
+                Debug.LogError($"{logPrefix} Got Process info, but reported <color=orange>Stopped</color> " +
+                    $"(returnNullOnStoppedProcess=={_returnNullOnStoppedProcess})");
+                return null;
+            }
 
             return getProcessInfoResult;
         }

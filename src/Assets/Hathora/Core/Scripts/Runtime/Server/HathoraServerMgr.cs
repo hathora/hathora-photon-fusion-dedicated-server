@@ -11,6 +11,7 @@ using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Runtime.Server.ApiWrapper;
 using Hathora.Core.Scripts.Runtime.Server.Models;
 using UnityEngine;
+using Application = Hathora.Cloud.Sdk.Model.Application;
 
 namespace Hathora.Core.Scripts.Runtime.Server
 {
@@ -105,7 +106,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             hathoraProcessIdEnvVar = getServerDeployedProcessId();
 #endif
             
-            _ = GetHathoraServerContext(_throwErrIfNoLobby: false); // !await; sets `HathoraServerContext ServerContext` ^
+            _ = GetHathoraServerContextAsync(_throwErrIfNoLobby: false); // !await; sets `HathoraServerContext ServerContext` ^
         }
         
         /// <summary>If we were not server || editor, we'd already be destroyed @ Awake</summary>
@@ -278,14 +279,14 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// - Calls automatically @ Awake => triggers `OnInitializedEvent` on success.
         /// - Caches locally @ serverContext; public get via GetCachedServerContextAsync().
         /// </summary>
-        /// <param name="_throwErrIfNoLobby"></param>
+        /// <param name="_throwErrIfNoLobby">Be extra sure to try/catch this, if true</param>
         /// <param name="_cancelToken"></param>
         /// <returns>Triggers `OnInitializedEvent` event on success</returns>
-        public async Task<HathoraServerContext> GetHathoraServerContext(
+        public async Task<HathoraServerContext> GetHathoraServerContextAsync(
             bool _throwErrIfNoLobby,
             CancellationToken _cancelToken = default)
         {
-            string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContext)}]";
+            string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContextAsync)}]";
             Debug.Log($"{logPrefix} Start");
 
             if (!IsDeployedOnHathora)
@@ -299,20 +300,40 @@ namespace Hathora.Core.Scripts.Runtime.Server
                 return null;
             }
             
-            serverContext = new HathoraServerContext(hathoraProcessIdEnvVar);
+            // GetCachedServerContext() will await !null, so we don't want to the main var *yet*
+            HathoraServerContext tempServerContext = new HathoraServerContext(hathoraProcessIdEnvVar);
             
             // ----------------
             // Get Process from env var "HATHORA_PROCESS_ID" => We probably cached this, already, @ )
             // We await => just in case we called this early, to prevent race conditions
             Process processInfo = await ServerApis.ServerProcessApi.GetProcessInfoAsync(
                 hathoraProcessIdEnvVar, 
+                _returnNullOnStoppedProcess: true,
                 _cancelToken);
             
-            string procId = processInfo.ProcessId;
-            if (string.IsNullOrEmpty(procId) || _cancelToken.IsCancellationRequested)
-                return null;
+            string procId = processInfo?.ProcessId;
             
-            serverContext.ProcessInfo = processInfo;
+            if (_cancelToken.IsCancellationRequested)
+            {
+                Debug.LogError($"{logPrefix} Cancelled - `OnInitialized` event will !trigger");
+                return null;
+            }
+            if (string.IsNullOrEmpty(procId))
+            {
+                string errMsg = $"{logPrefix} !Process";
+
+                // Are we debugging in the Editor? Add +info
+                bool isMockDebuggingInEditor = UnityEngine.Application.isEditor && 
+                    !string.IsNullOrEmpty(debugEditorMockProcId);
+                if (isMockDebuggingInEditor)
+                    errMsg += " <b>Since isEditor && debugEditorMockProcId, `your HathoraServerMgr.debugEditorMockProcId` " +
+                        "is likely stale.</b> Create a new Room -> Update your `debugEditorMockProcId` -> try again.";
+                
+                Debug.LogError(errMsg);
+                return null;
+            }
+            
+            tempServerContext.ProcessInfo = processInfo;
 
             // ----------------
             // Get all active Rooms by ProcessId =>
@@ -321,39 +342,57 @@ namespace Hathora.Core.Scripts.Runtime.Server
 
             // Get 1st Room -> validate
             PickRoomExcludeKeyofRoomAllocations firstActiveRoom = activeRooms?.FirstOrDefault();
-            if (firstActiveRoom == null || _cancelToken.IsCancellationRequested)
+            
+            if (_cancelToken.IsCancellationRequested)
             {
-                Debug.LogError(_cancelToken.IsCancellationRequested 
-                    ? "Cancelled" 
-                    : "!firstActiveRoom");
-                
+                Debug.LogError($"{logPrefix} Cancelled - `OnInitialized` event will !trigger");
+                return null;
+            }
+            if (firstActiveRoom == null)
+            {
+                Debug.LogError($"{logPrefix} !Room");
                 return null;
             }
 
-            serverContext.ActiveRoomsForProcess = activeRooms;
+            tempServerContext.ActiveRoomsForProcess = activeRooms;
 			
             // ----------------
-            // We have Room info, but we need Lobby: Get from RoomId =>
-            Lobby lobby = await ServerApis.ServerLobbyApi.GetLobbyInfoAsync(
-                firstActiveRoom.RoomId,
-                _cancelToken);
+            // We have Room info, but we *may* need Lobby: Get from RoomId =>
+            Lobby lobby = null;
+            try
+            {
+                // Try catch since we may not have a Lobby, which could be ok
+                lobby = await ServerApis.ServerLobbyApi.GetLobbyInfoAsync(
+                    firstActiveRoom.RoomId,
+                    _cancelToken);
+            }
+            catch (Exception e)
+            {
+                // Should 404 if !Lobby, returning null
+                if (_throwErrIfNoLobby)
+                {
+                    Debug.LogError($"Error: {e}");
+                    throw;
+                }
+                
+                Debug.Log($"{logPrefix} <b>!Lobby, but likely expected</b> " +
+                    "(since !_throwErrIfNoLobby) - continuing...");
+            }
 
             if (_cancelToken.IsCancellationRequested)
             {
                 Debug.LogError("Cancelled");
                 return null;
             }
-            if (lobby == null && _throwErrIfNoLobby)
-            {
-                Debug.LogError("!lobby");
-                return null;
-            }
             
-            serverContext.Lobby = lobby;
+            tempServerContext.Lobby = lobby;
 
+            // ----------------
             // Done
-            OnInitializedEvent?.Invoke(serverContext);
-            return serverContext;
+            Debug.Log($"{logPrefix} Done");
+            this.serverContext = tempServerContext;
+            OnInitializedEvent?.Invoke(tempServerContext);
+            return tempServerContext;
         }
         #endregion // Chained API calls outside Init
     }
