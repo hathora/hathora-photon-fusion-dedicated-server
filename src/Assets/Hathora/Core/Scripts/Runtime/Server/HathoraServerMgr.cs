@@ -66,81 +66,16 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// - Publicly get via awaiting _GetServerContext()
         /// </summary>
         private volatile HathoraServerContext serverContext;
-
-        /// <summary>
-        /// Set @ Awake async, chained through 3 API calls -- this is async to prevent race conditions.
-        /// - If UNITY_SERVER: While !null, delay 0.1s until !null
-        /// - If !UNITY_SERVER: Return null - this is only for deployed Hathora servers
-        /// - Timeout after 10s
-        /// - TODO: Add a Coroutine friendly alternative
-        /// </summary>
-        /// <returns></returns>
-        public async Task<HathoraServerContext> GetCachedServerContextAsync()
-        {
-            CancellationTokenSource cts = new();
-            cts.CancelAfter(TimeSpan.FromSeconds(10));
-            
-            if (serverContext != null)
-                return serverContext;
-
-            // We're probably still gathering the data => await for up to 10s
-            string logPrefix = "[HathoraServerMgr._GetServerContext]";
-            Debug.Log($"{logPrefix} <color=orange>(!)</color> serverContext == null: " +
-                "Awaiting up to 10s for val set async");
-            
-            while (serverContext == null)
-            {
-                if (cts.IsCancellationRequested)
-                {
-                    Debug.LogError($"{logPrefix} Timed out after 10s");
-                    return null;
-                }
-                
-                await Task.Delay(TimeSpan.FromSeconds(0.5), cts.Token);
-            }
-
-            return serverContext;
-        }
         
-        /// <summary>
-        /// [Coroutine Workaround] Set @ Awake async, chained through 3 API calls -
-        /// This is async to prevent race conditions. Coroutine variant.
-        /// - If UNITY_SERVER: While !null, delay 0.1s until !null
-        /// - If !UNITY_SERVER: Return null - this is only for deployed Hathora servers
-        /// - Timeout after 10s
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator _GetServerContext()
-        {
-            CancellationTokenSource cts = new();
-            cts.CancelAfter(TimeSpan.FromSeconds(10));
-            
-            if (serverContext != null)
-                return serverContext;
-
-            // We're probably still gathering the data => await for up to 10s
-            string logPrefix = "[HathoraServerMgr._GetServerContext]";
-            Debug.Log($"{logPrefix} <color=orange>(!)</color> serverContext == null: " +
-                "Awaiting up to 10s for val set async");
-            
-            while (serverContext == null)
-            {
-                if (cts.IsCancellationRequested)
-                {
-                    Debug.LogError($"{logPrefix} Timed out after 10s");
-                    return null;
-                }
-                
-                await Task.Delay(TimeSpan.FromSeconds(0.5), cts.Token);
-            }
-
-            return serverContext;
-        }
         
         /// <summary>Set @ Awake, and only if deployed on Hathora</summary>
         private string hathoraProcessIdEnvVar;
         
-        private bool hasHathoraProcessIdEnvVar =>
+        /// <summary>
+        /// This will only be true if we're deployed on Hathora, by verifying
+        /// a special env var ("HATHORA_PROCESS_ID").
+        /// </summary>
+        public bool IsDeployedOnHathoraHasProcessIdEnvVar =>
             !string.IsNullOrEmpty(hathoraProcessIdEnvVar);
         
         public static event Action<HathoraServerContext> OnInitializedEvent;
@@ -253,13 +188,93 @@ namespace Hathora.Core.Scripts.Runtime.Server
         #endregion // Init
         
         
+        #region ServerContext Getters
+        /// <summary>
+        /// Set @ Awake async, chained through 3 API calls - async to prevent race conditions.
+        /// - If UNITY_SERVER: While !null, delay 0.1s until !null
+        /// - If !UNITY_SERVER: Return cached null - this is only for deployed Hathora servers
+        /// - Timeout after 10s
+        /// </summary>
+        /// <returns></returns>
+        public async Task<HathoraServerContext> GetCachedServerContextAsync(
+            CancellationToken _cancelToken = default)
+        {
+            #if !UNITY_SERVER
+            return null; // For headless servers deployed on Hathora only
+            #endif
+            
+            using CancellationTokenSource cts = new();
+            cts.CancelAfter(TimeSpan.FromSeconds(10));
+            
+            if (serverContext != null)
+                return serverContext;
+
+            // We're probably still gathering the data => await for up to 10s
+            string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetCachedServerContextAsync)}]";
+            Debug.Log($"{logPrefix} <color=orange>(!)</color> serverContext == null: " +
+                "Awaiting up to 10s for val set async");
+            
+            return await waitForServerContextAsync(cts.Token);
+        }
+        
+        /// <summary>
+        /// [Coroutine alternative to async/await] Set @ Awake async, chained through 3 API calls -
+        /// Async to prevent race conditions.
+        /// - If UNITY_SERVER: While !null, delay 0.1s until !null
+        /// - If !UNITY_SERVER: Return null - this is only for deployed Hathora servers
+        /// - Timeout after 10s
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator GetCachedServerContextCoroutine(Action<HathoraServerContext> _callback)
+        {
+            Task<HathoraServerContext> task = GetCachedServerContextAsync();
+
+            // Wait until the task is completed
+            while (!task.IsCompleted)
+                yield return null; // Wait for the next frame
+
+            // Handle any exceptions that were thrown by the task
+            if (task.IsFaulted)
+            {
+                string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetCachedServerContextCoroutine)}]";
+                Debug.LogError($"{logPrefix} An error occurred while getting the server context: {task.Exception}");
+            }
+            else
+            {
+                // Retrieve the result and invoke the callback
+                HathoraServerContext result = task.Result;
+                _callback?.Invoke(result);
+            }
+        }
+
+        private async Task<HathoraServerContext> waitForServerContextAsync(CancellationToken _cancelToken)
+        {
+            while (serverContext == null)
+            {
+                if (_cancelToken.IsCancellationRequested)
+                {
+                    string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetCachedServerContextCoroutine)}]";
+                    Debug.LogError($"{logPrefix} Timed out after 10s");
+                    return null;
+                }
+                
+                await Task.Delay(TimeSpan.FromSeconds(0.1), _cancelToken);
+            }
+
+            return serverContext;
+        }
+        #endregion // ServerContext Getters
+        
+        
         #region Chained API calls outside Init
         /// <summary>
         /// If Deployed (not localhost), get HathoraServerContext: { Room, Process, [Lobby], utils }.
+        /// - (!) If cached info is ok, instead call `GetCachedHathoraServerContextAsync()`.
         /// - Servers deployed in Hathora will have a special env var containing the ProcessId (HATHORA_PROCESS_ID).
         /// - If env var exists, we're deployed in Hathora.
-        /// - Note the GetLobbyInitConfig() util: Parse this `object` to your own model.
+        /// - Note the result GetLobbyInitConfig() util: Parse this `object` to your own model.
         /// - Calls automatically @ Awake => triggers `OnInitializedEvent` on success.
+        /// - Caches locally @ serverContext; public get via GetCachedServerContextAsync().
         /// </summary>
         /// <param name="_throwErrIfNoLobby"></param>
         /// <param name="_cancelToken"></param>
@@ -271,7 +286,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContext)}";
             Debug.Log($"{logPrefix} Start");
 
-            if (!hasHathoraProcessIdEnvVar)
+            if (!IsDeployedOnHathoraHasProcessIdEnvVar)
             {
                 #if UNITY_SERVER && !UNITY_EDITOR
                 Debug.LogError($"{logPrefix} !serverDeployedProcessId; ensure: " +

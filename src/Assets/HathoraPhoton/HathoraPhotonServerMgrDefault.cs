@@ -69,7 +69,7 @@ namespace HathoraPhoton
             // ##################################################################################################
 
             // deployInffo.Lobby will be null (expected)
-            HathoraServerContext serverContext = await hathoraServerMgr.ServerContext
+            HathoraServerContext serverContext = await hathoraServerMgr.GetCachedServerContextAsync();
 
             string deployErrMsg = $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +
@@ -97,9 +97,9 @@ namespace HathoraPhoton
                 "expected hasHathoraServerConfig: Did you serialize your selected " +
                 "config? Create/find a config via top menu: `Hathora/ConfigFinder` or via `Assets/Hathora/`");
 
-            bool isServerDeployedOnHathora = hathoraServerMgr.HasServerDeployedProcessId;
-            Assert.IsTrue(isServerDeployedOnHathora, $"{logPrefix} hasHathoraServerConfig, but " +
-                "Expected isServerDeployedOnHathora: If you're trying to mock a deployed Server as localhost: " +
+            bool isServerDeployedOnHathora = hathoraServerMgr.IsDeployedOnHathoraHasProcessIdEnvVar;
+            Assert.IsTrue(isServerDeployedOnHathora, $"{logPrefix} {nameof(hathoraServerMgr.IsDeployedOnHathoraHasProcessIdEnvVar)}, " +
+                "but Expected isServerDeployedOnHathora: If you're trying to mock a deployed Server as localhost: " +
                 "(1) Create a Room via HathoraServerConfig (or via web console) and await ready => " +
                 "(2) Copy the `ProcessId` from the Hathora web console next to the new Room => " +
                 "(3) Paste the ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId` " +
