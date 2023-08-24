@@ -1,10 +1,13 @@
 // Created by dylan@hathora.dev
 
 using System;
+using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Fusion;
-using Hathora.Demos.Shared.Scripts.Common;
+using Fusion.Sockets;
+using Hathora.Cloud.Sdk.Model;
+using Hathora.Core.Scripts.Runtime.Client;
 using UnityEngine;
-using Assert = UnityEngine.Assertions.Assert;
 
 namespace HathoraPhoton
 {
@@ -19,35 +22,22 @@ namespace HathoraPhoton
     /// - Base contains events like: OnClientStarted, OnClientStopped.
     /// - Base tracks `ClientState` like: Stopped, Starting, Started.
     /// </summary>
-    public class PhotonStateMgr : NetworkMgrStateTracker
+    public class PhotonStateMgr : MonoBehaviour, INetworkRunnerCallbacks
     {
         #region vars
         /// <summary>
         /// `New` keyword overrides base Singleton when accessing child directly.
         /// </summary>
-        public new static PhotonStateMgr Singleton { get; private set; }
+        public static PhotonStateMgr Singleton { get; private set; }
         #endregion // vars
 
         
         #region Init
         /// <summary>Set Singleton instance</summary>
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake(); // Sets base singleton
+            Debug.Log($"[{nameof(PhotonStateMgr)}] Awake");
             setSingleton();
-        }
-
-        /// <summary>Subscribe to NetworkManager Client state changes</summary>
-        protected override void Start()
-        {
-            base.Start();
-            subToPhotonStateEvents();
-        }
-
-        /// <summary>FishNet has a singular event tracker enum.</summary>
-        private void subToPhotonStateEvents()
-        {
-            throw new NotImplementedException("TODO: subToPhotonStateEvents");
         }
 
         /// <summary>Allow this script to be called from anywhere.</summary>
@@ -101,7 +91,7 @@ namespace HathoraPhoton
             string logPrefix = $"[{nameof(PhotonStateMgr)}] {nameof(StartClient)}]"; 
             Debug.Log($"{logPrefix} Start");
             
-            (string hostNameOrIp, ushort port) hostPortContainer = SplitPortFromHostOrIp(_hostPort);
+            (string hostNameOrIp, ushort port) hostPortContainer = splitPortFromHostOrIp(_hostPort);
             bool hasHost = !string.IsNullOrEmpty(hostPortContainer.hostNameOrIp);
             bool hasPort = hostPortContainer.port > 0;
 
@@ -169,7 +159,7 @@ namespace HathoraPhoton
         /// </returns>
         public bool StartClientFromHathoraLobbySession()
         {
-            string hostPort = GetHathoraSessionHostPort();
+            string hostPort = getHathoraSessionHostPort();
             return StartClient(hostPort);
         }
 
@@ -194,41 +184,127 @@ namespace HathoraPhoton
         #endregion // NetworkManager Client
         
 
-        #region Common Utils
-        // TODO: Find how to subscribe to the Photon state. Fishnet example below.
-        // private void OnClientConnectionState(ClientConnectionStateArgs _state)
-        // {
-        //     localConnectionState = _state.ConnectionState;
-        //     Debug.Log($"[HathoraFishnetClient.OnClientConnectionState] " +
-        //         $"New state: {localConnectionState}");
-        //     
-        //     switch (localConnectionState)
-        //     {
-        //         case LocalConnectionState.Starting:
-        //             base.OnClientStarting();
-        //             break;
-        //
-        //         // onConnectSuccess?
-        //         case LocalConnectionState.Started:
-        //             base.OnClientStarted();
-        //             break;
-        //         
-        //         case LocalConnectionState.Stopped:
-        //             // Failed to connect, or stopped cleanly?
-        //             if (base.ClientState == ClientTrackedState.Connecting)
-        //                 base.OnStartClientFail(CONNECTION_STOPPED_FRIENDLY_STR);
-        //             else
-        //                 base.OnClientStopped();
-        //             
-        //             break;
-        //     }
-        // }
-        #endregion // Common Utils
+        #region Photon OnState Callbacks
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+        }
 
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+        }
 
+        public void OnInput(NetworkRunner runner, NetworkInput input)
+        {
+        }
+
+        public void OnInputMissing(
+            NetworkRunner runner,
+            PlayerRef player,
+            NetworkInput input)
+        {
+        }
+
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        {
+        }
+
+        public void OnConnectedToServer(NetworkRunner runner)
+        {
+        }
+
+        public void OnDisconnectedFromServer(NetworkRunner runner)
+        {
+        }
+
+        public void OnConnectRequest(
+            NetworkRunner runner,
+            NetworkRunnerCallbackArgs.ConnectRequest request,
+            byte[] token)
+        {
+        }
+
+        public void OnConnectFailed(
+            NetworkRunner runner,
+            NetAddress remoteAddress,
+            NetConnectFailedReason reason)
+        {
+        }
+
+        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
+        {
+        }
+
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
+        }
+
+        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+        {
+        }
+
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        {
+        }
+
+        public void OnReliableDataReceived(
+            NetworkRunner runner,
+            PlayerRef player,
+            ArraySegment<byte> data)
+        {
+        }
+
+        public void OnSceneLoadDone(NetworkRunner runner)
+        {
+        }
+
+        public void OnSceneLoadStart(NetworkRunner runner)
+        {
+        }
+        #endregion // Photon OnState Callbacks
+        
+        
+        #region Hathora
+        /// <summary>
+        /// Get the last queried "host:port" from a Hathora Client session.
+        /// - From `HathoraClientSession.ServerConnectionInfo.ExposedPort`.
+        /// </summary>
+        private string getHathoraSessionHostPort()
+        {
+            ExposedPort connectInfo = HathoraClientSession.Singleton.ServerConnectionInfo.ExposedPort;
+
+            string hostPort = $"{connectInfo.Host}:{connectInfo.Port}";
+            return hostPort;
+        }
+        #endregion Hathora
+        
+        
+        #region Utils
+        /// <summary>
+        /// This was likely passed in from the UI to override the default
+        /// NetworkManager (often from Standalone Client). Eg:
+        /// "1.proxy.hathora.dev:12345" -> "1.proxy.hathora.dev", 12345
+        /// </summary>
+        /// <param name="_hostPort"></param>
+        /// <returns></returns>
+        private static (string hostNameOrIp, ushort port) splitPortFromHostOrIp(string _hostPort)
+        {
+            if (string.IsNullOrEmpty(_hostPort))
+                return default;
+            
+            string[] hostPortArr = _hostPort.Split(':');
+            string hostNameOrIp = hostPortArr[0];
+            ushort port = ushort.Parse(hostPortArr[1]);
+            
+            return (hostNameOrIp, port);
+        }
+        #endregion // Utils
+
+        
+        #region Cleanup
         private void OnDestroy()
         {
             // TODO: Unsub to events
         }
+        #endregion // Cleanup
     }
 }

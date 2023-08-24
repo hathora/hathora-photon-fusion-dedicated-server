@@ -75,7 +75,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// This will only be true if we're deployed on Hathora, by verifying
         /// a special env var ("HATHORA_PROCESS_ID").
         /// </summary>
-        public bool IsDeployedOnHathoraHasProcessIdEnvVar =>
+        public bool IsDeployedOnHathora =>
             !string.IsNullOrEmpty(hathoraProcessIdEnvVar);
         
         public static event Action<HathoraServerContext> OnInitializedEvent;
@@ -199,9 +199,11 @@ namespace Hathora.Core.Scripts.Runtime.Server
         public async Task<HathoraServerContext> GetCachedServerContextAsync(
             CancellationToken _cancelToken = default)
         {
-            #if !UNITY_SERVER
-            return null; // For headless servers deployed on Hathora only
-            #endif
+#if !UNITY_SERVER
+            bool isMockTesting = !string.IsNullOrEmpty(debugEditorMockProcId);
+            if (!isMockTesting)
+                return null; // For headless servers deployed on Hathora only (and !mock testing)
+#endif
             
             using CancellationTokenSource cts = new();
             cts.CancelAfter(TimeSpan.FromSeconds(10));
@@ -283,10 +285,10 @@ namespace Hathora.Core.Scripts.Runtime.Server
             bool _throwErrIfNoLobby,
             CancellationToken _cancelToken = default)
         {
-            string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContext)}";
+            string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContext)}]";
             Debug.Log($"{logPrefix} Start");
 
-            if (!IsDeployedOnHathoraHasProcessIdEnvVar)
+            if (!IsDeployedOnHathora)
             {
                 #if UNITY_SERVER && !UNITY_EDITOR
                 Debug.LogError($"{logPrefix} !serverDeployedProcessId; ensure: " +

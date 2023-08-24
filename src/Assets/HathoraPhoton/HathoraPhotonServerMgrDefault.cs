@@ -40,8 +40,8 @@ namespace HathoraPhoton
 #endif
             
             // Allow us to debug Server (instead of just Client) within the Editor
-            bool isEditorServer = Application.isEditor && editorStartType == EditorStartType.Server;
-            if (isEditorServer)
+            bool isEditorMockedAsServer = Application.isEditor && editorStartType == EditorStartType.Server;
+            if (isEditorMockedAsServer)
                 await LoadGameAsDedicatedServer();
             else
                 LoadMenuAsClient();
@@ -97,13 +97,13 @@ namespace HathoraPhoton
                 "expected hasHathoraServerConfig: Did you serialize your selected " +
                 "config? Create/find a config via top menu: `Hathora/ConfigFinder` or via `Assets/Hathora/`");
 
-            bool isServerDeployedOnHathora = hathoraServerMgr.IsDeployedOnHathoraHasProcessIdEnvVar;
-            Assert.IsTrue(isServerDeployedOnHathora, $"{logPrefix} {nameof(hathoraServerMgr.IsDeployedOnHathoraHasProcessIdEnvVar)}, " +
-                "but Expected isServerDeployedOnHathora: If you're trying to mock a deployed Server as localhost: " +
-                "(1) Create a Room via HathoraServerConfig (or via web console) and await ready => " +
-                "(2) Copy the `ProcessId` from the Hathora web console next to the new Room => " +
-                "(3) Paste the ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId` " +
-                "(you only have 5m before the server Room Process idles out) => " +
+            bool isServerDeployedOnHathora = hathoraServerMgr.IsDeployedOnHathora;
+            Assert.IsTrue(isServerDeployedOnHathora, $"{logPrefix} {nameof(hathoraServerMgr.IsDeployedOnHathora)}, " +
+                "but Expected isServerDeployedOnHathora: If you're trying to mock a deployed Server as localhost:\n" +
+                "(1) Create a Room via HathoraServerConfig (or via web console) and await ready =>\n" +
+                "(2) Copy the `ProcessId` from the Hathora web console next to the new Room =>\n" +
+                "(3) Paste the `ProcessId` to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId` " +
+                "(you only have 5m before the server Room Process idles out) =>\n" +
                 "This will go through the flow of getting Process=>Room=>Lobby");
         }
     }
