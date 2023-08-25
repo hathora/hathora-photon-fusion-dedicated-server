@@ -96,11 +96,9 @@ namespace HathoraPhoton
             string deployErrMsg = $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +
                 "Inactive Processes despawn in 5m - perhaps timed out?";
-            Assert.IsNotNull(hathoraServerContext, deployErrMsg);
-            Assert.IsTrue(hathoraServerContext.CheckIsValid(EXPECTING_HATHORA_LOBBY), 
-                deployErrMsg); // TODO: Should we expect lobby later?
+            Assert.IsNotNull(hathoraServerContext?.FirstRoomServerContext, deployErrMsg);
             
-            // Ready
+            // Hathora server is ready - now init Photon dedicated server logic
             _ = startPhotonDedicatedServer(hathoraServerContext);   
         }
         
@@ -116,7 +114,7 @@ namespace HathoraPhoton
             
             #region Hathora Edits
             // Set public ip:port
-            (IPAddress ip, ushort port) ipPort = await hathoraServerContext.GetHathoraServerIpPortAsync();
+            (IPAddress ip, ushort port) ipPort = await hathoraServerContext.FirstRoomServerContext.GetConnectionInfoIpPortAsync();
             config.PublicIP = ipPort.ip.ToString();
             config.PublicPort = ipPort.port;
             
