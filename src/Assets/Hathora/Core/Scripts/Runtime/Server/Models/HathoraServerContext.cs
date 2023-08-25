@@ -1,13 +1,9 @@
 // Created by dylan@hathora.dev
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Hathora.Cloud.Sdk.Model;
-using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Hathora.Core.Scripts.Runtime.Server.Models
 {
@@ -20,15 +16,15 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
     public class HathoraServerContext
     {
         #region Vars
-        public string EnvVarProcessId { get; private set; }
-        public Process ProcessInfo { get; set; }
-        public List<PickRoomExcludeKeyofRoomAllocations> ActiveRoomsForProcess { get; set; }
+        public string EnvVarProcessId { get; }
+        public Process ProcessInfo { get; }
+        public List<PickRoomExcludeKeyofRoomAllocations> ActiveRoomsForProcess { get; }
         
         /// <summary>
         /// Contains the Room + ConnectionInfo (host/ip/port) of the 1st active Room.
         /// - For info other than the 1st, iterate ActiveRoomsForProcess through HathoraServerMgr Room api.
         /// </summary>
-        private RoomServerContext FirstRoomServerContext { get; set; }
+        public RoomServerContext FirstRoomServerContext { get; }
         #endregion // Vars
         
 
