@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hathora.Cloud.Sdk.Model;
-using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -15,7 +14,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
     /// <summary>
     /// Result model for HathoraServerMgr.GetHathoraServerContextAsync().
     /// - Can get Hathora Process, Room, [Lobby].
-    /// - Can quick check if valid via `CheckIsValid`.
+    /// - Can quick check if valid via `CheckIsValidActiveRoom`.
     /// - Contains utils to get "host:port" || "ip:port".
     /// </summary>
     public class HathoraServerContext
@@ -23,137 +22,45 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
         #region Vars
         public string EnvVarProcessId { get; private set; }
         public Process ProcessInfo { get; set; }
-        public Lobby Lobby { get; set; }
         public List<PickRoomExcludeKeyofRoomAllocations> ActiveRoomsForProcess { get; set; }
+        
+        /// <summary>
+        /// Contains the Room + ConnectionInfo (host/ip/port) of the 1st active Room.
+        /// - For info other than the 1st, iterate ActiveRoomsForProcess through HathoraServerMgr Room api.
+        /// </summary>
+        private RoomServerContext FirstRoomServerContext { get; set; }
         #endregion // Vars
         
 
         #region Utils
-        public bool HasPort => ProcessInfo?.ExposedPort?.Port > 0;
-        
-        /// <summary>
-        /// Return host:port sync (opposed to GetHathoraServerIpPort async).
-        /// </summary>
-        /// <returns></returns>
-        public (string host, ushort port) GetHathoraServerHostPort()
-        {
-            ExposedPort connectInfo = ProcessInfo?.ExposedPort;
-
-            if (connectInfo == null)
-                return default;
-
-            ushort port = (ushort)connectInfo.Port;
-            return (connectInfo.Host, port);
-        }
-        
-        /// <summary>
-        /// Async since we use Dns to translate the Host to IP.
-        /// </summary>
-        /// <returns></returns>
-        public async Task<(IPAddress ip, ushort port)> GetHathoraServerIpPortAsync()
-        {
-            string logPrefix = $"[{nameof(HathoraServerContext)}.{nameof(GetHathoraServerIpPortAsync)}]";
-            
-            (IPAddress ip, ushort port) ipPort;
-            
-            ExposedPort connectInfo = ProcessInfo?.ExposedPort;
-
-            if (connectInfo == null)
-            {
-                Debug.LogError($"{logPrefix} !connectInfo from ProcessInfo.ExposedPort");
-                return default;
-            }
-            
-            ipPort.port = (ushort)connectInfo.Port;
-
-            try
-            {
-                ipPort.ip = await HathoraUtils.ConvertHostToIpAddress(connectInfo.Host);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"{logPrefix} ConvertHostToIpAddress => Error: {e}");
-                throw;
-            }
-
-            return ipPort;
-        }
-        
-        public PickRoomExcludeKeyofRoomAllocations FirstActiveRoomForProcess => 
-            ActiveRoomsForProcess?.FirstOrDefault();
-
-        /// <summary>Checks for (Process, Room and Lobby) != null.</summary>
-        /// <returns>isValid</returns>
-        public bool CheckIsValid(bool _expectingLobby) =>
-            ProcessInfo != null &&
-            ProcessInfo.StoppingAt == null &&
-            FirstActiveRoomForProcess != null &&
-            (!_expectingLobby || Lobby != null);
-
-        /// <summary>
-        /// You probably want to parse the InitialConfig to your own model.
-        /// </summary>
-        /// <typeparam name="TInitConfig"></typeparam>
-        /// <returns></returns>
-        public TInitConfig GetLobbyInitConfig<TInitConfig>()
-        {
-            string logPrefix = $"[{nameof(HathoraServerContext)}.{nameof(GetLobbyInitConfig)}]";
-
-            object initConfigObj = Lobby?.InitialConfig;
-            if (initConfigObj == null)
-            {
-                Debug.LogError($"{logPrefix} !initConfigObj");
-                return default;
-            }
-
-            try
-            {
-                string jsonString = initConfigObj as string;
-                
-                if (string.IsNullOrEmpty(jsonString))
-                {
-                    Debug.LogError($"{logPrefix} !jsonString");
-                    return default;
-                }
-                
-                TInitConfig initConfigParsed = JsonConvert.DeserializeObject<TInitConfig>(jsonString);
-                return initConfigParsed;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"{logPrefix} Error parsing initConfigObj: {e}");
-                throw;
-            }
-        }
-
         /// <summary>
         /// Return debug log info:
-        /// - IsValid, ProcessInfo, FirstActiveRoomForProcess, [Lobby], hostPort, ipPort
+        /// - IsValid, FirstRoomServerContext { IsValid, ConnectionInfo, RoomInfo, hostPort, ipPort, [Lobby] }.
         /// - Async to get IP info (uses async DNS namespace).
         /// </summary>
         /// <returns></returns>
         public async Task<string> GetDebugSummary()
         {
-            (IPAddress ip, ushort port) ipPort = await GetHathoraServerIpPortAsync();
-            string ipPortStr = $"{ipPort.ip}:{ipPort.port}";
-
-            (string host, ushort port) hostPort = GetHathoraServerHostPort();
-            string hostPortStr = $"{hostPort.host}:{hostPort.port}";
-
+            string firstRoomServerContextDebugSummary = await FirstRoomServerContext.GetDebugSummary();
+            
             return "\n--------------------------\n" +
-                $"IsValid: `{CheckIsValid(_expectingLobby: Lobby != null)}`,\n" +
+                $"ConnectionInfo: `{ProcessInfo.ToJson() ?? "null"}`,\n" +
                 "--------------------------\n" +
-                $"ProcessInfo: `{ProcessInfo.ToJson() ?? "null"}`,\n" +
-                "--------------------------\n" +
-                $"FirstActiveRoomForProcess: `{FirstActiveRoomForProcess.ToJson() ?? "null"}`,\n" +
-                "--------------------------\n" +
-                $"Lobby: `{Lobby?.ToJson() ?? "null"}`,\n" +
-                "--------------------------\n" +
-                $"hostPort: `{hostPortStr}`,\n" +
-                "--------------------------\n" +
-                $"ipPort: `{ipPortStr}`,\n" +
+                $"FirstRoomServerContext: `{firstRoomServerContextDebugSummary}`,\n" +
                 "--------------------------\n";
         }
+        
+        /// <summary>
+        /// Checks for:
+        /// - Valid ProcessInfo
+        /// - At least 1 valid + Active Room
+        /// - [Optionally, checks for a Lobby, if expecting one]
+        /// </summary>
+        /// <returns>isValid</returns>
+        public bool CheckIsValidServerContext(bool _expectingLobby) =>
+            ProcessInfo != null &&
+            FirstRoomServerContext != null &&
+            FirstRoomServerContext.CheckIsValidActiveRoom(_expectingLobby);
         #endregion // Utils
 
         
@@ -163,16 +70,30 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
             this.EnvVarProcessId = _envVarProcessId;
         }
 
+        /// <summary>
+        /// Set at HathoraServerMgr.GetHathoraServerContextAsync().
+        /// </summary>
+        /// <param name="_envVarProcessId"></param>
+        /// <param name="_processInfo"></param>
+        /// <param name="_activeRoomsForProcess"></param>
+        /// <param name="_firstRoomConnectionInfo"></param>
+        /// <param name="_firstRoomLobby"></param>
         public HathoraServerContext(
             string _envVarProcessId,
             Process _processInfo,
             List<PickRoomExcludeKeyofRoomAllocations> _activeRoomsForProcess,
-            Lobby _lobby)
+            ConnectionInfoV2 _firstRoomConnectionInfo,
+            Lobby _firstRoomLobby)
         {
             this.EnvVarProcessId = _envVarProcessId;
             this.ProcessInfo = _processInfo;
             this.ActiveRoomsForProcess = _activeRoomsForProcess;
-            this.Lobby = _lobby;
+
+            PickRoomExcludeKeyofRoomAllocations firstRoom = ActiveRoomsForProcess.FirstOrDefault();
+            this.FirstRoomServerContext = new RoomServerContext(
+                firstRoom, 
+                _firstRoomConnectionInfo,
+                _lobby: _firstRoomLobby);
         }
         #endregion // Constructors
     }
