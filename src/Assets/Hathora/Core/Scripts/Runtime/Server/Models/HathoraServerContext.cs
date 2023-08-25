@@ -125,6 +125,35 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
                 throw;
             }
         }
+
+        /// <summary>
+        /// Return debug log info:
+        /// - IsValid, ProcessInfo, FirstActiveRoomForProcess, [Lobby], hostPort, ipPort
+        /// - Async to get IP info (uses async DNS namespace).
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetDebugSummary()
+        {
+            (IPAddress ip, ushort port) ipPort = await GetHathoraServerIpPortAsync();
+            string ipPortStr = $"{ipPort.ip}:{ipPort.port}";
+
+            (string host, ushort port) hostPort = GetHathoraServerHostPort();
+            string hostPortStr = $"{hostPort.host}:{hostPort.port}";
+
+            return "\n--------------------------\n" +
+                $"IsValid: `{CheckIsValid(_expectingLobby: Lobby != null)}`,\n" +
+                "--------------------------\n" +
+                $"ProcessInfo: `{ProcessInfo.ToJson() ?? "null"}`,\n" +
+                "--------------------------\n" +
+                $"FirstActiveRoomForProcess: `{FirstActiveRoomForProcess.ToJson() ?? "null"}`,\n" +
+                "--------------------------\n" +
+                $"Lobby: `{Lobby?.ToJson() ?? "null"}`,\n" +
+                "--------------------------\n" +
+                $"hostPort: `{hostPortStr}`,\n" +
+                "--------------------------\n" +
+                $"ipPort: `{ipPortStr}`,\n" +
+                "--------------------------\n";
+        }
         #endregion // Utils
 
         

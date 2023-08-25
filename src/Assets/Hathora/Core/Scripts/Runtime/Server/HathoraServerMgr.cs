@@ -278,6 +278,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// - Note the result GetLobbyInitConfig() util: Parse this `object` to your own model.
         /// - Calls automatically @ Awake => triggers `OnInitializedEvent` on success.
         /// - Caches locally @ serverContext; public get via GetCachedServerContextAsync().
+        /// - Logs a verbose summary on success.
         /// </summary>
         /// <param name="_throwErrIfNoLobby">Be extra sure to try/catch this, if true</param>
         /// <param name="_cancelToken"></param>
@@ -389,7 +390,9 @@ namespace Hathora.Core.Scripts.Runtime.Server
 
             // ----------------
             // Done
-            Debug.Log($"{logPrefix} Done");
+            string summaryLogs = await tempServerContext.GetDebugSummary();
+            Debug.Log($"{logPrefix} Done. <b>Result Summary:</b> {summaryLogs}");
+            
             this.serverContext = tempServerContext;
             OnInitializedEvent?.Invoke(tempServerContext);
             return tempServerContext;
