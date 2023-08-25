@@ -36,14 +36,17 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
         #region Server Process Async Hathora SDK Calls
         /// <summary>
         /// `GetProcessInfo` wrapper: Get details for an existing process using appId and processId.
-        /// API Doc | https://hathora.dev/api#tag/ProcessesV1/operation/GetProcessInfo 
+        /// - API Doc | https://hathora.dev/api#tag/ProcessesV1/operation/GetProcessInfo 
         /// </summary>
         /// <param name="_processId">
         /// The process running the Room; find it in web console or GetRunningProcesses().
         /// </param>
         /// <param name="_returnNullOnStoppedProcess">If the Process stopped (no Rooms inside), just return null</param>
         /// <param name="_cancelToken"></param>
-        /// <returns>Returns Process on success</returns>
+        /// <returns>
+        /// Returns Process on success.
+        /// (!) Just because it's != null doesn't mean Rooms are active! Poll RoomApi.GetConnectionInfoAsync().
+        /// </returns>
         public async Task<Process> GetProcessInfoAsync(
             string _processId,
             bool _returnNullOnStoppedProcess = true,

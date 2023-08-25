@@ -197,7 +197,9 @@ namespace Hathora.Cloud.Sdk.Model
         /// <summary>
         /// Gets or Sets ExposedPort
         /// </summary>
-        [DataMember(Name = "exposedPort", EmitDefaultValue = false)]
+        [DataMember(Name = "exposedPort", EmitDefaultValue = false), 
+         Obsolete("Generally only used for Hathora's backend (for Docker Container purposes) -- " +
+             "instead, get the Room ConnectionInfo's ExposedPort for the actual host:port Room connection info.")]
         public ExposedPort ExposedPort { get; set; }
 
         /// <summary>
