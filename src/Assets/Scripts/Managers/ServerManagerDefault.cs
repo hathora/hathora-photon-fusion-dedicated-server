@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace Fusion.Sample.DedicatedServer
 {
-    [Obsolete("For the Hathora<>Fusion demo, instead use `HathoraPhotonServerMgrDefault`")]
+    [Obsolete("For the Hathora<>Fusion demo, instead use `HathoraPhotonServerMgr`")]
     public class ServerManagerDefault : ServerManagerBase
     {
 

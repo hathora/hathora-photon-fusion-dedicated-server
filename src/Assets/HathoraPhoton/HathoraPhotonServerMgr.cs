@@ -21,7 +21,7 @@ namespace HathoraPhoton
     /// - Added Editor debugging + Hathora logic to ServerManagerDefault.
     /// - (!) This does *not* create a Hathora Lobby; just a Room.
     /// </summary>
-    public class HathoraPhotonServerMgrDefault : ServerManagerBase
+    public class HathoraPhotonServerMgr : ServerManagerBase
     {
         #region vars
         private enum EditorStartType
@@ -59,7 +59,7 @@ namespace HathoraPhoton
         #region Init
         private void Awake()
         {
-            Debug.Log($"[{nameof(HathoraPhotonServerMgrDefault)}] Awake: " +
+            Debug.Log($"[{nameof(HathoraPhotonServerMgr)}] Awake: " +
                 $"canRunServerEvents? {canRunServerEvents}");
             
             if (!canRunServerEvents)
@@ -84,7 +84,7 @@ namespace HathoraPhoton
         /// <param name="hathoraServerContext"></param>
         private void onHathoraServerInitd(HathoraServerContext hathoraServerContext)
         {
-            string logPrefix = $"[{nameof(HathoraPhotonServerMgrDefault)}.{nameof(onHathoraServerInitd)}]";
+            string logPrefix = $"[{nameof(HathoraPhotonServerMgr)}.{nameof(onHathoraServerInitd)}]";
             
             // Validate
             assertHathoraDeployServerReqs();
@@ -102,7 +102,7 @@ namespace HathoraPhoton
         private async Task startPhotonDedicatedServer(HathoraServerContext hathoraServerContext)
         {
             // Continue with start the Dedicated Server
-            string logPrefix = $"[HathoraPhotonServerMgrDefault.{nameof(startPhotonDedicatedServer)}]";
+            string logPrefix = $"[HathoraPhotonServerMgr.{nameof(startPhotonDedicatedServer)}]";
             Debug.Log($"{logPrefix} (`2.Game` scene)");
             Application.targetFrameRate = 30;
 
@@ -156,7 +156,7 @@ namespace HathoraPhoton
         /// <summary>Load scene 1 (Menu) as Client</summary>
         private void startClient()
         {
-            Debug.Log($"[HathoraPhotonServerMgrDefault] {nameof(startClient)} (`1.Menu` scene)");
+            Debug.Log($"[HathoraPhotonServerMgr] {nameof(startClient)} (`1.Menu` scene)");
             SceneManager.LoadScene((int)SceneDefs.MENU, LoadSceneMode.Single);
         }
         #endregion // Init
@@ -166,7 +166,7 @@ namespace HathoraPhoton
         /// <summary>Throws if !valid with verbose instructions on how to fix the issue</summary>
         private void assertHathoraDeployServerReqs()
         {
-            string logPrefix = $"[HathoraPhotonServerMgrDefault.{nameof(assertHathoraDeployServerReqs)}]";
+            string logPrefix = $"[HathoraPhotonServerMgr.{nameof(assertHathoraDeployServerReqs)}]";
 
             bool isHathoraServerSerializedInScene = hathoraServerMgr; 
             Assert.IsTrue(isHathoraServerSerializedInScene, $"{logPrefix} !isHathoraServerSerializedInScene: " +
