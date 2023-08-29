@@ -103,7 +103,7 @@ namespace HathoraPhoton
         {
             // Continue with start the Dedicated Server
             string logPrefix = $"[HathoraPhotonServerMgr.{nameof(startPhotonDedicatedServer)}]";
-            Debug.Log($"{logPrefix} (`2.Game` scene)");
+            Debug.Log($"{logPrefix} `2.Game` scene");
             Application.targetFrameRate = 30;
 
             DedicatedServerConfig config = DedicatedServerConfig.Resolve();
@@ -111,15 +111,18 @@ namespace HathoraPhoton
             #region Hathora Edits
             // Set container (!public) port
             ushort containerPort = (ushort)hathoraServerMgr.HathoraServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber;
-            config.Port = containerPort; 
+            config.Port = containerPort; // 7777
             
             // Set public Room ip:port
-            (IPAddress ip, ushort port) roomIpPort = await hathoraServerContext.FirstRoomServerContext.GetConnectionInfoIpPortAsync();
+            (IPAddress ip, ushort port) roomIpPort = await hathoraServerContext
+                .FirstRoomServerContext.GetConnectionInfoIpPortAsync();
+            
             config.PublicIP = roomIpPort.ip.ToString();
             config.PublicPort = roomIpPort.port;
-            
-            Debug.Log($"{logPrefix} Used hathoraServerContext to set Photon public config.PublicIp and .PublicPort " +
-                $"to `{config.PublicIP}:{config.PublicPort}`");
+
+            Debug.Log($"{logPrefix} Used hathoraServerContext to set Photon `config`:\n" +
+                $"1. Internal bind container set to port: {config.Port}\n" +
+                $"2. Photon public config.PublicIp and .PublicPort set to ip:port: `{config.PublicIP}:{config.PublicPort}\n`");
             #endregion // Hathora Edits
             
             Debug.Log(config);

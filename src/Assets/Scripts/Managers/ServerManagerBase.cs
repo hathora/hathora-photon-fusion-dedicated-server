@@ -30,7 +30,7 @@ namespace Fusion.Sample.DedicatedServer {
       NetworkRunner runner,
       string SessionName,
       Dictionary<string, SessionProperty> customProps = null,
-      ushort port = 0,
+      ushort containerPort = 0,
       string customLobby = null,
       string customRegion = null,
       string customPublicIP = null,
@@ -47,6 +47,7 @@ namespace Fusion.Sample.DedicatedServer {
       // Build Custom External Addr
       NetAddress? externalAddr = null;
 
+      // Parse custom public IP
       if (string.IsNullOrEmpty(customPublicIP) == false && customPublicPort > 0) {
         if (IPAddress.TryParse(customPublicIP, out var _)) {
           externalAddr = NetAddress.CreateFromIpPort(customPublicIP, customPublicPort);
@@ -62,8 +63,8 @@ namespace Fusion.Sample.DedicatedServer {
         SceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
         Scene = (int)SceneDefs.GAME,
         SessionProperties = customProps,
-        Address = NetAddress.Any(port),
-        CustomPublicAddress = externalAddr,
+        Address = NetAddress.Any(containerPort), // RELAY: Pre-defined Local EndPoint & Automatic Public EndPoint
+        CustomPublicAddress = externalAddr, // DIRECT CONNECTION: For Hathora deployment as a dedicated server
         CustomLobbyName = customLobby,
         CustomPhotonAppSettings = photonSettings,
       });
