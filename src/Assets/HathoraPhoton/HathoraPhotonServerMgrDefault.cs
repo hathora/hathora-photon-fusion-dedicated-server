@@ -19,15 +19,11 @@ namespace HathoraPhoton
     /// - Added `|| UNITY_EDITOR` to `#if UNITY_SERVER` to allow optional Editor debugging as server.
     /// - Added server + client wrappers for clarity, since #if wrappers get confusing.
     /// - Added Editor debugging + Hathora logic to ServerManagerDefault.
+    /// - (!) This does *not* create a Hathora Lobby; just a Room.
     /// </summary>
     public class HathoraPhotonServerMgrDefault : ServerManagerBase
     {
         #region vars
-        /// <summary>
-        /// When we validate the HathoraServerContext, should we expect a Lobby to exist?
-        /// </summary>
-        private const bool EXPECTING_HATHORA_LOBBY = false;
-        
         private enum EditorStartType
         {
             Client,
@@ -113,10 +109,14 @@ namespace HathoraPhoton
             DedicatedServerConfig config = DedicatedServerConfig.Resolve();
             
             #region Hathora Edits
-            // Set public ip:port
-            (IPAddress ip, ushort port) ipPort = await hathoraServerContext.FirstRoomServerContext.GetConnectionInfoIpPortAsync();
-            config.PublicIP = ipPort.ip.ToString();
-            config.PublicPort = ipPort.port;
+            // Set container (!public) port
+            ushort containerPort = (ushort)hathoraServerMgr.HathoraServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber;
+            config.Port = containerPort; 
+            
+            // Set public Room ip:port
+            (IPAddress ip, ushort port) roomIpPort = await hathoraServerContext.FirstRoomServerContext.GetConnectionInfoIpPortAsync();
+            config.PublicIP = roomIpPort.ip.ToString();
+            config.PublicPort = roomIpPort.port;
             
             Debug.Log($"{logPrefix} Used hathoraServerContext to set Photon public config.PublicIp and .PublicPort " +
                 $"to `{config.PublicIP}:{config.PublicPort}`");
