@@ -19,7 +19,7 @@ MonoBehaviour:
     AppVersion: 
     UseNameServer: 1
     FixedRegion: 
-    Server: 
+    Server: 35.71.157.211
     Port: 0
     ProxyServer: 
     Protocol: 0
