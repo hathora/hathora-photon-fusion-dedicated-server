@@ -112,7 +112,7 @@ namespace HathoraPhoton
             #region Hathora Edits
             // Set container (!public) port
             ushort containerPort = (ushort)hathoraServerMgr.HathoraServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber;
-            config.Port = containerPort; // 7777
+            config.Port = containerPort; // Default == 7777
             
             // Set public Room ip:port
             (IPAddress ip, ushort port) roomIpPort = await hathoraServerContext
@@ -139,7 +139,8 @@ namespace HathoraPhoton
             }
             catch (Exception e)
             {
-                Debug.LogError($"{logPrefix} StartSimulation => Error: {e}");
+                Debug.LogError($"{logPrefix} StartSimulation => Error: {e.Message} " +
+                    $"// startGameResult=={result}");
                 throw;
             }
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
 using Fusion.Sample.DedicatedServer.Utils;
+using Hathora.Core.Scripts.Runtime.Server;
 
 namespace Fusion.Sample.DedicatedServer {
 
@@ -35,8 +36,10 @@ namespace Fusion.Sample.DedicatedServer {
       string customRegion = null,
       string customPublicIP = null,
       ushort customPublicPort = 0
-    ) {
-
+    )
+    {
+      string logPrefix = $"[{nameof(ServerManagerBase)}.{nameof(StartSimulation)}]";
+        
       // Build Custom Photon Config
       var photonSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
 
@@ -50,11 +53,16 @@ namespace Fusion.Sample.DedicatedServer {
       // Parse custom public IP
       if (string.IsNullOrEmpty(customPublicIP) == false && customPublicPort > 0) {
         if (IPAddress.TryParse(customPublicIP, out var _)) {
+          Log.Info($"{logPrefix} Preparing to parse ip:port from env vars: `{customPublicIP}:{customPublicPort}`");
           externalAddr = NetAddress.CreateFromIpPort(customPublicIP, customPublicPort);
         } else {
-          Log.Warn("Unable to parse 'Custom Public IP'");
+          Log.Error($"{logPrefix} Unable to parse 'Custom Public IP' - " +
+              "we may run as a relay instead of a direct connection");
         }
       }
+      
+      Log.Info($"{logPrefix} {nameof(externalAddr)} == `{externalAddr}` | " +
+          $"{nameof(containerPort)} == {containerPort}");
 
       // Start Runner
       return runner.StartGame(new StartGameArgs() {
@@ -63,8 +71,14 @@ namespace Fusion.Sample.DedicatedServer {
         SceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
         Scene = (int)SceneDefs.GAME,
         SessionProperties = customProps,
-        Address = NetAddress.Any(containerPort), // RELAY: Pre-defined Local EndPoint & Automatic Public EndPoint
-        CustomPublicAddress = externalAddr, // DIRECT CONNECTION: For Hathora deployment as a dedicated server
+        
+        #region >> Important for Hathora Deployment >>
+          
+        Address = NetAddress.Any(containerPort), // Default == 7777
+        CustomPublicAddress = externalAddr,
+        
+        #endregion // << Important for Hathora Deployment <<
+
         CustomLobbyName = customLobby,
         CustomPhotonAppSettings = photonSettings,
       });

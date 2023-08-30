@@ -329,16 +329,6 @@ namespace Hathora.Core.Scripts.Runtime.Server
             // Delay just 1 frame so the logs are closer to the bottom [Hathora Console workaround for max 1k logs viewed]
             await Task.Yield();
             
-            // ----------------
-            // Log projections from env vars only set on deployed Hathora server | https://hathora.dev/docs/guides/access-env-variables 
-            Debug.Log(
-                $"{logPrefix} Gathering verbose server context that should match similarly to deployed env vars:\n" +
-                $"{nameof(HathoraProcessIdEnvVar)}={HathoraProcessIdEnvVar},\n" +
-                // $"{nameof(hathoraAppSecretEnvVar)}={hathoraAppSecretEnvVar}\n"); // Uncomment to log your secret key (!recommended)
-                $"{nameof(HathoraRegionEnvVar)}={HathoraRegionEnvVar}\n" +
-                $"{nameof(HathoraPublicIpAddressEnvVar)}={HathoraPublicIpAddressEnvVar}\n" +
-                $"{nameof(HathoraPublicPortEnvVar)}={HathoraPublicPortEnvVar}\n");
-            
             if (!IsDeployedOnHathora)
             {
                 #if UNITY_SERVER && !UNITY_EDITOR
@@ -349,6 +339,15 @@ namespace Hathora.Core.Scripts.Runtime.Server
                 
                 return null;
             }
+            
+            // ----------------
+            // Log projections from env vars only set on deployed Hathora server | https://hathora.dev/docs/guides/access-env-variables 
+            Debug.Log($"{logPrefix} Gathering verbose server context that should match similarly to deployed env vars:\n" +
+                $"{nameof(HathoraProcessIdEnvVar)}={HathoraProcessIdEnvVar},\n" +
+                // $"{nameof(hathoraAppSecretEnvVar)}={hathoraAppSecretEnvVar}\n"); // Uncomment to log your secret key (!recommended)
+                $"{nameof(HathoraRegionEnvVar)}={HathoraRegionEnvVar}\n" +
+                $"{nameof(HathoraPublicIpAddressEnvVar)}={HathoraPublicIpAddressEnvVar}\n" +
+                $"{nameof(HathoraPublicPortEnvVar)}={HathoraPublicPortEnvVar}\n");
             
             // ----------------
             // Get Process from env var "HATHORA_PROCESS_ID" => Cached already @ Awake.

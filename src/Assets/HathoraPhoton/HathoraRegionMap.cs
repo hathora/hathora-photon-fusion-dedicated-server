@@ -10,7 +10,7 @@ namespace HathoraPhoton
 {
     /// <summary>
     /// To prevent confusion, maps do not override Photon's region whitelist.
-    /// Instead, this is more so used for *creating* a game.
+    /// Instead, this is more so useful for *dynamically creating* a game.
     /// </summary>
     public class HathoraRegionMap
     {
