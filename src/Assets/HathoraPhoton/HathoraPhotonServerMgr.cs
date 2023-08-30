@@ -77,6 +77,7 @@ namespace HathoraPhoton
 
         /// <summary>
         /// Triggers when HathoraServerMgr finishes getting HathoraServerContext async.
+        /// (!) Does not trigger if Init fails.
         /// - Subscribed @ Awake
         /// - Unsubscribed @ OnDestroy
         /// - VaLidates -> then curries to initDedicatedServer Task
