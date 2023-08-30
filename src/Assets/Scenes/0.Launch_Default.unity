@@ -195,7 +195,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1190425046, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: editorStartType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046547, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_Name
@@ -211,7 +211,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046549, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046549, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_LocalPosition.z
