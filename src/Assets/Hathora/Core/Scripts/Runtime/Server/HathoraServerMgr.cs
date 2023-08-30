@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hathora.Cloud.Sdk.Client;
 using Hathora.Cloud.Sdk.Model;
+using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Hathora.Core.Scripts.Runtime.Server.ApiWrapper;
 using Hathora.Core.Scripts.Runtime.Server.Models;
 using UnityEngine;
@@ -69,48 +70,48 @@ namespace Hathora.Core.Scripts.Runtime.Server
         private volatile HathoraServerContext serverContext;
         
         
-        /// <summary>Set @ Awake, and only if deployed on Hathora</summary>
-        private string hathoraProcessIdEnvVar;
+        #region Vars -> Deployed Env Vars // TODO: Mv to HathoraDeployedEnvVars
+        // ####################################################
+        // https://hathora.dev/docs/guides/access-env-variables
+        // ####################################################
+        
+        /// <summary>Set @ Awake from "HATHORA_PROCESS_ID", and only if deployed on Hathora</summary>
+        public string HathoraProcessIdEnvVar { get; private set; }
+        
+        /// <summary>Set @ Awake from "HATHORA_REGION", and only if deployed on Hathora</summary>
+        public string HathoraRegionEnvVar { get; private set; }
+        
+        /// <summary>Set @ Awake from "HATHORA_IP", and only if deployed on Hathora</summary>
+        public string HathoraPublicIpAddressEnvVar { get; private set; }
+
+        /// <summary>Set @ Awake from "HATHORA_PORT", and only if deployed on Hathora</summary>
+        public ushort HathoraPublicPortEnvVar { get; private set; }
+        
+        /// <summary>
+        /// Set @ Awake from "HATHORA_APP_SECRET", and only if deployed on Hathora.
+        /// Should match HathoraServerConfig's secret.
+        /// </summary>
+        private string hathoraAppSecretEnvVar;
         
         /// <summary>
         /// This will only be true if we're deployed on Hathora, by verifying
         /// a special env var ("HATHORA_PROCESS_ID").
         /// </summary>
         public bool IsDeployedOnHathora =>
-            !string.IsNullOrEmpty(hathoraProcessIdEnvVar);
+            !string.IsNullOrEmpty(HathoraProcessIdEnvVar);
+        #endregion Vars -> // Deployed Env Vars
+
         
         public static event Action<HathoraServerContext> OnInitializedEvent;
         #endregion // Vars
 
         
         #region Init
-        protected virtual async void Awake()
-        {
-#if !UNITY_SERVER && !UNITY_EDITOR
-            Debug.Log("(!) [HathoraServerMgr.Awake] Destroying - not a server");
-            Destroy(this);
-            return;
-#endif
-            
-
-            Debug.Log($"[{nameof(HathoraServerMgr)}] Awake");
-            setSingleton();
-
-            // Unlike Client calls, we can init immediately @ Awake
-            InitApis(_hathoraSdkConfig: null); // Base will create this
-
-#if (UNITY_EDITOR)
-            // Optional mocked ID for debugging: Create a Room manually in Hathora console => paste ProcessId @ debugEditorMockProcId
-            hathoraProcessIdEnvVar = getServerDeployedProcessId(debugEditorMockProcId);
-#else
-            hathoraProcessIdEnvVar = getServerDeployedProcessId();
-#endif
-        }
-        
         /// <summary>If we were not server || editor, we'd already be destroyed @ Awake</summary>
         protected virtual void Start()
         {
-            // Ideally, this would be placed in Awake, but spammy server logs often bury this result 
+            // Ideally, this would be placed in Awake, but spammy server logs often bury this result.
+            // Subscribe to `OnInitializedEvent` to prevent race conditions.
             _ = GetHathoraServerContextAsync(_expectingLobby: false); // !await; sets `HathoraServerContext ServerContext` ^
         }
 
@@ -124,7 +125,42 @@ namespace Hathora.Core.Scripts.Runtime.Server
 
                 return _overrideProcIdVal;
             }
-            return Environment.GetEnvironmentVariable("HATHORA_PROCESS_ID");
+            
+            return HathoraUtils.GetEnvVar("HATHORA_PROCESS_ID");
+        }
+
+        protected virtual async void Awake()
+        {
+#if !UNITY_SERVER && !UNITY_EDITOR
+            Debug.Log("(!) [HathoraServerMgr.Awake] Destroying - not a server");
+            Destroy(this);
+            return;
+#endif
+            
+            Debug.Log($"[{nameof(HathoraServerMgr)}] Awake");
+            setSingleton();
+            
+#if (UNITY_EDITOR)
+            // Optional mocked ID for debugging: Create a Room manually in Hathora console => paste ProcessId @ debugEditorMockProcId
+            HathoraProcessIdEnvVar = getServerDeployedProcessId(debugEditorMockProcId); // Special, since it can be overridden for mock tests
+#else
+            setDeployedEnvVars();
+#endif
+            
+            // Unlike Client calls, we can init immediately @ Awake
+            InitApis(_hathoraSdkConfig: null); // Base will create this
+        }
+
+        private void setDeployedEnvVars()
+        {
+            HathoraProcessIdEnvVar = HathoraUtils.GetEnvVar("HATHORA_PROCESS_ID");
+            HathoraRegionEnvVar = HathoraUtils.GetEnvVar("HATHORA_REGION");
+            HathoraPublicIpAddressEnvVar = HathoraUtils.GetEnvVar("HATHORA_IP");
+            
+            ushort.TryParse(HathoraUtils.GetEnvVar("HATHORA_PORT"), out ushort _hathoraPublicPortEnvVar);
+            this.HathoraPublicPortEnvVar = _hathoraPublicPortEnvVar;
+            
+            hathoraAppSecretEnvVar = HathoraUtils.GetEnvVar("HATHORA_APP_SECRET"); // Should match HathoraServerConfig's secret
         }
 
         /// <summary>
@@ -293,6 +329,16 @@ namespace Hathora.Core.Scripts.Runtime.Server
             // Delay just 1 frame so the logs are closer to the bottom [Hathora Console workaround for max 1k logs viewed]
             await Task.Yield();
             
+            // ----------------
+            // Log projections from env vars only set on deployed Hathora server | https://hathora.dev/docs/guides/access-env-variables 
+            Debug.Log(
+                $"{logPrefix} Gathering verbose server context that should match similarly to deployed env vars:\n" +
+                $"{nameof(HathoraProcessIdEnvVar)}={HathoraProcessIdEnvVar},\n" +
+                // $"{nameof(hathoraAppSecretEnvVar)}={hathoraAppSecretEnvVar}\n"); // Uncomment to log your secret key (!recommended)
+                $"{nameof(HathoraRegionEnvVar)}={HathoraRegionEnvVar}\n" +
+                $"{nameof(HathoraPublicIpAddressEnvVar)}={HathoraPublicIpAddressEnvVar}\n" +
+                $"{nameof(HathoraPublicPortEnvVar)}={HathoraPublicPortEnvVar}\n");
+            
             if (!IsDeployedOnHathora)
             {
                 #if UNITY_SERVER && !UNITY_EDITOR
@@ -310,7 +356,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             // (!) Don't trust the ExposedPort here -- trust the Room's ConnectionInfo `Active` status (that relates to Process), instead.
             // (!) Don't trust the Room's `Active` status; unrelated to a Process status.
             Process initializingProcess = await ServerApis.ServerProcessApi.GetProcessInfoAsync(
-                hathoraProcessIdEnvVar, 
+                HathoraProcessIdEnvVar, 
                 _returnNullOnStoppedProcess: true,
                 _cancelToken);
             
@@ -361,7 +407,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             // ----------------
             // Combine all the data
             HathoraServerContext tempServerContext = new(
-                hathoraProcessIdEnvVar,
+                HathoraProcessIdEnvVar,
                 initializingProcess,
                 activeRooms,
                 tempFirstRoomServerContext.ConnectionInfo,
@@ -409,7 +455,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
                     "`OnInitialized` event will !trigger");
                 return null;
             }
-
+                
             // ----------------
             // We have Room info, but the Process itself may not yet be active:  Poll for connection info `Active` status from RoomId.
             // - We can't simply check `Room` status since the `Process` may still be initializing. 
