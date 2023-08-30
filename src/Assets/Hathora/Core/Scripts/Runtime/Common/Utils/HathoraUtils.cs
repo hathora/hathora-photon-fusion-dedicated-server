@@ -21,6 +21,23 @@ namespace Hathora.Core.Scripts.Runtime.Common.Utils
         public const int SDK_ENUM_STARTING_INDEX = 1;
 
         /// <summary>
+        /// OPTIONS:
+        /// - HATHORA_APP_ID
+        /// - HATHORA_APP_SECRET
+        /// - HATHORA_PROCESS_ID
+        /// - HATHORA_IP
+        /// - hATHORA_PORT
+        /// 
+        /// - Doc | https://hathora.dev/docs/guides/access-env-variables 
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <returns></returns>
+        public static string GetEnvVar(string _key) =>
+            string.IsNullOrEmpty(_key) 
+                ? null 
+                : Environment.GetEnvironmentVariable(_key);
+        
+        /// <summary>
         /// eg: "E1HKfn68Pkms5zsZsvKONw=="
         /// https://stackoverflow.com/a/9279005 
         /// </summary>
