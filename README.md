@@ -75,7 +75,7 @@ Check it out to learn more about hosting Photon Fusion on Hathora Cloud and acce
 
 Within this repro, we have already made changes to support Hathora for direct connections. However, if you are interested in the core **logic changes** from the original, in order of importance:
 
-1. [Asssets/HathoraPhoton/HathoraPhotonServerMgr.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/Assets/HathoraPhoton/HathoraPhotonServerMgr.cs)
+1. [Asssets/HathoraPhoton/HathoraPhotonServerMgr.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraPhotonServerMgr.cs)
     - At `Awake()`, if deployed headless Server, subscribe to `HathoraServerMgr.OnInitialized` event, returning [HathoraServerContext](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/46ce7b20c71b91c5debca50d2de390c595a96752/src/Assets/Hathora/Core/Scripts/Runtime/Server/Models/HathoraServerContext.cs#L16).
     - At `OnInitialized()`:
         * Set Photon's Config `containerPort` (renamed from `port`) to HathoraServerContext's `Port` (default `7777`).
@@ -88,7 +88,7 @@ Within this repro, we have already made changes to support Hathora for direct co
 
 ### Region Mapping
 
-Although unused the vanilla demo, we have included [HathoraRegionMap.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/Assets/HathoraPhoton/HathoraRegionMap.cs) to map the following Photon<>Hathora regions:
+Although unused the vanilla demo, we have included [HathoraRegionMap.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraRegionMap.cs) to map the following Photon<>Hathora regions:
 
 **<< Photon : Hathora >>**
 - "us" : Washingington DC
