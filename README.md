@@ -2,10 +2,7 @@
 
 [![UnityVersion](https://img.shields.io/badge/Unity-2021.3%20LTS-57b9d3.svg?logo=unity&color=2196F3)](https://unity.com/releases/editor/qa/lts-releases)
 [![HathoraSdkVersion](https://img.shields.io/badge/Hathora%20SDK-1.5.1-57b9d3.svg?logo=none&color=AF64EE)](https://hathora.dev/docs)
-![image](https://assetstorev1-prd-cdn.unity3d.com/key-image/44946285-5088-4f57-b51b-a996184da940.webp)
-<br><br>
-
-____________________
+<br>
 
 ### About
 
@@ -45,6 +42,7 @@ Check it out to learn more about hosting Photon Fusion on Hathora Cloud and acce
 ### Direct download
 
  - Select [Code](https://github.com/hathora/hathora-photon-fusion-dedicated-server) and select the 'Download Zip' option.  Please note that this will download the branch you're currently viewing on Github.
+
  ![Code - Zip](resources/git-code-zip.png)
 <br><br>
 
@@ -60,7 +58,7 @@ Check it out to learn more about hosting Photon Fusion on Hathora Cloud and acce
 ## Steps
 
 1. If building your Linux headless server via `HathoraServerConfig`, the Dockerfile will automatically add the `-args` necessary to start "as a server".
-    - To see the default args, see [./hathora/Dockerfile](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/.hathora/Dockerfile) - or the official [Photon docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server)
+    - To see the default args, see [./hathora/Dockerfile](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/.hathora/Dockerfile) - or the official [Photon docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server)
 
 2. Use the Hathora Unity plugin to configure, build, and deploy your server on Hathora Cloud via `Assets/Hathora/HathoraServerConfig`. See [Hathora Unity Plugin](https://github.com/hathora/unity-plugin)
     - After setting up, serialize your HathoraServerConfig to the 1st scnee (`0.Launch_Default`)'s `HathoraManager.HathoraServerConfig` GameObject component.
