@@ -13,12 +13,12 @@ namespace HathoraPhoton
 {
     /// <summary>
     /// Acts as the liason between NetworkManager and Hathora managers such as HathoraClientMgr.
-    /// - This child class tracks FishNet NetworkManager state changes, and:
+    /// - This child class tracks NetworkManager state changes, and:
     ///   * Handles setting the NetworkManager [host|ip]:port.
     ///   * Can talk to Hathora scripts to get cached host:port.
     ///   * Can initialize or stop NetworkManager connections.
-    ///   * Tells base to log + trigger OnDone() events other scripts subcribe to.
-    /// - Base contains funcs like: StartServer, StartClient, StartHost.
+    ///   * Tells base to log + trigger OnDone() events other scripts subscribe to.
+    /// - Base contains functions like: StartServer, StartClient, StartHost.
     /// - Base contains events like: OnClientStarted, OnClientStopped.
     /// - Base tracks `ClientState` like: Stopped, Starting, Started.
     /// </summary>

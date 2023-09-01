@@ -9,36 +9,28 @@
 This minimalist technical demo was started from Photon's [Fusion Dedicated Server Sample](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server) and assumes familiarity with the associated Photon Fusion [Dedicated Server Docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server).
 
 
-### Fork Changes
+### Photon Fusion on Hathora Cloud
 
-We have added integration to deploy a Photon Fusion dedicated server on Hathora Cloud. By deploying your Photon Fusion game on Hathora Cloud you unlock all the benefits of dedicated servers (cheat protection, improved latency, more stable connections), while also gaining access to [10+ global regions](https://hathora.dev/docs/faq/scale-globally) that map nicely with Photon Cloud's regions. 
+We have added integration to deploy a Photon Fusion dedicated server on Hathora Cloud. By deploying your Photon Fusion game on Hathora Cloud you unlock all the benefits of dedicated servers (cheat protection, improved latency, more stable connections), while also gaining access to [10+ global regions](https://hathora.dev/docs/faq/scale-globally) that map nicely with Photon Cloud's regions. And of course, you still get to take advantage of all of Photon Fusion's excellent netcode features.
 
-The original repo inits in Photon **Relay** mode, but we will have a **Direct** connection in this fork for best performance:
+This example makes sure to establish a direct connection between the dedicated server and the game clients, which ensures optimal performance for your players.
 
-- Hathora SDK assets at: `/Hathora/Hathora.Cloud.Sdk`
-- Hathora high-level wrapper assets at: `/Hathora/Core`
-- Photon-specific tools at: `/HathoraPhoton` for *direct connection* support.
-- `HathoraServerConfig` build, deployment and room management utils
-
-Check it out to learn more about hosting Photon Fusion on Hathora Cloud and accessing the Hathora SDK. We have made a few modifications to make this game easily deployable with a dedicated server on [Hathora Cloud](https://hathora.dev/docs).
+To learn more about the benefits and features of Hathora Cloud, check out our [Hathora Cloud Documenation](https://hathora.dev/docs).
 <br><br>
 
 ---
-## Readme Contents and Quick Links
-<details open> <summary> Click to expand/collapse contents </summary>
+## Contents
 
-- ### [Getting the Project](#getting-the-project-1)
-- ### [Requirements](#requirements-1)
-- ### [Troubleshooting](#troubleshooting-1)
-  - [Bugs](#bugs)
-  - [Documentation](#documentation)
-
-</details>
+- [Getting started](#getting-started)
+	-  [Requirements](#requirements)
+	-  [Deploy and run steps](#deploy-and-run-steps)
+- [Integration steps](#integration-steps)
+- [Troubleshooting](#troubleshooting)
 
 ---
 <br>
 
-## Getting the project
+## Getting started
 ### Direct download
 
  - Select [Code](https://github.com/hathora/hathora-photon-fusion-dedicated-server) and select the 'Download Zip' option.  Please note that this will download the branch you're currently viewing on Github.
@@ -46,7 +38,7 @@ Check it out to learn more about hosting Photon Fusion on Hathora Cloud and acce
  ![Code - Zip](resources/git-code-zip.png)
 <br><br>
 
-## Requirements
+### Requirements
 
 - This sample game is compatible with the latest Unity Long Term Support (LTS) editor version, currently [2021 LTS](https://unity.com/releases/2021-lts). Please include **Linux Dedicated Server Build Support** in your installation, as well as **Linux Build Support (Mono)**.
 
@@ -55,40 +47,66 @@ Check it out to learn more about hosting Photon Fusion on Hathora Cloud and acce
 - [Hathora Cloud account](https://console.hathora.dev) with an active app created (for `AppId`).
 <br><br>
 
-## Steps
+### Deploy and run steps
 
-1. If building your Linux headless server via `HathoraServerConfig`, the Dockerfile will automatically add the `-args` necessary to start "as a server".
-    - To see the default args, see [./hathora/Dockerfile](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/.hathora/Dockerfile) - or the official [Photon docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server)
+1. Create a Fusion AppId in the [PhotonEngine Dashboard](https://dashboard.photonengine.com/) and paste it into the `App Id` Fusion field in the Real Time Settings (reachable from the Fusion menu)
+2. Create a Hathora Server Config file
+	- This file will streamline your server deploiyment and integration with Hathora Cloud
+![Create a Hathora Server Config file](resources/create-server-config.png)
 
-2. Use the Hathora Unity plugin to configure, build, and deploy your server on Hathora Cloud via `Assets/Hathora/HathoraServerConfig`. For detailed steps, check out our guide on getting started with [Hathora's Unity Plugin](https://hathora.dev/docs/engines/unity/beginners-tutorial).
-    - After setting up, serialize your HathoraServerConfig to the 1st scnee (`0.Launch_Default`)'s `HathoraManager.HathoraServerConfig` GameObject component.
-    - Since this demo is not using any Hathora-specific Client calls, you don't need to do anything with `HathoraClientConfig`.
+3. Connect your Hathora Cloud account with the Hathora Unity plugin
+	- If you don't have an account, create one here: [https://console.hathora.dev](https://console.hathora.dev)
+![Connect your Hathora Cloud account](resources/connect-with-hathora.png)
 
-3. Once deployed, create a room in Hathora Cloud via any method:
-    - via `Hathora ServerConfig`: Click "Create Room" button in the "Create Room" dropdown group
-    - via [Hathora Console](https://console.hathora.dev) in your browser at the top-right
+4. Serialize the `HathoraServerConfig` file you created to the `0.Launch_Default` scene's `HathoraManager.HathoraServerConfig` GameObject component.
+![Config to Launch scene](resources/config-to-scene.png)
 
-4. Play the `Menu` scene (in your local Editor or a standalone Client build) click the `Client` button in the loaded Lobby scene.
+5. Use the Hathora Unity plugin to configure, build, and deploy your server on Hathora Cloud.
+	1. Select the Hathora application (if you don't have one yet, [create one here](https://console.hathora.dev/application/create))
+	2. Generate a server build
+	3. Deploy to Hathora Cloud
+	- For detailed steps on this process, check out our guide on getting started with [Hathora's Unity Plugin](https://hathora.dev/docs/engines/unity/beginners-tutorial).
+
+4. Once deployed, create a room in Hathora Cloud:
+    - via Hathora Unity plugin: Click "Create Room" button in the "Create Room" section
+    - via [Hathora Console](https://console.hathora.dev): Select your application then find the "Create Room" button in the top right corner
+    - Note: Creating a room in Hathora Cloud will spin up a new server instance, which will host a single match or session. Read more about [rooms in Hathora Cloud](https://hathora.dev/docs/concepts/room-lifecycle).
+
+5. Play the `Menu` scene (in your local Editor or a standalone Client build) click the `Client` button in the loaded Lobby scene.
     - If you are in the Editor, ensure your `ServerNetworkManager.HathoraPhotonServerMgr` GameObject component script is set to `Client` (default).
 
-## Altered Photon Files
+## Integration steps
 
-Within this repro, we have already made changes to support Hathora for direct connections. However, if you are interested in the core **logic changes** from the original, in order of importance:
+The core changes needed to integrate your game with Hathora Cloud is minimal.
 
-1. [Asssets/HathoraPhoton/HathoraPhotonServerMgr.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraPhotonServerMgr.cs)
+### Step 1: Add the Hathora Cloud Unity Plugin to your project
+
+See Hathora Cloud Unity Plugin [download and install steps](https://github.com/hathora/unity-plugin). Note: when installing, you can exclude the `Demos` folder.
+
+Once you have the plugin installed you will have access to:
+- Hathora Cloud Unity SDK: `/Assets/Hathora/Hathora.Cloud.Sdk`
+- Hathora Unity plugin & wrapper code: `/Hathora/Core`
+
+Refer to the steps above to create and configure your `HathoraServerConfig` file.
+
+### Step 2: Add a Hathora-Photon Server Manager
+
+1. Create server manager like: [Asssets/HathoraPhoton/HathoraPhotonServerMgr.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraPhotonServerMgr.cs). This manager will register your Hathora server instance with Photon Cloud via `StartArgs` (needed to establish a direct connection).
     - At `Awake()`, if deployed headless Server, subscribe to `HathoraServerMgr.OnInitialized` event, returning [HathoraServerContext](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/46ce7b20c71b91c5debca50d2de390c595a96752/src/Assets/Hathora/Core/Scripts/Runtime/Server/Models/HathoraServerContext.cs#L16).
     - At `OnInitialized()`:
         * Set Photon's Config `containerPort` (renamed from `port`) to HathoraServerContext's `Port` (default `7777`).
         * Set Photon's Config `PublicIp` and `PublicPort` from `HathoraServerContext`.
         * Continue as normal to `base.StartSimulation()`.
 
-2. Assets/Scenes/0.Launch_Default.unity
+2. Add manager to `Assets/Scenes/0.Launch_Default`
     - Added `HathoraManager` GameObject with `HathoraServerManager` script component to get ip:port info at `OnInitialized()` (mentioned above).
-        * **(!)** Serialize your selected `HathoraServerConfig` ScriptableObject here!
+        * **(!)** Be sure to add your `HathoraServerConfig` file here as well (needed to get your selected Hathora `AppId` and your Hathora developer token.
 
-### Region Mapping
+### Additional integrations
 
-Although unused the vanilla demo, we have included [HathoraRegionMap.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraRegionMap.cs) to map the following Photon<>Hathora regions:
+#### Region Mapping
+
+Although unused in this demo, we have included [HathoraRegionMap.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraRegionMap.cs) to map the following Photon<>Hathora regions:
 
 **<< Photon : Hathora >>**
 - "us" : Washingington DC
@@ -101,29 +119,36 @@ Although unused the vanilla demo, we have included [HathoraRegionMap.cs](https:/
 
 Should you choose to touch Region specifics later, this should prove useful!
 
-## Default Dockerfile launch args
+#### Dockerfile launch args (server command line arugments)
+
+These arguments can be edited in your game's Dockerfile. The Hathora Unity plugin generates a Dockerfile for you the first time you generate a server build. To view your generated Dockerfile, click `Open Dockerfile` from the "Server Build Settings" section of the Hathora Unity plugin.
 
 From the [official docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server):
 
-### Unity Required Args
+**Unity Required Args**
+
 - `-batchmode` | Unity arg to run as headlesss server.
 - `-nographics` | Unity arg to skips shaders/GUI; requires `-batchmode`.
 
-### Photon Optional Args
+
+**Photon Optional Args**
+
 - `-session <custom session name>` | Start a Game Session with name my-custom-session. Default is a random GUID.
 - `-region <region ID>` | Connect to Region US. Default is Best Region.
 - `-lobby <custom lobby name>` | Publish the Game Session on the Lobby named my-custom-lobby. Default is ClientServer Lobby.
 - `-port <custom port number>` | Bind to port 30001. Default is 27015.
 - `-P <property name> <value>` | Setup the custom properties map = city and type = free-for-all. Default is an empty list.
 
-### Hathora Optional Args
+
+**Hathora Optional Args**
+
 - `-mode server` | Legacy from other projects to automatically start in `Server` mode; does not natively affect anything since Photon handles this for you.
 
 ## Troubleshooting
 ### Bug Reporting
 - Report bugs in the sample game using Github [issues](https://github.com/hathora/hathora-photon-fusion-dedicated-server/issues).
 
-### Known Issues
+### Common Issues
 1. **Issue:** `InvalidOperationException: Failed to load the global config from "NetworkProjectConfig"`
     - **Caught:** Known Photon issue - your `NetworkProjectConfig` is desync'd. 
     - **Resolution:** Open this ScriptableObject -> click "Rebuild Object Table" button at top.
