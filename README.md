@@ -25,7 +25,10 @@ To learn more about the benefits and features of Hathora Cloud, check out our [H
 	-  [Requirements](#requirements)
 	-  [Deploy and run steps](#deploy-and-run-steps)
 - [Integration steps](#integration-steps)
+- [Further integrations](#further-integrations)
 - [Troubleshooting](#troubleshooting)
+- [Community](#community)
+- [Other samples](#other-samples)
 
 ---
 <br>
@@ -102,9 +105,9 @@ Refer to the steps above to create and configure your `HathoraServerConfig` file
     - Added `HathoraManager` GameObject with `HathoraServerManager` script component to get ip:port info at `OnInitialized()` (mentioned above).
         * **(!)** Be sure to add your `HathoraServerConfig` file here as well (needed to get your selected Hathora `AppId` and your Hathora developer token.
 
-### Additional integrations
+## Further integrations
 
-#### Region Mapping
+### Region Mapping
 
 Although unused in this demo, we have included [HathoraRegionMap.cs](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/Assets/HathoraPhoton/HathoraRegionMap.cs) to map the following Photon<>Hathora regions:
 
@@ -119,7 +122,7 @@ Although unused in this demo, we have included [HathoraRegionMap.cs](https://git
 
 Should you choose to touch Region specifics later, this should prove useful!
 
-#### Dockerfile launch args (server command line arugments)
+### Dockerfile launch args (server command line arugments)
 
 These arguments can be edited in your game's Dockerfile. The Hathora Unity plugin generates a Dockerfile for you the first time you generate a server build. To view your generated Dockerfile, click `Open Dockerfile` from the "Server Build Settings" section of the Hathora Unity plugin.
 
