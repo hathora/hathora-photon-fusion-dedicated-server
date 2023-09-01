@@ -60,16 +60,16 @@ Check it out to learn more about hosting Photon Fusion on Hathora Cloud and acce
 1. If building your Linux headless server via `HathoraServerConfig`, the Dockerfile will automatically add the `-args` necessary to start "as a server".
     - To see the default args, see [./hathora/Dockerfile](https://github.com/hathora/hathora-photon-fusion-dedicated-server/blob/main/src/.hathora/Dockerfile) - or the official [Photon docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server)
 
-2. Use the Hathora Unity plugin to configure, build, and deploy your server on Hathora Cloud via `Assets/Hathora/HathoraServerConfig`. See [Hathora Unity Plugin](https://github.com/hathora/unity-plugin)
+2. Use the Hathora Unity plugin to configure, build, and deploy your server on Hathora Cloud via `Assets/Hathora/HathoraServerConfig`. For detailed steps, check out our guide on getting started with [Hathora's Unity Plugin](https://hathora.dev/docs/engines/unity/beginners-tutorial).
     - After setting up, serialize your HathoraServerConfig to the 1st scnee (`0.Launch_Default`)'s `HathoraManager.HathoraServerConfig` GameObject component.
     - Since this demo is not using any Hathora-specific Client calls, you don't need to do anything with `HathoraClientConfig`.
 
 3. Once deployed, create a room in Hathora Cloud via any method:
-  - via `Hathora ServerConfig`: Click "Create Room" button in the "Create Room" dropdown group
-  - via [Hathora Console](https://console.hathora.dev) in your browser at the top-right
+    - via `Hathora ServerConfig`: Click "Create Room" button in the "Create Room" dropdown group
+    - via [Hathora Console](https://console.hathora.dev) in your browser at the top-right
 
 4. Play the `Menu` scene (in your local Editor or a standalone Client build) click the `Client` button in the loaded Lobby scene.
-  - If you are in the Editor, ensure your `ServerNetworkManager.HathoraPhotonServerMgr` GameObject component script is set to `Client` (default).
+    - If you are in the Editor, ensure your `ServerNetworkManager.HathoraPhotonServerMgr` GameObject component script is set to `Client` (default).
 
 ## Altered Photon Files
 
