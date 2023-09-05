@@ -8,6 +8,10 @@
 
 This minimalist technical demo was started from Photon's [Fusion Dedicated Server Sample](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server) and assumes familiarity with the associated Photon Fusion [Dedicated Server Docs](https://doc.photonengine.com/fusion/current/technical-samples/dedicated-server/fusion-dedicated-server).
 
+<div style="wdith:400px;display:flex;flex-direction:column;align-items:center;">
+  <img src="resources/hathora-photon-screenshot.png" />
+  <div style="margin-top:-4px;color:#56616e;">Photon Fusion Dedicated Server sample game with Hathora's Unity plugin</div>
+</div>
 
 ### Photon Fusion on Hathora Cloud
 
@@ -77,6 +81,12 @@ To learn more about the benefits and features of Hathora Cloud, check out our [H
 
 5. Play the `Menu` scene (in your local Editor or a standalone Client build) click the `Client` button in the loaded Lobby scene.
     - If you are in the Editor, ensure your `ServerNetworkManager.HathoraPhotonServerMgr` GameObject component script is set to `Client` (default).
+    - You can then view your active connection, logs, and metrics in your Hathora Console
+
+<div style="wdith:400px;display:flex;flex-direction:column;align-items:center;">
+  <img src="resources/hathora-console-screenshot.png" />
+  <div style="margin-top:-4px;color:#56616e;">Sample game running in Hathora Cloud's Console UI</div>
+</div>
 
 ## Integration steps
 
