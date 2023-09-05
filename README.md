@@ -10,7 +10,6 @@ This minimalist technical demo was started from Photon's [Fusion Dedicated Serve
 
 <div style="wdith:400px;display:flex;flex-direction:column;align-items:center;">
   <img src="resources/hathora-photon-screenshot.png" />
-  <div style="margin-top:-4px;color:#56616e;">Photon Fusion Dedicated Server sample game with Hathora's Unity plugin</div>
 </div>
 
 ### Photon Fusion on Hathora Cloud
@@ -85,7 +84,6 @@ To learn more about the benefits and features of Hathora Cloud, check out our [H
 
 <div style="wdith:400px;display:flex;flex-direction:column;align-items:center;">
   <img src="resources/hathora-console-screenshot.png" />
-  <div style="margin-top:-4px;color:#56616e;">Sample game running in Hathora Cloud's Console UI</div>
 </div>
 
 ## Integration steps
