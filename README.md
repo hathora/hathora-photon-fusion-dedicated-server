@@ -14,7 +14,7 @@ This minimalist technical demo was started from Photon's [Fusion Dedicated Serve
 
 ### Photon Fusion on Hathora Cloud
 
-We have added integration to deploy a Photon Fusion dedicated server on Hathora Cloud. By deploying your Photon Fusion game on Hathora Cloud you unlock all the benefits of dedicated servers (cheat protection, improved latency, more stable connections), while also gaining access to [10+ global regions](https://hathora.dev/docs/faq/scale-globally) that map nicely with Photon Cloud's regions. And of course, you still get to take advantage of all of Photon Fusion's excellent netcode features.
+We have added integration to deploy a Photon Fusion dedicated server on Hathora Cloud. By deploying your Photon Fusion game on Hathora Cloud you unlock all the benefits of dedicated servers (cheat protection, improved latency, more stable connections), while also gaining scalability and access to [10+ global regions](https://hathora.dev/docs/faq/scale-globally) that map nicely with Photon Cloud's regions. And of course, you still get to take advantage of all of Photon Fusion's excellent netcode features.
 
 This example makes sure to establish a direct connection between the dedicated server and the game clients, which ensures optimal performance for your players.
 
