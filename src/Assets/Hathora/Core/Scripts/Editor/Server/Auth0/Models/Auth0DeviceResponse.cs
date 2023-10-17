@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace Hathora.Core.Scripts.Editor.Server.Auth0.Models
 {
     /// <summary>
-    /// Take the UserCode and send it to the Auth0 API to get a token.
+    /// Take the UserCode and send it to the HathoraDevToken API to get a token.
     /// </summary>
     [Serializable]
     public class Auth0DeviceResponse

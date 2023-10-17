@@ -8,10 +8,10 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
     public class HathoraConfigPostAuthBodyUI : HathoraConfigUIBase
     {
         #region Vars
-        private HathoraConfigPostAuthBodyHeaderUI bodyHeaderUI {get;set; }
-        public HathoraConfigPostAuthBodyBuildUI BodyBuildUI {get;set; }
-        public HathoraConfigPostAuthBodyDeployUI BodyDeployUI {get;set; }
-        private HathoraConfigPostAuthBodyRoomUI bodyRoomUI {get;set; }
+        private HathoraConfigPostAuthBodyHeaderUI bodyHeaderUI { get; set; }
+        public HathoraConfigPostAuthBodyBuildUI BodyBuildUI { get; private set; }
+        public HathoraConfigPostAuthBodyDeployUI BodyDeployUI { get; private set; }
+        private HathoraConfigPostAuthBodyRoomUI bodyRoomUI { get; set; }
         #endregion // Vars
 
 

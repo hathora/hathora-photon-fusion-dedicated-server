@@ -76,10 +76,10 @@ namespace Hathora.Core.Scripts.Editor.Server
             #region bug (when restored later): Recompiles - you lose all logs [including HathoraServerConfig logs]
             // // ----------------
             // // This will change your selected build setting: Cache here, revert later
-            // BuildTarget originalBuildTarget = EditorUserBuildSettings.activeBuildTarget;
-            // BuildTargetGroup originalBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(originalBuildTarget);
+            BuildTarget originalBuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            BuildTargetGroup originalBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(originalBuildTarget);
             // int originalArchitecture = PlayerSettings.GetArchitecture(originalBuildTargetGroup);
-            // ScriptingImplementation originalScriptingBackend = PlayerSettings.GetScriptingBackend(originalBuildTargetGroup);
+            ScriptingImplementation originalScriptingBackend = PlayerSettings.GetScriptingBackend(originalBuildTargetGroup);
             // ApiCompatibilityLevel originalApiCompatibility = PlayerSettings.GetApiCompatibilityLevel(originalBuildTargetGroup);
             //
             // // Sanity check: Does the 1st scene match the current scene we're on?
@@ -93,6 +93,11 @@ namespace Hathora.Core.Scripts.Editor.Server
             // }
             #endregion // bug (when restored later): Recompiles - you lose all logs [including HathoraServerConfig logs]
 
+            // Set scripting backend to Mono since we unlikely support IL2CPP for Linux (unless Unity Editor is Linux)
+            PlayerSettings.SetScriptingBackend(
+                BuildTargetGroup.Standalone,
+                ScriptingImplementation.Mono2x);
+            
             // ----------------
             // Generate build opts
             BuildPlayerOptions buildPlayerOptions = generateBuildPlayerOptions(
@@ -155,22 +160,14 @@ namespace Hathora.Core.Scripts.Editor.Server
             #region bug: Recompiles - you lose all logs [including HathoraServerConfig logs]
             // // ----------------
             // // Delay since we don't want the rest of the block to cutoff (This causes a recompile)
-            // EditorApplication.delayCall += () =>
-            // {
-            //     // Revert build settings since we changed them to headless Linux server
-            //     EditorUserBuildSettings.SwitchActiveBuildTarget(originalBuildTargetGroup, originalBuildTarget);
-            //     PlayerSettings.SetArchitecture(originalBuildTargetGroup, originalArchitecture);
-            //     PlayerSettings.SetScriptingBackend(originalBuildTargetGroup, originalScriptingBackend);
-            //     PlayerSettings.SetApiCompatibilityLevel(originalBuildTargetGroup, originalApiCompatibility);
-            //
-            //     Debug.Log(
-            //         $"{logPrefix} Reverted build settings to original: " +
-            //         $"[BuildTarget: {originalBuildTarget}, " +
-            //         $"BuildTargetGroup: {originalBuildTargetGroup}, " +
-            //         $"Architecture: {originalArchitecture}, " +
-            //         $"ScriptingBackend: {originalScriptingBackend}, " +
-            //         $"ApiCompatibility: {originalApiCompatibility}");
-            // };
+            EditorApplication.delayCall += () =>
+            {
+                // Revert build settings since we changed them to headless Linux server
+                PlayerSettings.SetScriptingBackend(originalBuildTargetGroup, originalScriptingBackend);
+                // EditorUserBuildSettings.SwitchActiveBuildTarget(originalBuildTargetGroup, originalBuildTarget);
+                // PlayerSettings.SetArchitecture(originalBuildTargetGroup, originalArchitecture);
+                // PlayerSettings.SetApiCompatibilityLevel(originalBuildTargetGroup, originalApiCompatibility);
+            };
             #endregion // bug: Recompiles - you lose all logs [including HathoraServerConfig logs]
             
             strb.AppendLine($"**BUILD SUCCESS: {resultStr}**");

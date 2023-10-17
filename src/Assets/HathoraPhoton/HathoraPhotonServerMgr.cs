@@ -93,7 +93,7 @@ namespace HathoraPhoton
             string deployErrMsg = $"{logPrefix} Expected deployInfo: If debugging locally, are you sure " +
                 "you pasted an *active* ProcessId to `HathoraPhotonManager.HathoraServerMgr.DebugEditorMockProcId?` " +
                 "Inactive Processes despawn in 5m - perhaps timed out?";
-            Assert.IsNotNull(hathoraServerContext?.FirstRoomServerContext, deployErrMsg);
+            Assert.IsNotNull(hathoraServerContext?.FirstActiveRoomForProcess, deployErrMsg);
             
             // Hathora server is ready - now init Photon dedicated server logic
             _ = startPhotonDedicatedServer(hathoraServerContext);   
@@ -111,15 +111,14 @@ namespace HathoraPhoton
             
             #region Hathora Edits
             // Set container (!public) port
-            ushort containerPort = (ushort)hathoraServerMgr.HathoraServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber;
+            ushort containerPort = (ushort)hathoraServerMgr.HathoraServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port;
             config.Port = containerPort; // Default == 7777
             
             // Set public Room ip:port
-            (IPAddress ip, ushort port) roomIpPort = await hathoraServerContext
-                .FirstRoomServerContext.GetConnectionInfoIpPortAsync();
+            (IPAddress Ip, ushort Port) roomIpPort = await hathoraServerContext.GetHathoraServerIpPortAsync();
             
-            config.PublicIP = roomIpPort.ip.ToString();
-            config.PublicPort = roomIpPort.port;
+            config.PublicIP = roomIpPort.Ip.ToString();
+            config.PublicPort = roomIpPort.Port;
 
             Debug.Log($"{logPrefix} Used hathoraServerContext to set Photon `config`:\n" +
                 $"1. Internal bind container set to port: {config.Port}\n" +

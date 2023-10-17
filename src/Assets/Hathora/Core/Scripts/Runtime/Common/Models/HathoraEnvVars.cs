@@ -24,10 +24,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.Models
             this.StrVal = _strVal;
         }
         
-        public string ToJson()
-        {
-            // Serialize with Newtonsoft
-            return JsonConvert.SerializeObject(this);
-        }
+        public string ToJson() =>
+            JsonConvert.SerializeObject(this);
     }
 }

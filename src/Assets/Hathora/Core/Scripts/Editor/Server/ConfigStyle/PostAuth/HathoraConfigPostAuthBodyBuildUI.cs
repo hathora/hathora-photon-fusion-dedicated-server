@@ -17,8 +17,11 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
     {
         #region Vars
         // Foldouts
-        private bool isServerBuildFoldout;
+        private bool isBuildFoldout;
         private CancellationTokenSource cancelBuildTokenSrc;
+        
+        /// <summary>For state persistence on which dropdown group was last clicked</summary>
+        protected const string SERVER_BUILD_SETTINGS_FOLDOUT_STATE_KEY = "ServerBuildSettingsFoldoutState";
         #endregion // Vars
 
 
@@ -45,11 +48,22 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 
         private void insertServerBuildSettingsFoldout()
         {
-            isServerBuildFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(
-                isServerBuildFoldout,
+            // Retrieve the saved foldout state from EditorPrefs
+            isBuildFoldout = EditorPrefs.GetBool(
+                SERVER_BUILD_SETTINGS_FOLDOUT_STATE_KEY, 
+                defaultValue: false);
+            
+            // Create the foldout
+            isBuildFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(
+                isBuildFoldout,
                 "Server Build Settings");
+            
+            // Save the new foldout state to EditorPrefs
+            EditorPrefs.SetBool(
+                SERVER_BUILD_SETTINGS_FOLDOUT_STATE_KEY, 
+                isBuildFoldout);
 
-            if (!isServerBuildFoldout)
+            if (!isBuildFoldout)
             {
                 EditorGUILayout.EndFoldoutHeaderGroup();
                 return;
@@ -72,7 +86,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 
             InsertSpace2x();
             
-            bool enableBuildBtn = ServerConfig.MeetsBuildAndDeployBtnReqs();
+            bool enableBuildBtn = ServerConfig.MeetsBuildBtnReqs();
             if (!enableBuildBtn && !HathoraServerDeploy.IsDeploying)
                 insertGenerateServerBuildBtnHelpboxOnMissingReqs();
             else
@@ -128,7 +142,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 : ""
             );
             
-            // (!) Hathora SDK Enums start at index 1 (not 0)
             if (!_serverConfig.HathoraCoreOpts.HasAppId)
                 helpboxLabelStrb.Append("`AppId` ");
             

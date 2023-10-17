@@ -10,7 +10,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
     /// <summary>
     /// The main editor for HathoraServerConfig, including all the button clicks and extra UI.
     /// </summary>
-    [CustomEditor(typeof(HathoraServerConfig))]
+    [CustomEditor(typeof(HathoraServerConfig), editorForChildClasses: true)]
     public class HathoraConfigUI : UnityEditor.Editor
     {
         #region Vars
@@ -37,8 +37,12 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
         #region Main
         public void OnEnable()
         {
+            // Get instance - there may be multiple
             if (SelectedServerConfig == null)
                 SelectedServerConfig = getSelectedInstance();
+            
+            // Save last-focused window so we can find it easy later via top Hathora/ menu
+            HathoraServerConfigFinder.CacheSelectedConfig(SelectedServerConfig);
 
             // If !authed, check again for a physical token cache file
             if (SelectedServerConfig != null && !IsAuthed)

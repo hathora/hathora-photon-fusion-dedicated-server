@@ -7,7 +7,6 @@ using Hathora.Core.Scripts.Editor.Common;
 using Hathora.Core.Scripts.Runtime.Common.Extensions;
 using Hathora.Core.Scripts.Runtime.Server;
 using UnityEditor;
-using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -133,7 +132,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
         /// <summary>Are we logged in, already (is ServerConfig dev auth token set)?</summary>
         /// <returns></returns>
         protected bool CheckHasAuthToken() =>
-            !string.IsNullOrEmpty(ServerConfig.HathoraCoreOpts.DevAuthOpts.DevAuthToken);
+            !string.IsNullOrEmpty(ServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken);
         
         protected bool CheckHasSelectedApp() => 
             !string.IsNullOrEmpty(ServerConfig.HathoraCoreOpts.AppId);
@@ -548,12 +547,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
         /// <typeparam name="TEnum"></typeparam>
         /// <returns></returns>
         /// <param name="_opts"></param>
-        /// <param name="_prependDummyIndex0Str">
-        /// (!) Hathora SDK Enums starts at index 1; not 0: Care of indexes.
-        /// </param>
-        protected static List<string> GetStrListOfEnumMemberKeys<TEnum>(
-            EnumListOpts _opts,
-            string _prependDummyIndex0Str = null) where TEnum : Enum
+        protected static List<string> GetStrListOfEnumMemberKeys<TEnum>(EnumListOpts _opts) where TEnum : Enum
         {
             IEnumerable<string> enumerable = Enum
                 .GetValues(typeof(TEnum))
@@ -567,9 +561,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
                         _ => e.ToString(), // AsIs
                     };
                 });
-
-            if (!string.IsNullOrEmpty(_prependDummyIndex0Str))
-                enumerable = enumerable.Prepend(_prependDummyIndex0Str);
 
             return enumerable.ToList();
         }
@@ -748,11 +739,17 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
             return inputInt;
         }
         
-        protected void SaveConfigChange(string _logKeyName, string _logKeyVal)
+        protected void SaveConfigChange(
+            string _logKeyName, 
+            string _logKeyVal, 
+            bool _skipLog = false)
          {
-             Debug.Log($"[HathoraConfigUIBase] Set new ServerConfig vals for: " +
-                 $"`{_logKeyName}` to: `{_logKeyVal}`");
-             
+             if (!_skipLog)
+             {
+                 Debug.Log($"[HathoraConfigUIBase] Set new ServerConfig vals for: " +
+                     $"`{_logKeyName}` to: `{_logKeyVal}`");    
+             }
+
              SerializedConfig.ApplyModifiedProperties();
              EditorUtility.SetDirty(ServerConfig); // Mark the object as dirty
              AssetDatabase.SaveAssets(); // Save changes to the ScriptableObject asset
@@ -778,22 +775,21 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 
         /// <summary>
         /// </summary>
-        /// <param name="_prependDummyIndex0Str">
-        /// (!) Hathora SDK has 1-based Enums.  You may want to prepend a dummy
-        /// like "None", although you'd have to later validate it.
-        /// </param>
         /// <typeparam name="TEnum"></typeparam>
+        /// <param name="_prettifyNames">
+        /// If true, we'll SplitPascalCase() -
+        /// (!) be sure to reference the enum by int and not string since the str vals won't match.
+        /// </param>
         /// <returns></returns>
-        protected List<string> GetDisplayOptsStrArrFromEnum<TEnum>(string _prependDummyIndex0Str)
+        protected static List<string> GetDisplayOptsStrArrFromEnum<TEnum>(bool _prettifyNames = false)
             where TEnum : Enum
         {
             IEnumerable<string> enumerable = Enum
                 .GetValues(typeof(TEnum))
                 .Cast<TEnum>()
-                .Select(x => x.ToString());
-            
-            if (!string.IsNullOrEmpty(_prependDummyIndex0Str))
-                enumerable = enumerable.Prepend(_prependDummyIndex0Str);
+                .Select(x => _prettifyNames
+                    ? x.ToString().SplitPascalCase()
+                    : x.ToString());
 
             return enumerable.ToList();
         }

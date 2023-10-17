@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Fusion;
 using Fusion.Sockets;
-using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Runtime.Client;
+using HathoraCloud.Models.Shared;
 using UnityEngine;
 
 namespace HathoraPhoton

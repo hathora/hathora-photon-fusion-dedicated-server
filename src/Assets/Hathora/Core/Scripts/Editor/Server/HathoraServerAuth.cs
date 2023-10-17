@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Hathora.Core.Scripts.Editor.Server
 {
     /// <summary>
-    /// Dev auth to get a dev token. Browser will launch to OAuth (via Auth0) and we'll
+    /// Dev auth to get a dev token. Browser will launch to OAuth (via HathoraDevToken) and we'll
     /// tell the server we want a code. After a code, we'll launch a browser for the user
     /// to auth (via UI) and poll every 5s until we are authed.
     /// Timeout is ~5m, supporting cancel tokens. 
@@ -93,8 +93,8 @@ namespace Hathora.Core.Scripts.Editor.Server
         /// <param name="_token">You probably want the refreshToken</param>
         public static void SetAuthToken(HathoraServerConfig _hathoraServerConfig, string _token)
         {
-            _hathoraServerConfig.HathoraCoreOpts.DevAuthOpts.DevAuthToken = _token;
-            Debug.Log("[HathoraServerBuild] Dev Auth0 login successful: " +
+            _hathoraServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken = _token;
+            Debug.Log("[HathoraServerBuild] Dev HathoraDevToken login successful: " +
                 "Token set @ HathoraServerConfig");
         }
     }
