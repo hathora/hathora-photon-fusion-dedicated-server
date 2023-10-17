@@ -1,252 +1,93 @@
 // Created by dylan@hathora.dev
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Hathora.Core.Scripts.Editor.Common;
 using Hathora.Core.Scripts.Runtime.Server;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Hathora.Core.Scripts.Editor.Server
 {
-    [InitializeOnLoad]
     public class HathoraServerConfigFinder : EditorWindow
     {
-        public static HathoraServerConfigFinder Instance { get; private set; }
-
-        private const string ShowOnStartupKey = "HathoraServerConfigFinder.ShowOnStartup";
-        private static List<HathoraServerConfig> serverConfigs;
-        private static Vector2 scrollPos;
-        private static GUIStyle richCenterTxtLabelStyle;
-        private static GUIStyle richSmLeftTxtLabelStyle;
-
+        private const string LAST_FOCUSED_SERVER_CONFIG_PATH = "HathoraServerConfigFinder.LastFocusedServerConfigPath";
         
-        #region Init
-        /// <summary>Just run once on startup</summary>
-        static HathoraServerConfigFinder()
-        {
-            EditorApplication.delayCall += ShowWindowOnStartup;
-        }
         
-        /// <summary>
-        /// As soon as we see the window, we find all the configs and select the latest (if any).
-        /// </summary>
-        private void OnEnable()
+        #region Menu Items
+        [MenuItem("Hathora/Select Last-Used HathoraServerConfig _%#h", priority = -1000)] // Ctrl + Shift + H
+        public static void SelectLastKnownServerConfig()
         {
-            findAllHathoraServerConfigs();
-            AssetDatabase.importPackageCompleted += OnImportPackageCompleted;
-        }
-        
-        private void OnDisable()
-        {
-            AssetDatabase.importPackageCompleted -= OnImportPackageCompleted;
-            EditorApplication.delayCall -= ShowWindowOnStartup;
-        }
+            string assetPath = EditorPrefs.GetString(LAST_FOCUSED_SERVER_CONFIG_PATH);
 
-        /// <summary>
-        /// We're looking for new _serverConfig files while the window is open
-        /// As soon as we close the window, we unsubscribe from the event.
-        /// </summary>
-        /// <param name="_packagename"></param>
-        private void OnImportPackageCompleted(string _packagename)
-        {
-            findAllHathoraServerConfigs();
-            Repaint();
-        }
-
-        private static void InitStyles()
-        {
-            richCenterTxtLabelStyle ??= new GUIStyle(EditorStyles.label)
+            if (string.IsNullOrEmpty(assetPath))
             {
-                richText = true,
-                alignment = TextAnchor.MiddleCenter,
-                wordWrap = true,
-            };
-            
-            richSmLeftTxtLabelStyle ??= new GUIStyle(EditorStyles.label)
-            {
-                richText = true,
-                alignment = TextAnchor.MiddleLeft,
-                wordWrap = true,
-                fontSize = 11,
-            };
-        }
-
-        private static void ShowWindowOnStartup()
-        {
-            if (EditorPrefs.GetBool(ShowOnStartupKey, true))
-                ShowWindowSelect1stFound();
-        }
-
-        [MenuItem("Hathora/ServerConfig Finder On Startup/Enable", false, -1001)]
-        public static void EnableConfigFinderOnStartup()
-        {
-            EditorPrefs.SetBool(ShowOnStartupKey, true);
-        }
-
-        [MenuItem("Hathora/ServerConfig Finder On Startup/Disable", false, -1000)]
-        public static void DisableConfigFinderOnStartup()
-        {
-            EditorPrefs.SetBool(ShowOnStartupKey, false);
-        }
-        #endregion // Init
-        
-        
-        public static void RefreshConfigsAndRepaint()
-        {
-            if (Instance == null)
-                return;
-            
-            Instance.findAllHathoraServerConfigs();
-            Instance.Repaint();
-        }
-        
-
-        [MenuItem("Hathora/Configuration (Server) _%#h", priority = -1000)] // Ctrl + Shift + H
-        public static void ShowWindowSelect1stFound()
-        {
-            ShowWindowOnly();
-            
-            // Select the 1st one found
-            selectHathoraServerConfig(serverConfigs[0]);
-        }
-        
-        /// <summary>
-        /// Does not select 1st found, unlike ShowWindowSelect1stFound().
-        /// </summary>
-        public static void ShowWindowOnly()
-        {
-            HathoraServerConfigFinder window = GetWindow<HathoraServerConfigFinder>(
-                "Hathora Server Config Finder");
-            
-            window.minSize = new Vector2(x: 350, y: 255);
-            window.maxSize = new Vector2(x: 600, y: 500);
-            
-            // Set the Instance property
-            Instance = window;
-            
-            // Select the 1st one found
-            selectHathoraServerConfig(serverConfigs[0]);
-        }
-
-        [MenuItem("Hathora/ServerConfig Finder On Startup/Enable", true)]
-        public static bool ValidateEnableConfigFinderOnStartup()
-        {
-            return !EditorPrefs.GetBool(ShowOnStartupKey, true);
-        }
-
-        [MenuItem("Hathora/ServerConfig Finder On Startup/Disable", true)]
-        public static bool ValidateDisableConfigFinderOnStartup()
-        {
-            return EditorPrefs.GetBool(ShowOnStartupKey, true);
-        }
-
-        private void OnGUI()
-        {
-            InitStyles();
-            
-            HathoraEditorUtils.InsertBanner(
-                _includeVerticalGroup: false,
-                _wrapperExtension: 24f); // Place banner @ top
-            EditorGUILayout.Space(4f);
-            HathoraEditorUtils.InsertHathoraSloganLbl();
-            EditorGUILayout.EndVertical();
-            
-            insertDescrLbl();
-            EditorGUILayout.Space(20f);
-
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-    
-            // Check if any serverConfigs are null with LINQ: If they are, findAllHathoraServerConfigs() to refresh cache.
-            if (serverConfigs != null && serverConfigs.Any(config => config == null))
-                findAllHathoraServerConfigs();
-
-            insertRowForEachConfigFound();
-
-            EditorGUILayout.Space(10f);
-            insertNewConfigBtn();
-            
-            EditorGUILayout.Space(5);
-        }
-
-        private void insertDescrLbl()
-        {
-            string lblContent = "Your Hathora Configuration Files make integration " +
-                "with Hathora Cloud seamless. They store your developer token and appId, " +
-                "and will make it easy to configure, build and deploy your game server.";
-            
-            GUILayout.Label(lblContent, richSmLeftTxtLabelStyle);
-        }
-
-        private void insertNewConfigBtn()
-        {
-            // Add the "New ServerConfig" button
-            if (GUILayout.Button("New ServerConfig", 
-                    GUILayout.Height(20), 
-                    GUILayout.MinWidth(215),
-                    GUILayout.ExpandWidth(false)))
-            {
-                createAndSelectNewConfig();
-            }
-        }
-
-        private void insertRowForEachConfigFound()
-        {
-            foreach (HathoraServerConfig config in serverConfigs)
-            {
-                EditorGUILayout.BeginVertical(GUI.skin.box);
-                EditorGUILayout.BeginHorizontal();
-                
-                GUILayout.Label(config.name, GUILayout.ExpandWidth(true));
-
-                if (GUILayout.Button("Select", GUILayout.Width(100)))
-                    selectHathoraServerConfig(config);
-
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndVertical();
-                EditorGUILayout.Space(5);
+                List<HathoraServerConfig> configs = getAllHathoraServerConfigs();
+                Assert.IsNotNull(configs?[0], "Expected at least 1 config; TODO: Create a new Config, if !exists");
+                selectHathoraServerConfig(configs[0]); // Find the 1st one
             }
 
-            EditorGUILayout.EndScrollView();
+            // Find the last known
+            HathoraServerConfig config = AssetDatabase.LoadAssetAtPath<HathoraServerConfig>(assetPath);
+            selectHathoraServerConfig(config);
         }
-
-        private void createAndSelectNewConfig()
+        
+        [MenuItem("Hathora/Create New HathoraServerConfig")]
+        public static void CreateNewServerConfig()
         {
-            string basePath = "Assets/Hathora";
-            string fullPath = $"{basePath}/HathoraServerConfig.asset";
-
-            // Create Hathora directory if it doesn't exist
-            if (!AssetDatabase.IsValidFolder(basePath))
-                AssetDatabase.CreateFolder("Assets", "Hathora");
-
-            // Create a new instance of HathoraServerConfig
             HathoraServerConfig newConfig = ScriptableObject.CreateInstance<HathoraServerConfig>();
+            
+            // Ensure target dir exists
+            const string dirPath = "Assets/Hathora";
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+            
+            // Set the asset path and asset name
+            string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath($"{dirPath}/{nameof(HathoraServerConfig)}.asset");
 
-            // Save the new instance as an asset
-            AssetDatabase.CreateAsset(newConfig, AssetDatabase.GenerateUniqueAssetPath(fullPath));
+            // Create the asset in the designated path
+            AssetDatabase.CreateAsset(newConfig, assetPathAndName);
 
-            // Refresh the AssetDatabase to ensure the new asset is properly saved and recognized
+            // Save and refresh the asset db
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-
-            // Select the newly created HathoraServerConfig in the Project tab
+            
+            // Select the new config
             selectHathoraServerConfig(newConfig);
+        }
+        #endregion // Menu Items
+        
+   
+        /// <returns>List of HathoraServerConfig</returns>
+        private static List<HathoraServerConfig> getAllHathoraServerConfigs()
+        {
+            string[] guids = AssetDatabase.FindAssets($"t:{nameof(HathoraServerConfig)}");
+            
+            List<HathoraServerConfig> serverConfigs = guids?.Select(guid => 
+                AssetDatabase.LoadAssetAtPath<HathoraServerConfig>(AssetDatabase.GUIDToAssetPath(guid))
+            ).ToList();
 
-            // Refresh the list of configs
-            findAllHathoraServerConfigs();        
+            return serverConfigs;
+        }
+        
+        /// <summary>Find and select the Config to both show in the Inspector and Project windows</summary>
+        /// <param name="_config"></param>
+        private static void selectHathoraServerConfig(HathoraServerConfig _config)
+        {
+            EditorGUIUtility.PingObject(_config);
+            Selection.activeObject = _config;
         }
 
-        private void findAllHathoraServerConfigs()
+        /// <summary>
+        /// Call this from HathoraServerConfig to save the last focused
+        /// Config to recall later via top Hathora/ menu.
+        /// </summary>
+        /// <param name="_activeObject"></param>
+        public static void CacheSelectedConfig(HathoraServerConfig _activeObject)
         {
-            string[] guids = AssetDatabase.FindAssets("t:Hathora.Scripts.Net.Server.HathoraServerConfig");
-            serverConfigs = guids?.Select(guid => AssetDatabase.LoadAssetAtPath<HathoraServerConfig>(
-                AssetDatabase.GUIDToAssetPath(guid))).ToList();
-        }
-
-        private static void selectHathoraServerConfig(HathoraServerConfig config)
-        {
-            EditorGUIUtility.PingObject(config);
-            Selection.activeObject = config;
+            string assetPath = AssetDatabase.GetAssetPath(_activeObject);
+            EditorPrefs.SetString(LAST_FOCUSED_SERVER_CONFIG_PATH, assetPath);
         }
     }
 }

@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Editor.Common;
 using Hathora.Core.Scripts.Runtime.Server;
 using Hathora.Core.Scripts.Runtime.Server.ApiWrapper;
+using Hathora.Core.Scripts.Runtime.Server.Models.SerializedWrappers;
+using HathoraCloud;
+using HathoraCloud.Models.Shared;
 using UnityEditor;
 using UnityEngine;
+using Security = HathoraCloud.Models.Shared.Security;
 
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 {
@@ -103,7 +106,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             GUILayout.BeginHorizontal();
             
             insertExistingAppsPopupList(); // This actually drops down, despite the name
-            insertExistingAppsRefreshBtn(); // !await
+            _ = insertExistingAppsRefreshBtn(); // !await
             
             GUILayout.EndHorizontal(); 
             EditorGUI.EndDisabledGroup();
@@ -148,7 +151,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 "Select an application to use</color>", LeftAlignLabelStyle);
         } 
 
-        private void insertExistingAppsRefreshBtn()
+        private async Task insertExistingAppsRefreshBtn()
         {
             bool recentlyAuthed = ServerConfig.HathoraCoreOpts.DevAuthOpts.RecentlyAuthed;
             bool disableBtn = isRefreshingExistingApps || recentlyAuthed;
@@ -165,7 +168,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             if (clickedAppRefreshBtn || recentlyAuthed)
             {
                 // TODO: Replace disabled btn with a separate cancel btn
-                onRefreshAppsListBtnClick();
+                await onRefreshAppsListBtnClick();
                 ServerConfig.HathoraCoreOpts.DevAuthOpts.RecentlyAuthed = false;
             }
         }
@@ -173,11 +176,8 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         /// <summary>(!) Despite its name, a Popup() is actually a dropdown list</summary>
         private void insertExistingAppsPopupList()
         {
-            List<string> displayedOptionsList = ServerConfig.HathoraCoreOpts.GetExistingAppNames(
-                _prependDummyIndex0Str: null);
-                
+            List<string> displayedOptionsList = ServerConfig.HathoraCoreOpts.GetExistingAppNames();
             string[] displayedOptionsArr = displayedOptionsList?.ToArray();
-    
             int selectedIndex = ServerConfig.HathoraCoreOpts.ExistingAppsSelectedIndex;
     
             int newSelectedIndex = EditorGUILayout.Popup(
@@ -185,8 +185,8 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 displayedOptionsArr,
                 GUILayout.ExpandWidth(true));
 
-            bool isNewValidIndex = displayedOptionsList != null &&
-                selectedIndex >= 0 &&
+            bool isNewValidIndex = 
+                displayedOptionsList != null &&
                 newSelectedIndex != selectedIndex &&
                 selectedIndex < displayedOptionsList.Count;
 
@@ -230,10 +230,10 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             
             // USER INPUT >>
             string newDevAuthToken = EditorGUILayout.PasswordField(
-                ServerConfig.HathoraCoreOpts.DevAuthOpts.DevAuthToken,
+                ServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken,
                 options: null);
 
-            if (newDevAuthToken != ServerConfig.HathoraCoreOpts.DevAuthOpts.DevAuthToken)
+            if (newDevAuthToken != ServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken)
                 onDevTokenChanged(newDevAuthToken);
 
             GUILayout.EndHorizontal();
@@ -252,11 +252,12 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         #region Event Logic
         private void onDevTokenChanged(string _inputStr)
         {
-            ServerConfig.HathoraCoreOpts.DevAuthOpts.DevAuthToken = _inputStr;
+            ServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken = _inputStr;
             
             SaveConfigChange(
-                nameof(ServerConfig.HathoraCoreOpts.DevAuthOpts.DevAuthToken), 
-                _inputStr);
+                nameof(ServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken), 
+                _inputStr,
+                _skipLog: true); // Don't log secrets
 
             bool keyDeleted = string.IsNullOrEmpty(_inputStr); 
             if (keyDeleted)
@@ -280,21 +281,44 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         
         private async Task onRefreshAppsListBtnClick()
         {
-            Debug.Log("[HathoraConfigPostAuthBodyHeaderUI] onRefreshAppsListBtnClick");   
-            isRefreshingExistingApps = true;
-            HathoraServerAppApi appApi = new(ServerConfig); 
+            string logPrefix = $"[HathoraConfigPostAuthBodyHeaderUI.{nameof(onRefreshAppsListBtnClick)}"; 
+            Debug.Log($"{logPrefix} Start");
             
-            List<ApplicationWithDeployment> apps = await appApi.GetAppsAsync();
+            isRefreshingExistingApps = true;
+            
+            Security security = new()
+            {
+                HathoraDevToken = ServerConfig.HathoraCoreOpts.DevAuthOpts.HathoraDevToken,
+            };
+            
+            HathoraServerAppApiWrapper appApiWrapper = new(
+                new HathoraCloudSDK(security, ServerConfig.HathoraCoreOpts.AppId), 
+                ServerConfig);
+
+            List<ApplicationWithDeployment> apps = null;
+            apps = await appApiWrapper.GetAppsAsync();
+
+            if (apps == null)
+            {
+                Debug.LogError($"{logPrefix} !apps - Wiping dev token");
+                onDevTokenChanged(string.Empty);
+                isRefreshingExistingApps = false;
+                return;
+            }
+            
+            // TODO: SDK models should be serializable (instead of using a wrapper)
+            List<ApplicationWithDeploymentSerializable> appsSerializable = apps.ConvertAll(app =>
+                new ApplicationWithDeploymentSerializable(app));
 
             try 
             {
-                // The wrappers go through a great deal of parsing
-                ServerConfig.HathoraCoreOpts.ExistingAppsWithDeployment = apps; // Cache the response to ServerConfig
+                // Cache the response to ServerConfig
+                ServerConfig.HathoraCoreOpts.ExistingAppsWithDeploymentSerializable = appsSerializable; // 
             }
             catch (Exception e)
             {
-                Debug.LogError("Error setting " +
-                    $"{nameof(ServerConfig.HathoraCoreOpts.ExistingAppsWithDeployment)}: {e}");
+                Debug.LogError($"{logPrefix} Error setting " +
+                    $"{nameof(ServerConfig.HathoraCoreOpts.ExistingAppsWithDeploymentSerializable)}: {e}");
                 throw;
             }
               
@@ -303,9 +327,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 ServerConfig.HathoraCoreOpts.ExistingAppsSelectedIndex < apps.Count;
 
             if (!hasSelectedApp && apps.Count > 0)
-            {
                 setSelectedApp(0);
-            }
 
             isRefreshingExistingApps = false;
         }

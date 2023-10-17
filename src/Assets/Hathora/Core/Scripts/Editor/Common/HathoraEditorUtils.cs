@@ -275,7 +275,7 @@ namespace Hathora.Core.Scripts.Editor.Common
                 ? $"/c {_cmdWithArgs}" 
                 : $"-c \"{_cmdWithArgs}\"";
             
-            Debug.Log($"[HathoraEditorUtils.ExecuteCrossPlatformShellCmdAsync] " +
+            Debug.Log($"[HathoraEditorUtils.ExecuteCrossPlatformShellCmdAsync] Details: " +
                 $"\nshell: <color=yellow>{shell}</color>, " +
                 $"\nworkingDir: <color=yellow>{_workingDirPath}</color>, " +
                 $"\ncmd+args: <color=yellow>`{_cmdWithArgs}`</color>");

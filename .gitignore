@@ -87,3 +87,5 @@ HathoraServerConfig*.asset*
 # Ignore .tar.gz files or WIP files (.tar, .temp)
 **/.hathora/*.tar*
 **/.hathora/*.temp*
+
+.DS_Store

@@ -68,7 +68,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             _hathoraCoreOpts.DevAuthOpts.HasAuthToken &&
             !string.IsNullOrEmpty(_linuxHathoraAutoBuildOpts.ServerBuildDirName) &&
             !string.IsNullOrEmpty(_linuxHathoraAutoBuildOpts.ServerBuildExeName) &&
-            _hathoraDeployOpts.ContainerPortWrapper.PortNumber >= 1024;
+            _hathoraDeployOpts.ContainerPortSerializable.Port >= 1024;
         
         /// <summary>
         /// For Editor only: You may also want to check if you are !HathoraServerDeploy.IsDeploying
@@ -78,12 +78,9 @@ namespace Hathora.Core.Scripts.Runtime.Server
             MeetsBuildBtnReqs() &&
             MeetsDeployBtnReqs();
 
-        /// <summary>(!) Hathora SDK Enums start at index 1 (not 0).</summary>
-        /// <returns></returns>
+        /// <returns>meetsCreateRoomBtnReqs</returns>
         public bool MeetsCreateRoomBtnReqs() =>
-            HathoraCoreOpts.HasAppId &&
-            HathoraLobbyRoomOpts.SortedRegionSelectedIndexUi > -1 &&
-            HathoraLobbyRoomOpts.HathoraRegion > 0;
+            HathoraCoreOpts.HasAppId;
 
         /// <summary>
         /// Combines path, then normalizes

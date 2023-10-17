@@ -5,11 +5,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Hathora.Cloud.Sdk.Model;
 using Hathora.Core.Scripts.Editor.Common;
-using Hathora.Core.Scripts.Runtime.Common.Models;
 using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Hathora.Core.Scripts.Runtime.Server;
+using HathoraCloud.Models.Shared;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,6 +22,9 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         
         // Foldouts
         private bool isDeploymentFoldout;
+        
+        /// <summary>For state persistence on which dropdown group was last clicked</summary>
+        protected const string SERVER_DEPLOY_SETTINGS_FOLDOUT_STATE_KEY = "ServerDeploySettingsFoldoutState";
         #endregion // Vars
 
 
@@ -62,9 +64,20 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 
         private void insertDeploymentSettingsFoldout()
         {
+            // Retrieve the saved foldout state from EditorPrefs
+            isDeploymentFoldout = EditorPrefs.GetBool(
+                SERVER_DEPLOY_SETTINGS_FOLDOUT_STATE_KEY, 
+                defaultValue: false);
+            
+            // Create the foldout
             isDeploymentFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(
                 isDeploymentFoldout, 
                 "Hathora Deployment Configuration");
+            
+            // Save the new foldout state to EditorPrefs
+            EditorPrefs.SetBool(
+                SERVER_DEPLOY_SETTINGS_FOLDOUT_STATE_KEY, 
+                isDeploymentFoldout);
             
             if (!isDeploymentFoldout)
             {
@@ -87,19 +100,19 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             insertTransportTypeHorizRadioBtnGroup();
             // _advancedDeployUI.Draw();
 
-            bool enableDeployBtn = checkIsReadyToEnableToDeployBtn();
-            insertDeployBtnHelpbox(enableDeployBtn);
-            insertDeployAndOrCancelBtn();
+            bool deployBtnMeetsReqs = checkIsReadyToEnableToDeployBtn();
+            insertDeployBtnHelpbox(deployBtnMeetsReqs);
+            insertDeployAndOrCancelBtn(deployBtnMeetsReqs);
         }
 
         /// <summary>
         /// If deploying, we'll disable the btn and show a cancel btn.
         /// On cancel btn click, we'll disable until done ("Cancelling...") -> have a 2s cooldown.
         /// </summary>
-        private void insertDeployAndOrCancelBtn()
+        private void insertDeployAndOrCancelBtn(bool _deployBtnMeetsReqs)
         {
             // Deploy btn - active if !deploying
-            insertDeployAppBtn();
+            insertDeployAppBtn(_deployBtnMeetsReqs);
             insertCancelOrCancellingBtn(); // Show cancel btn separately (below)
         }
 
@@ -107,17 +120,20 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         {
             if (isCancellingDeployment)
                 insertDeployAppCancellingDisabledBtn();
-            else if (HathoraServerDeploy.IsDeploying && cancelBuildTokenSrc.Token.CanBeCanceled)
+            else if (HathoraServerDeploy.IsDeploying && cancelBuildTokenSrc is { Token: { CanBeCanceled: true } })
                 insertDeployAppCancelBtn();
         }
 
-        private void insertDeployAppBtn()
+        private void insertDeployAppBtn(bool _deployBtnMeetsReqs)
         {
             string btnLabelStr = HathoraServerDeploy.IsDeploying 
                 ? HathoraServerDeploy.GetDeployFriendlyStatus()
                 : "Deploy Application";
             
-            EditorGUI.BeginDisabledGroup(disabled: HathoraServerDeploy.IsDeploying || isCancellingDeployment);
+            EditorGUI.BeginDisabledGroup(disabled: 
+                HathoraServerDeploy.IsDeploying || 
+                isCancellingDeployment || 
+                !_deployBtnMeetsReqs);
 
             // USER INPUT >>
             bool clickedDeployBtn = InsertLeftGeneralBtn(btnLabelStr);
@@ -191,27 +207,27 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 _tooltip: "This is the port your server code is listening on, Hathora will bind to this.\n" +
                 "(NOTE: this will be different from the port players/clients connect to - see \"Create Room\")\n\n" +
                 "Default: 7777 (<1024 is generally reserved by system)",
-                _val: ServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber,
+                _val: ServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port,
                 _minVal: 1024,
                 _maxVal: 49151,
                 _alignPopup: GuiAlign.SmallRight);
 
-            bool isChanged = inputInt != ServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber;
-            if (isChanged)
-                onContainerPortNumberNumChanged(inputInt);
+            bool isChanged = inputInt != ServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port;
+            if (isChanged && inputInt >= 1024)
+            {
+                int clampedInputInt = Math.Clamp(inputInt, 1024, ushort.MaxValue);
+                onContainerPortNumberNumChanged(clampedInputInt);
+            }
             
             InsertSpace1x();
         }
         
         private void insertTransportTypeHorizRadioBtnGroup()
         {
-            int selectedIndex = ServerConfig.HathoraDeployOpts.TransportTypeSelectedIndex;
+            int selectedIndex = ServerConfig.HathoraDeployOpts.TransportTypeIndex;
             
-            // Get list of string names from PlanName Enum members. Set UPPER.
-            List<string> displayOptsStrList = GetStrListOfEnumMemberKeys<TransportType>(
-                EnumListOpts.AllCaps,
-                _prependDummyIndex0Str: "<Choose a Transport Type>");
-
+            // Get list of string names from PlanNameIndex Enum members. Set UPPER.
+            List<string> displayOptsStrList = GetStrListOfEnumMemberKeys<TransportType>(EnumListOpts.AllCaps);
             int newSelectedIndex = base.InsertHorizLabeledPopupList(
                 _labelStr: "Transport Type",
                 _tooltip: 
@@ -221,7 +237,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 _selectedIndex: selectedIndex,
                 GuiAlign.SmallRight);
 
-            bool isNewValidIndex = selectedIndex >= 0 &&
+            bool isNewValidIndex = 
                 newSelectedIndex != selectedIndex &&
                 selectedIndex < displayOptsStrList.Count;
 
@@ -252,13 +268,11 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 
         private void insertPlanNameHorizPopupList()
         {
-            int selectedIndex = ServerConfig.HathoraDeployOpts.PlanNameSelectedIndex;
+            int selectedIndex = ServerConfig.HathoraDeployOpts.PlanNameIndex;
             
-            // Get list of string names from PlanName Enum members - with extra info.
+            // Get list of string names from PlanNameIndex Enum members - with extra info.
             // The index order is !modified.
-            List<string> displayOptsStrArr = GetDisplayOptsStrArrFromEnum<PlanName>(
-                _prependDummyIndex0Str: "<Choose a Plan>");
-
+            List<string> displayOptsStrArr = GetDisplayOptsStrArrFromEnum<PlanName>();
             int newSelectedIndex = base.InsertHorizLabeledPopupList(
                 _labelStr: "Plan Size",
                 _tooltip: "Determines amount of resources your server instances has access to\n\n" +
@@ -271,7 +285,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 _selectedIndex: selectedIndex,
                 GuiAlign.SmallRight);
 
-            bool isNewValidIndex = selectedIndex >= 0 &&
+            bool isNewValidIndex = 
                 newSelectedIndex != selectedIndex &&
                 selectedIndex < displayOptsStrArr.Count;
 
@@ -300,21 +314,20 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         {
             InsertSpace2x();
 
-            // (!) Hathora SDK Enums start at index 1 (not 0)
             StringBuilder helpboxLabelStrb = new("Missing required fields: ");
             if (!ServerConfig.HathoraCoreOpts.HasAppId)
                 helpboxLabelStrb.Append("`AppId` ");
             
-            if (ServerConfig.HathoraDeployOpts.PlanNameSelectedIndex < 1)
+            if (ServerConfig.HathoraDeployOpts.PlanNameIndex < 0)
                 helpboxLabelStrb.Append("`Plan Size` ");
             
-            if (ServerConfig.HathoraDeployOpts.RoomsPerProcess < 1)
-                helpboxLabelStrb.Append("`Rooms per Process`,");
+            if (ServerConfig.HathoraDeployOpts.RoomsPerProcess < 0)
+                helpboxLabelStrb.Append("`Rooms per Process` ");
             
-            if (ServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber < 1)
+            if (ServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port < 0)
                 helpboxLabelStrb.Append("`Container Port Number` ");
             
-            if (ServerConfig.HathoraDeployOpts.TransportTypeSelectedIndex < 1)
+            if (ServerConfig.HathoraDeployOpts.TransportType < 0)
                 helpboxLabelStrb.Append("`Transport Type`");
 
             // Post the help box *before* we disable the button so it's easier to see (if toggleable)
@@ -326,17 +339,17 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         #region Event Logic
         private void onSelectedPlanNamePopupIndexChanged(int _newSelectedIndex)
         {
-            ServerConfig.HathoraDeployOpts.PlanNameSelectedIndex = _newSelectedIndex;
+            ServerConfig.HathoraDeployOpts.PlanNameIndex = _newSelectedIndex;
             SaveConfigChange(
-                nameof(ServerConfig.HathoraDeployOpts.PlanNameSelectedIndex), 
+                nameof(ServerConfig.HathoraDeployOpts.PlanNameIndex), 
                 _newSelectedIndex.ToString());
         }
         
         private void onSelectedTransportTypePopupIndexChanged(int _newSelectedIndex)
         {
-            ServerConfig.HathoraDeployOpts.TransportTypeSelectedIndex = _newSelectedIndex;
+            ServerConfig.HathoraDeployOpts.TransportTypeIndex = _newSelectedIndex;
             SaveConfigChange(
-                nameof(ServerConfig.HathoraDeployOpts.TransportTypeSelectedIndex), 
+                nameof(ServerConfig.HathoraDeployOpts.TransportType), 
                 _newSelectedIndex.ToString());
         }
 
@@ -350,9 +363,9 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         
         private void onContainerPortNumberNumChanged(int _inputInt)
         {
-            ServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber = _inputInt;
+            ServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port = _inputInt;
             SaveConfigChange(
-                nameof(ServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber), 
+                nameof(ServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port), 
                 _inputInt.ToString());
         }
         
@@ -397,12 +410,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
                 else
                     onDeployAppFail();
             }
-
-            // catch (TaskCanceledException)
-            // {
-            //     onDeployAppFail();
-            //     throw;
-            // }
             catch (Exception e)
             {
                 Debug.LogError($"[HathoraConfigPostAuthBodyDeployUI.DeployApp] Error: {e}");
@@ -447,25 +454,17 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         /// Cache last successful Deployment for the session
         /// </summary>
         /// <param name="_deployment"></param>
-        private void onDeployAppSuccess(Deployment _deployment)
-        {
-            ServerConfig.HathoraDeployOpts.LastDeployment = 
-                new DeploymentWrapper(_deployment);
-        }
+        private void onDeployAppSuccess(Deployment _deployment) =>
+            ServerConfig.HathoraDeployOpts.LastDeployment = _deployment;
         #endregion // Event Logic
         
         
         #region Utils
-        /// <summary>
-        /// (!) Hathora SDK Enums starts at index 1; not 0: Care of indexes
-        /// </summary>
-        /// <returns></returns>
+        /// <returns>isReadyToEnableToDeployBtn</returns>
         private bool checkIsReadyToEnableToDeployBtn() =>
             !HathoraServerDeploy.IsDeploying &&
-            ServerConfig.HathoraDeployOpts.PlanNameSelectedIndex >= HathoraUtils.SDK_ENUM_STARTING_INDEX &&
             ServerConfig.HathoraDeployOpts.RoomsPerProcess > 0 &&
-            ServerConfig.HathoraDeployOpts.ContainerPortWrapper.PortNumber > 0 &&
-            ServerConfig.HathoraDeployOpts.TransportTypeSelectedIndex >= HathoraUtils.SDK_ENUM_STARTING_INDEX;
+            ServerConfig.HathoraDeployOpts.ContainerPortSerializable.Port >= 1024;
 
         #endregion //Utils
 
