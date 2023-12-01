@@ -170,7 +170,15 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
             
             // Content within the scroller >>
             base.BeginPaddedBox();
-            InsertLabel(ServerConfig.LinuxHathoraAutoBuildOpts.LastBuildLogsStrb.ToString());
+            
+            if (ServerConfig.LinuxHathoraAutoBuildOpts.LastBuildLogsStrb?.Length > 0)
+            {
+                InsertLabel(ServerConfig.LinuxHathoraAutoBuildOpts.LastBuildLogsStrb.ToString());
+            }
+            else
+            {
+                InsertLabel(ServerConfig.LinuxHathoraAutoBuildOpts.LastBuildLogsStr);
+            }
             base.EndPaddedBox();
             
             GUILayout.EndScrollView();

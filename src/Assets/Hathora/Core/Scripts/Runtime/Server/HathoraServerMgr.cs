@@ -33,6 +33,11 @@ namespace Hathora.Core.Scripts.Runtime.Server
              "as if deployed on Hathora; useful for debugging")]
         private string debugEditorMockProcId;
         protected string DebugEditorMockProcId => debugEditorMockProcId;
+
+        /// <summary>Set null/empty to !fake a region in the Editor</summary>
+        [SerializeField, Tooltip("When in the Editor, can overide HATHORA_REGION envVar")]
+        private Region debugEditorMockRegion;
+        protected Region DebugEditorMockRegion => debugEditorMockRegion;
         
         [Header("(!) Top menu: Hathora/ServerConfigFinder")]
         [SerializeField]
@@ -73,6 +78,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
         
         /// <summary>Set @ Awake, and only if deployed on Hathora</summary>
         private string hathoraProcessIdEnvVar;
+        private Region hathoraRegionEnvVar;
         
         /// <summary>
         /// This will only be true if we're deployed on Hathora, by verifying
@@ -105,8 +111,10 @@ namespace Hathora.Core.Scripts.Runtime.Server
 #if (UNITY_EDITOR)
             // Optional mocked ID for debugging: Create a Room manually in Hathora console => paste ProcessId @ debugEditorMockProcId
             hathoraProcessIdEnvVar = getServerDeployedProcessId(debugEditorMockProcId);
+            hathoraRegionEnvVar = getServerDeployedRegion(debugEditorMockRegion);
 #else
             hathoraProcessIdEnvVar = getServerDeployedProcessId();
+            hathoraRegionEnvVar = getServerDeployedRegion();
 #endif
             
             _ = GetHathoraServerContextAsync(_throwErrIfNoLobby: false); // !await; sets `HathoraServerContext ServerContext` ^
@@ -128,6 +136,26 @@ namespace Hathora.Core.Scripts.Runtime.Server
                 return _overrideProcIdVal;
             }
             return Environment.GetEnvironmentVariable("HATHORA_PROCESS_ID");
+        }
+        
+        protected virtual Region getServerDeployedRegion(Region?_overrideRegionVal = null)
+        {
+            if (_overrideRegionVal != null)
+            {
+                Debug.Log($"[{nameof(HathoraServerMgr)}.{nameof(getServerDeployedRegion)}] " +
+                    $"(!) Overriding HATHORA_REGION with mock val: `{_overrideRegionVal}`");
+
+                return _overrideRegionVal.GetValueOrDefault(Region.Seattle);
+            }
+
+            Debug.Log(Environment.GetEnvironmentVariable("HATHORA_REGION"));
+            if (!Region.TryParse(Environment.GetEnvironmentVariable("HATHORA_REGION"), true, out Region envVarRegion))
+            {
+                Debug.LogError($"[{nameof(HathoraServerMgr)}.{nameof(getServerDeployedRegion)}] " +
+                    "Error: Invalid Hathora Region env var");
+            }
+            Debug.Log(envVarRegion);
+            return envVarRegion;
         }
 
         /// <summary>
@@ -302,10 +330,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
         {
             string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContextAsync)}]";
             Debug.Log($"{logPrefix} Start");
-            
-            // Delay just 1 frame so the logs are closer to the bottom [Hathora Console workaround for max 1k logs viewed]
-            await Task.Yield();
-            
+
             if (!IsDeployedOnHathora)
             {
                 #if UNITY_SERVER && !UNITY_EDITOR
@@ -318,7 +343,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             }
             
             // GetCachedServerContext() will await !null, so we don't want to the main var *yet*
-            HathoraServerContext tempServerContext = new HathoraServerContext(hathoraProcessIdEnvVar);
+            HathoraServerContext tempServerContext = new HathoraServerContext(hathoraProcessIdEnvVar, hathoraRegionEnvVar);
             
             // ----------------
             // Get Process from env var "HATHORA_PROCESS_ID" => We probably cached this, already, @ )

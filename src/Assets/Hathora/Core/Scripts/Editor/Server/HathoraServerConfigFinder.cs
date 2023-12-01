@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Hathora.Core.Scripts.Runtime.Common.Utils;
 using Hathora.Core.Scripts.Runtime.Server;
 using UnityEditor;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace Hathora.Core.Scripts.Editor.Server
             HathoraServerConfig newConfig = ScriptableObject.CreateInstance<HathoraServerConfig>();
             
             // Ensure target dir exists
-            const string dirPath = "Assets/Hathora";
+            const string dirPath = "Assets/";
             if (!Directory.Exists(dirPath))
                 Directory.CreateDirectory(dirPath);
             

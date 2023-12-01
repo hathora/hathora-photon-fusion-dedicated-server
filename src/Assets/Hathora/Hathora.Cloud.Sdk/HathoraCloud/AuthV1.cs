@@ -21,7 +21,7 @@ namespace HathoraCloud
     /// <summary>
     /// Operations that allow you to generate a Hathora-signed <a href="JWT">JSON web token (JWT)</a> for <a href="https://hathora.dev/docs/lobbies-and-matchmaking/auth-service">player authentication</a>.
     /// </summary>
-    public interface IAuthV1SDK
+    public interface IAuthV1
     {
 
         /// <summary>
@@ -32,30 +32,30 @@ namespace HathoraCloud
         /// <summary>
         /// Returns a unique player token using a Google-signed OIDC `idToken`.
         /// </summary>
-        Task<LoginGoogleResponse> LoginGoogleAsync(Models.Operations.LoginGoogleRequest request);
+        Task<LoginGoogleResponse> LoginGoogleAsync(HathoraCloud.Models.Operations.LoginGoogleRequest request);
 
         /// <summary>
         /// Returns a unique player token with a specified nickname for a user.
         /// </summary>
-        Task<LoginNicknameResponse> LoginNicknameAsync(Models.Operations.LoginNicknameRequest request);
+        Task<LoginNicknameResponse> LoginNicknameAsync(HathoraCloud.Models.Operations.LoginNicknameRequest request);
     }
 
     /// <summary>
     /// Operations that allow you to generate a Hathora-signed <a href="JWT">JSON web token (JWT)</a> for <a href="https://hathora.dev/docs/lobbies-and-matchmaking/auth-service">player authentication</a>.
     /// </summary>
-    public class AuthV1SDK: IAuthV1SDK
+    public class AuthV1: IAuthV1
     {
         public SDKConfig Config { get; private set; }
         private const string _target = "unity";
-        private const string _sdkVersion = "0.1.0";
-        private const string _sdkGenVersion = "2.144.7";
+        private const string _sdkVersion = "0.26.0";
+        private const string _sdkGenVersion = "2.195.2";
         private const string _openapiDocVersion = "0.0.1";
-        private const string _userAgent = "speakeasy-sdk/unity 0.1.0 2.144.7 0.0.1 hathora-unity-sdk";
+        private const string _userAgent = "speakeasy-sdk/unity 0.26.0 2.195.2 0.0.1 hathora-cloud";
         private string _serverUrl = "";
         private ISpeakeasyHttpClient _defaultClient;
         private ISpeakeasyHttpClient _securityClient;
 
-        public AuthV1SDK(ISpeakeasyHttpClient defaultClient, ISpeakeasyHttpClient securityClient, string serverUrl, SDKConfig config)
+        public AuthV1(ISpeakeasyHttpClient defaultClient, ISpeakeasyHttpClient securityClient, string serverUrl, SDKConfig config)
         {
             _defaultClient = defaultClient;
             _securityClient = securityClient;
@@ -67,11 +67,7 @@ namespace HathoraCloud
         public async Task<LoginAnonymousResponse> LoginAnonymousAsync(LoginAnonymousRequest? request = null)
         {
             request.AppId ??= Config.AppId;
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/auth/v1/{appId}/login/anonymous", request);
             
 
@@ -102,6 +98,7 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
@@ -115,7 +112,7 @@ namespace HathoraCloud
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
                 {
-                    response.LoginAnonymous404ApplicationJSONString = httpResponse.downloadHandler.text;
+                    response.ApiError = JsonConvert.DeserializeObject<ApiError>(httpResponse.downloadHandler.text, new JsonSerializerSettings(){ NullValueHandling = NullValueHandling.Ignore, Converters = new JsonConverter[] { new FlexibleObjectDeserializer(), new DateOnlyConverter(), new EnumSerializer() }});
                 }
                 
                 return response;
@@ -124,14 +121,10 @@ namespace HathoraCloud
         }
         
 
-        public async Task<LoginGoogleResponse> LoginGoogleAsync(Models.Operations.LoginGoogleRequest request)
+        public async Task<LoginGoogleResponse> LoginGoogleAsync(HathoraCloud.Models.Operations.LoginGoogleRequest request)
         {
             request.AppId ??= Config.AppId;
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/auth/v1/{appId}/login/google", request);
             
 
@@ -172,6 +165,7 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
@@ -181,20 +175,11 @@ namespace HathoraCloud
                 
                 return response;
             }
-            if((response.StatusCode == 401))
+            if((response.StatusCode == 401) || (response.StatusCode == 404))
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
                 {
-                    response.LoginGoogle401ApplicationJSONString = httpResponse.downloadHandler.text;
-                }
-                
-                return response;
-            }
-            if((response.StatusCode == 404))
-            {
-                if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
-                {
-                    response.LoginGoogle404ApplicationJSONString = httpResponse.downloadHandler.text;
+                    response.ApiError = JsonConvert.DeserializeObject<ApiError>(httpResponse.downloadHandler.text, new JsonSerializerSettings(){ NullValueHandling = NullValueHandling.Ignore, Converters = new JsonConverter[] { new FlexibleObjectDeserializer(), new DateOnlyConverter(), new EnumSerializer() }});
                 }
                 
                 return response;
@@ -203,14 +188,10 @@ namespace HathoraCloud
         }
         
 
-        public async Task<LoginNicknameResponse> LoginNicknameAsync(Models.Operations.LoginNicknameRequest request)
+        public async Task<LoginNicknameResponse> LoginNicknameAsync(HathoraCloud.Models.Operations.LoginNicknameRequest request)
         {
             request.AppId ??= Config.AppId;
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/auth/v1/{appId}/login/nickname", request);
             
 
@@ -251,6 +232,7 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
@@ -264,7 +246,7 @@ namespace HathoraCloud
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
                 {
-                    response.LoginNickname404ApplicationJSONString = httpResponse.downloadHandler.text;
+                    response.ApiError = JsonConvert.DeserializeObject<ApiError>(httpResponse.downloadHandler.text, new JsonSerializerSettings(){ NullValueHandling = NullValueHandling.Ignore, Converters = new JsonConverter[] { new FlexibleObjectDeserializer(), new DateOnlyConverter(), new EnumSerializer() }});
                 }
                 
                 return response;

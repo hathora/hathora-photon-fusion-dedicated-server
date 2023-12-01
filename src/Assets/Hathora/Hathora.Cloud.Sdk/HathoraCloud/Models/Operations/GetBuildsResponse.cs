@@ -20,11 +20,8 @@ namespace HathoraCloud.Models.Operations
     public class GetBuildsResponse: IDisposable
     {
 
-        /// <summary>
-        /// Ok
-        /// </summary>
         [SerializeField]
-        public List<Build>? Builds { get; set; }
+        public ApiError? ApiError { get; set; }
         
 
         /// <summary>
@@ -32,10 +29,6 @@ namespace HathoraCloud.Models.Operations
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? GetBuilds404ApplicationJSONString { get; set; }
         
 
         /// <summary>
@@ -49,7 +42,14 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
+        
+
+        /// <summary>
+        /// Ok
+        /// </summary>
+        [SerializeField]
+        public List<Build>? Classes { get; set; }
         
         public void Dispose() {
             if (RawResponse != null) {

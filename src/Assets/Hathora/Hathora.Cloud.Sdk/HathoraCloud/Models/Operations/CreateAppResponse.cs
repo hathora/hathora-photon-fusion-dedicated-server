@@ -20,7 +20,11 @@ namespace HathoraCloud.Models.Operations
     {
 
         [SerializeField]
-        public Models.Shared.Application? Application { get; set; }
+        public ApiError? ApiError { get; set; }
+        
+
+        [SerializeField]
+        public HathoraCloud.Models.Shared.Application? Application { get; set; }
         
 
         /// <summary>
@@ -28,14 +32,6 @@ namespace HathoraCloud.Models.Operations
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? CreateApp422ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateApp500ApplicationJSONString { get; set; }
         
 
         /// <summary>
@@ -49,7 +45,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

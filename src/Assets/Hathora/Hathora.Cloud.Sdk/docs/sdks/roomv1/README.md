@@ -3,7 +3,7 @@
 
 ## Overview
 
-Deprecated. Use RoomV2.
+Deprecated. Use [RoomV2](https://hathora.dev/api#tag/RoomV2).
 
 ### Available Operations
 
@@ -34,12 +34,12 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.CreateRoomDeprecatedAsync(new CreateRoomDeprecatedRequest() {
-        CreateRoomParams = new CreateRoomParams() {
-            Region = HathoraCloud.Models.Shared.Region.Chicago,
-            RoomConfig = "{\"name\":\"my-room\"}",
-        },
-        RoomId = "2swovpy1fnunu",
-    }))
+    CreateRoomParams = new CreateRoomParams() {
+        Region = Region.Chicago,
+        RoomConfig = "{\"name\":\"my-room\"}",
+    },
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -76,8 +76,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.DestroyRoomDeprecatedAsync(new DestroyRoomDeprecatedRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -114,8 +114,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.GetActiveRoomsForProcessDeprecatedAsync(new GetActiveRoomsForProcessDeprecatedRequest() {
-        ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
-    }))
+    ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
+}))
 {
     // handle response
 }
@@ -152,8 +152,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.GetConnectionInfoDeprecatedAsync(new GetConnectionInfoDeprecatedRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -190,8 +190,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.GetInactiveRoomsForProcessDeprecatedAsync(new GetInactiveRoomsForProcessDeprecatedRequest() {
-        ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
-    }))
+    ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
+}))
 {
     // handle response
 }
@@ -228,8 +228,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.GetRoomInfoDeprecatedAsync(new GetRoomInfoDeprecatedRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -266,8 +266,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV1.SuspendRoomDeprecatedAsync(new SuspendRoomDeprecatedRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }

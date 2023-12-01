@@ -11,7 +11,9 @@
 namespace HathoraCloud
 {
     using HathoraCloud.Models.Operations;
+    using HathoraCloud.Models.Shared;
     using HathoraCloud.Utils;
+    using Newtonsoft.Json;
     using System.Threading.Tasks;
     using System;
     using UnityEngine.Networking;
@@ -19,7 +21,7 @@ namespace HathoraCloud
     /// <summary>
     /// Operations to get logs by <a href="https://hathora.dev/docs/concepts/hathora-entities#application">applications</a>, <a href="https://hathora.dev/docs/concepts/hathora-entities#process">processes</a>, and <a href="https://hathora.dev/docs/concepts/hathora-entities#deployment">deployments</a>. We store 20GB of logs data.
     /// </summary>
-    public interface ILogV1SDK
+    public interface ILogV1
     {
 
         /// <summary>
@@ -41,19 +43,19 @@ namespace HathoraCloud
     /// <summary>
     /// Operations to get logs by <a href="https://hathora.dev/docs/concepts/hathora-entities#application">applications</a>, <a href="https://hathora.dev/docs/concepts/hathora-entities#process">processes</a>, and <a href="https://hathora.dev/docs/concepts/hathora-entities#deployment">deployments</a>. We store 20GB of logs data.
     /// </summary>
-    public class LogV1SDK: ILogV1SDK
+    public class LogV1: ILogV1
     {
         public SDKConfig Config { get; private set; }
         private const string _target = "unity";
-        private const string _sdkVersion = "0.1.0";
-        private const string _sdkGenVersion = "2.144.7";
+        private const string _sdkVersion = "0.26.0";
+        private const string _sdkGenVersion = "2.195.2";
         private const string _openapiDocVersion = "0.0.1";
-        private const string _userAgent = "speakeasy-sdk/unity 0.1.0 2.144.7 0.0.1 hathora-unity-sdk";
+        private const string _userAgent = "speakeasy-sdk/unity 0.26.0 2.195.2 0.0.1 hathora-cloud";
         private string _serverUrl = "";
         private ISpeakeasyHttpClient _defaultClient;
         private ISpeakeasyHttpClient _securityClient;
 
-        public LogV1SDK(ISpeakeasyHttpClient defaultClient, ISpeakeasyHttpClient securityClient, string serverUrl, SDKConfig config)
+        public LogV1(ISpeakeasyHttpClient defaultClient, ISpeakeasyHttpClient securityClient, string serverUrl, SDKConfig config)
         {
             _defaultClient = defaultClient;
             _securityClient = securityClient;
@@ -66,11 +68,7 @@ namespace HathoraCloud
         public async Task<GetLogsForAppResponse> GetLogsForAppAsync(GetLogsForAppRequest? request = null)
         {
             request.AppId ??= Config.AppId;
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/logs/v1/{appId}/all", request);
             
 
@@ -101,11 +99,12 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("text/plain",response.ContentType))
                 {
-                    response.GetLogsForApp200TextPlainByteString = httpResponse.downloadHandler.text;
+                    response.Res = httpResponse.downloadHandler.text;
                 }
                 
                 return response;
@@ -114,7 +113,7 @@ namespace HathoraCloud
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
                 {
-                    response.GetLogsForApp404ApplicationJSONString = httpResponse.downloadHandler.text;
+                    response.ApiError = JsonConvert.DeserializeObject<ApiError>(httpResponse.downloadHandler.text, new JsonSerializerSettings(){ NullValueHandling = NullValueHandling.Ignore, Converters = new JsonConverter[] { new FlexibleObjectDeserializer(), new DateOnlyConverter(), new EnumSerializer() }});
                 }
                 
                 return response;
@@ -127,11 +126,7 @@ namespace HathoraCloud
         public async Task<GetLogsForDeploymentResponse> GetLogsForDeploymentAsync(GetLogsForDeploymentRequest? request = null)
         {
             request.AppId ??= Config.AppId;
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/logs/v1/{appId}/deployment/{deploymentId}", request);
             
 
@@ -162,11 +157,12 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("text/plain",response.ContentType))
                 {
-                    response.GetLogsForDeployment200TextPlainByteString = httpResponse.downloadHandler.text;
+                    response.Res = httpResponse.downloadHandler.text;
                 }
                 
                 return response;
@@ -175,7 +171,7 @@ namespace HathoraCloud
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
                 {
-                    response.GetLogsForDeployment404ApplicationJSONString = httpResponse.downloadHandler.text;
+                    response.ApiError = JsonConvert.DeserializeObject<ApiError>(httpResponse.downloadHandler.text, new JsonSerializerSettings(){ NullValueHandling = NullValueHandling.Ignore, Converters = new JsonConverter[] { new FlexibleObjectDeserializer(), new DateOnlyConverter(), new EnumSerializer() }});
                 }
                 
                 return response;
@@ -187,11 +183,7 @@ namespace HathoraCloud
         public async Task<GetLogsForProcessResponse> GetLogsForProcessAsync(GetLogsForProcessRequest? request = null)
         {
             request.AppId ??= Config.AppId;
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/logs/v1/{appId}/process/{processId}", request);
             
 
@@ -222,29 +214,21 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("text/plain",response.ContentType))
                 {
-                    response.GetLogsForProcess200TextPlainByteString = httpResponse.downloadHandler.text;
+                    response.Res = httpResponse.downloadHandler.text;
                 }
                 
                 return response;
             }
-            if((response.StatusCode == 404))
+            if((response.StatusCode == 404) || (response.StatusCode == 500))
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
                 {
-                    response.GetLogsForProcess404ApplicationJSONString = httpResponse.downloadHandler.text;
-                }
-                
-                return response;
-            }
-            if((response.StatusCode == 500))
-            {
-                if(Utilities.IsContentTypeMatch("application/json",response.ContentType))
-                {
-                    response.GetLogsForProcess500ApplicationJSONString = httpResponse.downloadHandler.text;
+                    response.ApiError = JsonConvert.DeserializeObject<ApiError>(httpResponse.downloadHandler.text, new JsonSerializerSettings(){ NullValueHandling = NullValueHandling.Ignore, Converters = new JsonConverter[] { new FlexibleObjectDeserializer(), new DateOnlyConverter(), new EnumSerializer() }});
                 }
                 
                 return response;

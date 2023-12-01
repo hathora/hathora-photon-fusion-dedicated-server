@@ -153,7 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugEditorMockProcId: 
-  hathoraServerConfig: {fileID: 11400000, guid: d51cf915746b94e7e97440ea2039e67f, type: 2}
+  debugEditorMockRegion: 0
+  hathoraServerConfig: {fileID: 11400000, guid: 9b3750dc7ff254ead84b0bdc6b1a5b66, type: 2}
 --- !u!4 &1367994100
 Transform:
   m_ObjectHideFlags: 0
@@ -195,7 +196,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1190425046, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: editorStartType
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9147515999474046547, guid: 90a2870a3d8e4b647ba53f21cc9caca0, type: 3}
       propertyPath: m_Name

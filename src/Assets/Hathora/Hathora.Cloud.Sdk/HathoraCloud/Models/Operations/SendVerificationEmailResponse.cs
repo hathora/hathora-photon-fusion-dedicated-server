@@ -19,6 +19,10 @@ namespace HathoraCloud.Models.Operations
     public class SendVerificationEmailResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
@@ -37,11 +41,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
-        
-
-        [SerializeField]
-        public string? SendVerificationEmail500ApplicationJSONString { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
 
         /// <summary>

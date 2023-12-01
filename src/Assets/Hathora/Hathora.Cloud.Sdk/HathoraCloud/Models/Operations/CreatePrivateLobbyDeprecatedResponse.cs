@@ -10,6 +10,7 @@
 #nullable enable
 namespace HathoraCloud.Models.Operations
 {
+    using HathoraCloud.Models.Shared;
     using System;
     using UnityEngine.Networking;
     using UnityEngine;
@@ -18,35 +19,15 @@ namespace HathoraCloud.Models.Operations
     public class CreatePrivateLobbyDeprecatedResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? CreatePrivateLobbyDeprecated400ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreatePrivateLobbyDeprecated401ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreatePrivateLobbyDeprecated404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreatePrivateLobbyDeprecated422ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreatePrivateLobbyDeprecated429ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreatePrivateLobbyDeprecated500ApplicationJSONString { get; set; }
         
 
         /// <summary>
@@ -67,7 +48,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

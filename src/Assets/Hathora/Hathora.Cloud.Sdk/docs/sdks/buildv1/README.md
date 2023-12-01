@@ -32,10 +32,10 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.BuildV1.CreateBuildAsync(new CreateBuildRequest() {
-        CreateBuildParams = new CreateBuildParams() {
-            BuildTag = "0.1.14-14c793",
-        },
-    }))
+    CreateBuildParams = new CreateBuildParams() {
+        BuildTag = "0.1.14-14c793",
+    },
+}))
 {
     // handle response
 }
@@ -72,8 +72,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.BuildV1.DeleteBuildAsync(new DeleteBuildRequest() {
-        BuildId = 1,
-    }))
+    BuildId = 1,
+}))
 {
     // handle response
 }
@@ -110,8 +110,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.BuildV1.GetBuildInfoAsync(new GetBuildInfoRequest() {
-        BuildId = 1,
-    }))
+    BuildId = 1,
+}))
 {
     // handle response
 }
@@ -184,14 +184,14 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.BuildV1.RunBuildAsync(new RunBuildRequest() {
-        RequestBody = new RunBuildRequestBody() {
-            File = new RunBuildRequestBodyFile() {
-                Content = "Ukkktj?kA= as bytes <<<>>>",
-                File = "times Mini",
-            },
+    RequestBody = new RunBuildRequestBody() {
+        File = new File() {
+            Content = "0xcBBBDB7B76 as bytes <<<>>>",
+            FileName = "times_mini.wav",
         },
-        BuildId = 1,
-    }))
+    },
+    BuildId = 1,
+}))
 {
     // handle response
 }

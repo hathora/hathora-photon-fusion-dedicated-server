@@ -21,7 +21,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
     /// </summary>
     public class HathoraServerBuildApiWrapper : HathoraServerApiWrapperBase
     {
-        protected BuildV1SDK BuildApi { get; }
+        protected BuildV1 BuildApi { get; }
         private volatile bool uploading;
 
         public HathoraServerBuildApiWrapper(
@@ -32,7 +32,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             Debug.Log($"[{nameof(HathoraServerBuildApiWrapper)}.Constructor] " +
                 "Initializing Server API...");
             
-            this.BuildApi = _hathoraSdk.BuildV1 as BuildV1SDK;
+            this.BuildApi = _hathoraSdk.BuildV1 as BuildV1;
         }
         
         
@@ -100,9 +100,9 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             string logPrefix = $"[{nameof(HathoraServerBuildApiWrapper)}.{nameof(RunCloudBuildAsync)}]";
          
             // Prep upload request
-            RunBuildRequestBodyFile requestFile = new()
+            HathoraCloud.Models.Operations.File requestFile = new()
             {
-                File = _pathToTarGzBuildFile,
+                FileName = _pathToTarGzBuildFile,
                 // Content = // Apply below in try/catch since we need to await
             };
             
@@ -157,11 +157,11 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
 
             // (!) Unity, by default, truncates logs to 1k chars (callstack-inclusive).
             // string encodedLogs = await readStreamToStringAsync(runBuildResponse?.RunBuild200TextPlainByteString); // TODO: Cleanup
-            string logs = runBuildResponse?.RunBuild200TextPlainByteString;
+            string logs = runBuildResponse?.Res;
 
             if (string.IsNullOrEmpty(logs))
             {
-                Debug.LogError($"{logPrefix} Error: Expected {nameof(runBuildResponse.RunBuild200TextPlainByteString)}");
+                Debug.LogError($"{logPrefix} Error: Expected {nameof(runBuildResponse.Res)}");
                 return null;
             }
             
@@ -243,7 +243,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
 
             Build build = getBuildInfoResponse.Build;
-            bool isSuccess = build is { Status: BuildStatus.Succeeded };
+            bool isSuccess = build is { Status: Status.Succeeded };
             
             Debug.Log($"{logPrefix} Success? {isSuccess}, <color=yellow>" +
                 $"{nameof(getBuildInfoResponse)}: {ToJson(getBuildInfoResponse.Build)}</color>");

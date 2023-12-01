@@ -19,6 +19,10 @@ namespace HathoraCloud.Models.Operations
     public class GetConnectionInfoResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// Ok
         /// </summary>
@@ -33,18 +37,6 @@ namespace HathoraCloud.Models.Operations
         public string? ContentType { get; set; } = default!;
         
 
-        [SerializeField]
-        public string? GetConnectionInfo400ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? GetConnectionInfo404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? GetConnectionInfo500ApplicationJSONString { get; set; }
-        
-
         /// <summary>
         /// HTTP response status code for this operation
         /// </summary>
@@ -56,7 +48,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

@@ -172,13 +172,17 @@ namespace Hathora.Core.Scripts.Runtime.Client
         /// <param name="_roomConfigSerializable">
         /// Pass your own model OR stringified json, minimally "{}"
         /// </param>
+        /// <param name="_shortCode">
+        /// Ideal for user-defined identifiers for lobbies, if null will default to roomId
+        /// </param>
         /// <param name="_roomId">
-        /// Leave null to auto-generate an Id (recommended to prevent potential dupe issues)
+        /// Leave null to auto-generate a globally unique roomId (recommended). Should only be overwritten to integrate with matchmakers, etc.
         /// </param>
         /// <param name="_cancelToken"></param>
         public async Task<LobbyV3> CreateLobbyAsync(
             object _roomConfigSerializable,
             Region _region = HathoraUtils.DEFAULT_REGION,
+            string _shortCode = null,
             string _roomId = null,
             LobbyVisibility _visibility = LobbyVisibility.Public,
             CancellationToken _cancelToken = default)
@@ -191,6 +195,7 @@ namespace Hathora.Core.Scripts.Runtime.Client
                 _roomConfigSerializable,
                 _region,
                 _visibility,
+                _shortCode,
                 _roomId,
                 _cancelToken);
             

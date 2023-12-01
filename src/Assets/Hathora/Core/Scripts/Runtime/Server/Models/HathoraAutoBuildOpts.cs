@@ -2,6 +2,8 @@
 
 using System;
 using System.Text;
+using HathoraCloud.Models.Shared;
+using Newtonsoft.Json;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor.Build.Reporting;
@@ -84,6 +86,26 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
             set => _overwriteDockerfile = value;
         }
         #endregion // Persisted
+        
+        public enum ScriptingBackend
+        {
+            [JsonProperty("mono")]
+            Mono,
+            [JsonProperty("il2cpp")]
+            IL2CPP,
+        }
+        #region Scripting Backend
+        [SerializeField]
+        private int _scriptingBackendIndex = (int)ScriptingBackend.Mono;
+        public int ScriptingBackendIndex
+        {
+            get => _scriptingBackendIndex;
+            set => _scriptingBackendIndex = value;
+        }
+
+        public ScriptingBackend SelectedScriptingBackend => 
+            (ScriptingBackend)_scriptingBackendIndex;
+        #endregion // Scripting Backend
 
         
         #region Session Only (!Persistence)
@@ -103,8 +125,17 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
             get => _lastBuildLogsStrb; 
             set => _lastBuildLogsStrb = value;
         }
+        
+        [SerializeField]
+        private string _lastBuildLogsStr = "";
+        public string LastBuildLogsStr
+        {
+            get => _lastBuildLogsStr; 
+            set => _lastBuildLogsStr = value;
+        }
+
         public bool HasLastBuildLogsStrb => 
-            LastBuildLogsStrb?.Length > 0;
+            LastBuildLogsStrb?.Length > 0 || LastBuildLogsStr?.Length > 0;
         #endregion // Session Only (!Persistence)
     }
 }

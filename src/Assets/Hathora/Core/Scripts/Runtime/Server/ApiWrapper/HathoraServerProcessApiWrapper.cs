@@ -17,7 +17,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
     /// </summary>
     public class HathoraServerProcessApiWrapper : HathoraServerApiWrapperBase
     {
-        protected ProcessesV1SDK ProcessesApi { get; }
+        protected ProcessesV1 ProcessesApi { get; }
 
         public HathoraServerProcessApiWrapper(
             HathoraCloudSDK _hathoraSdk,
@@ -27,7 +27,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             Debug.Log($"[{nameof(HathoraServerProcessApiWrapper)}.Constructor] " +
                 "Initializing Server API...");
             
-            this.ProcessesApi = _hathoraSdk.ProcessesV1 as ProcessesV1SDK;
+            this.ProcessesApi = _hathoraSdk.ProcessesV1 as ProcessesV1;
         }
         
         

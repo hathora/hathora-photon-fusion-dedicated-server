@@ -20,7 +20,7 @@ namespace HathoraCloud.Models.Operations
 
         [SerializeField]
         [SpeakeasyMetadata("multipartForm:file")]
-        public RunBuildRequestBodyFile File { get; set; } = default!;
+        public File File { get; set; } = default!;
         
     }
 }

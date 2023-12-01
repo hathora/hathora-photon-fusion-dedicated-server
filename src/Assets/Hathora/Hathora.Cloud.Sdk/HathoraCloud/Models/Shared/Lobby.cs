@@ -65,7 +65,11 @@ namespace HathoraCloud.Models.Shared
         
 
         /// <summary>
-        /// Unique identifier to a game session or match. Use the default system generated ID or overwrite it with your own.
+        /// Unique identifier to a game session or match. Use the default system generated ID or overwrite it with your own.<br/>
+        /// 
+        /// <remarks>
+        /// Note: error will be returned if `roomId` is not globally unique.
+        /// </remarks>
         /// </summary>
         [SerializeField]
         [JsonProperty("roomId")]
@@ -82,7 +86,7 @@ namespace HathoraCloud.Models.Shared
         /// </summary>
         [SerializeField]
         [JsonProperty("state")]
-        public LobbyState? State { get; set; }
+        public State? State { get; set; }
         
 
         /// <summary>

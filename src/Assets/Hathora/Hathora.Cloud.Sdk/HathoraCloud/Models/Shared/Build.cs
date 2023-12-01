@@ -83,12 +83,10 @@ namespace HathoraCloud.Models.Shared
         public double ImageSize { get; set; } = default!;
         
 
-        /// <summary>
-        /// Identifiers for the containers stored in Hathora&apos;s registries.
-        /// </summary>
+        [Obsolete("This field will be removed in a future release, please migrate away from it as soon as possible")]
         [SerializeField]
         [JsonProperty("regionalContainerTags")]
-        public List<BuildRegionalContainerTags> RegionalContainerTags { get; set; } = default!;
+        public List<RegionalContainerTags> RegionalContainerTags { get; set; } = default!;
         
 
         /// <summary>
@@ -115,7 +113,7 @@ namespace HathoraCloud.Models.Shared
         /// </summary>
         [SerializeField]
         [JsonProperty("status")]
-        public BuildStatus Status { get; set; } = default!;
+        public Status Status { get; set; } = default!;
         
     }
 }

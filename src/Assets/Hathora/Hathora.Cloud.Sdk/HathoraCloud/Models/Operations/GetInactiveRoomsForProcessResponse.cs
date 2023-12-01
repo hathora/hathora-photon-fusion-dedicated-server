@@ -20,22 +20,15 @@ namespace HathoraCloud.Models.Operations
     public class GetInactiveRoomsForProcessResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? GetInactiveRoomsForProcess404ApplicationJSONString { get; set; }
-        
-
-        /// <summary>
-        /// Ok
-        /// </summary>
-        [SerializeField]
-        public List<RoomWithoutAllocations>? RoomWithoutAllocations { get; set; }
         
 
         /// <summary>
@@ -49,7 +42,14 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
+        
+
+        /// <summary>
+        /// Ok
+        /// </summary>
+        [SerializeField]
+        public List<RoomWithoutAllocations>? Classes { get; set; }
         
         public void Dispose() {
             if (RawResponse != null) {

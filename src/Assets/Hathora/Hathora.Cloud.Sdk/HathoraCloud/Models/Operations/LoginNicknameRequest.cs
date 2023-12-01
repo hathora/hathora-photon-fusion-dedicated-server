@@ -21,7 +21,7 @@ namespace HathoraCloud.Models.Operations
 
         [SerializeField]
         [SpeakeasyMetadata("request:mediaType=application/json")]
-        public Models.Shared.LoginNicknameRequest LoginNicknameRequestValue { get; set; } = default!;
+        public HathoraCloud.Models.Shared.LoginNicknameRequest LoginNicknameRequestValue { get; set; } = default!;
         
 
         [SerializeField]

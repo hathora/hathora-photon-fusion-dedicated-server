@@ -18,7 +18,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
     /// </summary>
     public class HathoraServerAppApiWrapper : HathoraServerApiWrapperBase
     {
-        protected AppV1SDK AppApi { get; }
+        protected AppV1 AppApi { get; }
 
         public HathoraServerAppApiWrapper(
             HathoraCloudSDK _hathoraSdk,
@@ -28,7 +28,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             Debug.Log($"[{nameof(HathoraServerAppApiWrapper)}.Constructor] " +
                 "Initializing Server API...");
             
-            this.AppApi = _hathoraSdk.AppV1 as AppV1SDK;
+            this.AppApi = _hathoraSdk.AppV1 as AppV1;
         }
         
         
@@ -57,7 +57,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
 
             // Get inner response to return -> Log/Validate
-            List<ApplicationWithDeployment> applicationWithDeployment = getAppsResponse.ApplicationWithDeployments;
+            List<ApplicationWithDeployment> applicationWithDeployment = getAppsResponse.Classes;
             Debug.Log($"{logPrefix} num: '{applicationWithDeployment?.Count ?? 0}'");
             
             getAppsResponse.RawResponse?.Dispose(); // Prevent mem leaks

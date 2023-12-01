@@ -1,6 +1,4 @@
 <!-- Start SDK Example Usage -->
-
-
 ```csharp
 using HathoraCloud;
 using HathoraCloud.Models.Shared;
@@ -13,15 +11,15 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.AppV1.CreateAppAsync(new AppConfig() {
-        AppName = "minecraft",
-        AuthConfiguration = new AuthConfiguration() {
-            Anonymous = new RecordStringNever() {},
-            Google = new AuthConfigurationGoogle() {
-                ClientId = "models ah Southeast",
-            },
-            Nickname = new RecordStringNever() {},
+    AppName = "minecraft",
+    AuthConfiguration = new AuthConfiguration() {
+        Anonymous = new RecordStringNever() {},
+        Google = new Google() {
+            ClientId = "string",
         },
-    }))
+        Nickname = new RecordStringNever() {},
+    },
+}))
 {
     // handle response
 }

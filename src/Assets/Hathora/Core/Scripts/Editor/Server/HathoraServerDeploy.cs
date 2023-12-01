@@ -184,7 +184,7 @@ namespace Hathora.Core.Scripts.Editor.Server
                 catch (Exception e) { return null; }
 
                 // Get the most-recent deployments env vars + additional ports, if any
-                List<DeploymentEnv> envVars = null;
+                List<Env> envVars = null;
                 List<ContainerPort> additionalContainerPorts = null;
                 if (oldDeployments?.Count > 0)
                 {
@@ -362,7 +362,7 @@ namespace Hathora.Core.Scripts.Editor.Server
 
             Assert.AreEqual(
                 _buildWithLogs.build?.Status,
-                BuildStatus.Succeeded,
+                Status.Succeeded,
                 $"[{nameof(HathoraServerDeploy)}.{nameof(appendServerLogOutput)}] " +
                     "buildWithLogs.build?.Status != Succeeded");
         }

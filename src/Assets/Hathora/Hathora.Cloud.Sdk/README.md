@@ -1,7 +1,12 @@
-# openapi
 
-<div align="left">
+<div align="center">
+    <img src="https://user-images.githubusercontent.com/6267663/235110661-00e586cc-7489-4daf-82e8-7ae3c2c7143e.svg" width="350px">
+    <p>Serverless cloud hosting for multiplayer games</p>
+    <h1>Unity SDK</h1>
+    <a href="https://hathora.dev/docs"><img src="https://img.shields.io/static/v1?label=Docs&message=API Ref&color=000&style=for-the-badge" /></a>
     <a href="https://speakeasyapi.dev/"><img src="https://custom-icon-badges.demolab.com/badge/-Built%20By%20Speakeasy-212015?style=for-the-badge&logoColor=FBE331&logo=speakeasy&labelColor=545454" /></a>
+    <a href="https://github.com/hathora/cloud-sdk-unity.git/actions"><img src="https://img.shields.io/github/actions/workflow/status/speakeasy-sdks/bolt-php/speakeasy_sdk_generation.yml?style=for-the-badge" /></a>
+    
 </div>
 
 <!-- Start SDK Installation -->
@@ -16,6 +21,8 @@ To do so open the Package Manager via `Window > Package Manager` and click the `
 
 ## SDK Example Usage
 <!-- Start SDK Example Usage -->
+### Example
+
 ```csharp
 using HathoraCloud;
 using HathoraCloud.Models.Shared;
@@ -28,15 +35,15 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.AppV1.CreateAppAsync(new AppConfig() {
-        AppName = "minecraft",
-        AuthConfiguration = new AuthConfiguration() {
-            Anonymous = new RecordStringNever() {},
-            Google = new AuthConfigurationGoogle() {
-                ClientId = "models ah Southeast",
-            },
-            Nickname = new RecordStringNever() {},
+    AppName = "minecraft",
+    AuthConfiguration = new AuthConfiguration() {
+        Anonymous = new RecordStringNever() {},
+        Google = new Google() {
+            ClientId = "string",
         },
-    }))
+        Nickname = new RecordStringNever() {},
+    },
+}))
 {
     // handle response
 }
@@ -94,17 +101,17 @@ using(var res = await sdk.AppV1.CreateAppAsync(new AppConfig() {
 
 ### [LobbyV2](docs/sdks/lobbyv2/README.md)
 
-* [CreateLobbyDeprecated](docs/sdks/lobbyv2/README.md#createlobbydeprecated) - Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retreiving a list of public lobbies to display to players.
+* [~~CreateLobbyDeprecated~~](docs/sdks/lobbyv2/README.md#createlobbydeprecated) - Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retrieving a list of public lobbies to display to players. :warning: **Deprecated**
 * [~~CreateLocalLobby~~](docs/sdks/lobbyv2/README.md#createlocallobby) - :warning: **Deprecated**
 * [~~CreatePrivateLobby~~](docs/sdks/lobbyv2/README.md#createprivatelobby) - :warning: **Deprecated**
 * [~~CreatePublicLobby~~](docs/sdks/lobbyv2/README.md#createpubliclobby) - :warning: **Deprecated**
-* [GetLobbyInfo](docs/sdks/lobbyv2/README.md#getlobbyinfo) - Get details for a lobby.
-* [ListActivePublicLobbiesDeprecatedV2](docs/sdks/lobbyv2/README.md#listactivepubliclobbiesdeprecatedv2) - Get all active lobbies for a an [application](https://hathora.dev/docs/concepts/hathora-entities#application). Filter by optionally passing in a `region`. Use this endpoint to display all public lobbies that a player can join in the game client.
-* [SetLobbyState](docs/sdks/lobbyv2/README.md#setlobbystate) - Set the state of a lobby. State is intended to be set by the server and must be smaller than 1MB. Use this endpoint to store match data like live player count to enforce max number of clients or persist end-game data (i.e. winner or final scores).
+* [~~GetLobbyInfo~~](docs/sdks/lobbyv2/README.md#getlobbyinfo) - Get details for a lobby. :warning: **Deprecated**
+* [~~ListActivePublicLobbiesDeprecatedV2~~](docs/sdks/lobbyv2/README.md#listactivepubliclobbiesdeprecatedv2) - Get all active lobbies for a an [application](https://hathora.dev/docs/concepts/hathora-entities#application). Filter by optionally passing in a `region`. Use this endpoint to display all public lobbies that a player can join in the game client. :warning: **Deprecated**
+* [~~SetLobbyState~~](docs/sdks/lobbyv2/README.md#setlobbystate) - Set the state of a lobby. State is intended to be set by the server and must be smaller than 1MB. Use this endpoint to store match data like live player count to enforce max number of clients or persist end-game data (i.e. winner or final scores). :warning: **Deprecated**
 
 ### [LobbyV3](docs/sdks/lobbyv3/README.md)
 
-* [CreateLobby](docs/sdks/lobbyv3/README.md#createlobby) - Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retreiving a list of public lobbies to display to players.
+* [CreateLobby](docs/sdks/lobbyv3/README.md#createlobby) - Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retrieving a list of public lobbies to display to players.
 * [GetLobbyInfoByRoomId](docs/sdks/lobbyv3/README.md#getlobbyinfobyroomid) - Get details for a lobby.
 * [GetLobbyInfoByShortCode](docs/sdks/lobbyv3/README.md#getlobbyinfobyshortcode) - Get details for a lobby. If 2 or more lobbies have the same `shortCode`, then the most recently created lobby will be returned.
 * [ListActivePublicLobbies](docs/sdks/lobbyv3/README.md#listactivepubliclobbies) - Get all active lobbies for a given [application](https://hathora.dev/docs/concepts/hathora-entities#application). Filter the array by optionally passing in a `region`. Use this endpoint to display all public lobbies that a player can join in the game client.
@@ -151,21 +158,63 @@ using(var res = await sdk.AppV1.CreateAppAsync(new AppConfig() {
 * [UpdateRoomConfig](docs/sdks/roomv2/README.md#updateroomconfig)
 <!-- End SDK Available Operations -->
 
+
+
 <!-- Start Dev Containers -->
 
 <!-- End Dev Containers -->
 
+
+
+<!-- Start Global Parameters -->
+## Global Parameters
+
+A parameter is configured globally. This parameter may be set on the SDK client instance itself during initialization. When configured as an option during SDK initialization, This global value will be used as the default on the operations that use it. When such operations are called, there is a place in each to override the global value, if needed.
+
+For example, you can set `appId` to `"app-af469a92-5b45-4565-b3c4-b79878de67d2"` at SDK initialization and then you do not have to pass the same value on calls to operations like `DeleteApp`. But if you want to do so you may, which will locally override the global setting. See the example code below for a demonstration.
+
+
+### Available Globals
+
+The following global parameter is available.
+
+| Name | Type | Required | Description |
+| ---- | ---- |:--------:| ----------- |
+| appId | string |  | The appId parameter. |
+
+
+### Example
+
+```csharp
+using HathoraCloud;
+using HathoraCloud.Models.Shared;
+using HathoraCloud.Models.Operations;
+
+var sdk = new HathoraCloudSDK(
+    security: new Security() {
+        HathoraDevToken = "",
+    },
+    appId: "app-af469a92-5b45-4565-b3c4-b79878de67d2"
+);
+
+using(var res = await sdk.AppV1.DeleteAppAsync(new DeleteAppRequest() {}))
+{
+    // handle response
+}
+```
+<!-- End Global Parameters -->
+
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
-# Development
 
-## Maturity
+
+### Maturity
 
 This SDK is in beta, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning usage
 to a specific package version. This way, you can install the same version each time without breaking changes unless you are intentionally
 looking for the latest version.
 
-## Contributions
+### Contributions
 
 While we value open-source contributions to this SDK, this library is generated programmatically.
 Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
