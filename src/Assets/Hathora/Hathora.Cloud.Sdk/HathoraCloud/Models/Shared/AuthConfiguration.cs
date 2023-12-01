@@ -34,7 +34,7 @@ namespace HathoraCloud.Models.Shared
         /// </summary>
         [SerializeField]
         [JsonProperty("google")]
-        public AuthConfigurationGoogle? Google { get; set; }
+        public Google? Google { get; set; }
         
 
         /// <summary>

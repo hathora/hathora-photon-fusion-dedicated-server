@@ -33,7 +33,7 @@ namespace Hathora.Core.Scripts.Editor.Server
 
         /// <summary>
         /// Archives the build + Dockerfile into a .tar.gz file.
-        /// - Excludes "*_DoNotShip" dirs.
+        /// - Excludes "*_DoNotShip" and "*_ButDontShipItWithYourGame" dirs.
         /// - Eg: "tar -czvf archive.tar.gz --exclude='*_DoNotShip' -C /path/to/dir ."
         /// </summary>
         /// <param name="_paths"></param>
@@ -70,6 +70,7 @@ namespace Hathora.Core.Scripts.Editor.Server
             // We don't use -v since it's too spammy; logs get truncated and you don't see the result
             string tarArgs = $"-czpf {outputArchiveNameTarGz} " +
                 "--exclude \"*_DoNotShip\" " +
+                "--exclude \"*_ButDontShipItWithYourGame\" " +
                 "-C .. " + // Set working dir at parent of .hathora (unity proj root)
                 $"{_paths.ExeBuildDirName} " + // Add build dir from proj root
                 "Dockerfile"; // Add copied Dockerfile from proj root

@@ -289,7 +289,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
 
             // Process result
-            List<RoomWithoutAllocations> activeRooms = getActiveRoomsForProcessResponse.RoomWithoutAllocations;
+            List<RoomWithoutAllocations> activeRooms = getActiveRoomsForProcessResponse.Classes;
             Debug.Log($"{logPrefix} Success: <color=yellow>" +
                 $"getActiveRoomsResultList count: {activeRooms.Count}</color>");
 

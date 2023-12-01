@@ -32,10 +32,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.LogV1.GetLogsForAppAsync(new GetLogsForAppRequest() {
-        Follow = false,
-        Region = HathoraCloud.Models.Shared.Region.Singapore,
-        TailLines = 100,
-    }))
+    TailLines = 100,
+}))
 {
     // handle response
 }
@@ -74,10 +72,9 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.LogV1.GetLogsForDeploymentAsync(new GetLogsForDeploymentRequest() {
-        DeploymentId = 1,
-        Follow = false,
-        TailLines = 100,
-    }))
+    DeploymentId = 1,
+    TailLines = 100,
+}))
 {
     // handle response
 }
@@ -114,10 +111,9 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.LogV1.GetLogsForProcessAsync(new GetLogsForProcessRequest() {
-        ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
-        Follow = false,
-        TailLines = 100,
-    }))
+    ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
+    TailLines = 100,
+}))
 {
     // handle response
 }

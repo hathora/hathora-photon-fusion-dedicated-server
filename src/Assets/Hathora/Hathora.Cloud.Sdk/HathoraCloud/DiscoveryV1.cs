@@ -22,7 +22,7 @@ namespace HathoraCloud
     /// <summary>
     /// Service that allows clients to directly ping all Hathora regions to get latency information
     /// </summary>
-    public interface IDiscoveryV1SDK
+    public interface IDiscoveryV1
     {
 
         /// <summary>
@@ -34,19 +34,19 @@ namespace HathoraCloud
     /// <summary>
     /// Service that allows clients to directly ping all Hathora regions to get latency information
     /// </summary>
-    public class DiscoveryV1SDK: IDiscoveryV1SDK
+    public class DiscoveryV1: IDiscoveryV1
     {
         public SDKConfig Config { get; private set; }
         private const string _target = "unity";
-        private const string _sdkVersion = "0.1.0";
-        private const string _sdkGenVersion = "2.144.7";
+        private const string _sdkVersion = "0.26.0";
+        private const string _sdkGenVersion = "2.195.2";
         private const string _openapiDocVersion = "0.0.1";
-        private const string _userAgent = "speakeasy-sdk/unity 0.1.0 2.144.7 0.0.1 hathora-unity-sdk";
+        private const string _userAgent = "speakeasy-sdk/unity 0.26.0 2.195.2 0.0.1 hathora-cloud";
         private string _serverUrl = "";
         private ISpeakeasyHttpClient _defaultClient;
         private ISpeakeasyHttpClient _securityClient;
 
-        public DiscoveryV1SDK(ISpeakeasyHttpClient defaultClient, ISpeakeasyHttpClient securityClient, string serverUrl, SDKConfig config)
+        public DiscoveryV1(ISpeakeasyHttpClient defaultClient, ISpeakeasyHttpClient securityClient, string serverUrl, SDKConfig config)
         {
             _defaultClient = defaultClient;
             _securityClient = securityClient;
@@ -57,11 +57,7 @@ namespace HathoraCloud
 
         public async Task<GetPingServiceEndpointsResponse> GetPingServiceEndpointsAsync()
         {
-            string baseUrl = _serverUrl;
-            if (baseUrl.EndsWith("/"))
-            {
-                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
-            }
+            string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = baseUrl + "/discovery/v1/ping";
             
 
@@ -92,6 +88,7 @@ namespace HathoraCloud
                 ContentType = contentType,
                 RawResponse = httpResponse
             };
+            
             if((response.StatusCode == 200))
             {
                 if(Utilities.IsContentTypeMatch("application/json",response.ContentType))

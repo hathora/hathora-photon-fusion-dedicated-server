@@ -19,6 +19,10 @@ namespace HathoraCloud.Models.Operations
     public class SetLobbyStateResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
@@ -33,10 +37,6 @@ namespace HathoraCloud.Models.Operations
         public Lobby? Lobby { get; set; }
         
 
-        [SerializeField]
-        public string? SetLobbyState404ApplicationJSONString { get; set; }
-        
-
         /// <summary>
         /// HTTP response status code for this operation
         /// </summary>
@@ -48,11 +48,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
-        
-
-        [SerializeField]
-        public string? SetLobbyState422ApplicationJSONString { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

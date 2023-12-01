@@ -18,6 +18,8 @@ namespace HathoraCloud.Models.Shared
     {
         [JsonProperty("Seattle")]
         Seattle,
+        [JsonProperty("Los_Angeles")]
+        LosAngeles,
         [JsonProperty("Washington_DC")]
         WashingtonDC,
         [JsonProperty("Chicago")]

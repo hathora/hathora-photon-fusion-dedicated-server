@@ -30,8 +30,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.ProcessesV1.GetProcessInfoAsync(new GetProcessInfoRequest() {
-        ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
-    }))
+    ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
+}))
 {
     // handle response
 }
@@ -67,9 +67,7 @@ var sdk = new HathoraCloudSDK(
     appId: "app-af469a92-5b45-4565-b3c4-b79878de67d2"
 );
 
-using(var res = await sdk.ProcessesV1.GetRunningProcessesAsync(new GetRunningProcessesRequest() {
-        Region = HathoraCloud.Models.Shared.Region.Tokyo,
-    }))
+using(var res = await sdk.ProcessesV1.GetRunningProcessesAsync(new GetRunningProcessesRequest() {}))
 {
     // handle response
 }
@@ -105,9 +103,7 @@ var sdk = new HathoraCloudSDK(
     appId: "app-af469a92-5b45-4565-b3c4-b79878de67d2"
 );
 
-using(var res = await sdk.ProcessesV1.GetStoppedProcessesAsync(new GetStoppedProcessesRequest() {
-        Region = HathoraCloud.Models.Shared.Region.Sydney,
-    }))
+using(var res = await sdk.ProcessesV1.GetStoppedProcessesAsync(new GetStoppedProcessesRequest() {}))
 {
     // handle response
 }

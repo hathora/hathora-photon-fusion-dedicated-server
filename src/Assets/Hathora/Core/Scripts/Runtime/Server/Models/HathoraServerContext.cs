@@ -23,6 +23,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
     {
         #region Vars
         public string EnvVarProcessId { get; private set; }
+        public Region EnvVarRegion { get; private set; }
         public Process ProcessInfo { get; set; }
         public LobbyV3 Lobby { get; set; }
         public List<RoomWithoutAllocations> ActiveRoomsForProcess { get; set; }
@@ -122,18 +123,21 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
 
         
         #region Constructors
-        public HathoraServerContext(string _envVarProcessId)
+        public HathoraServerContext(string _envVarProcessId, Region _envVarRegion)
         {
             this.EnvVarProcessId = _envVarProcessId;
+            this.EnvVarRegion = _envVarRegion;
         }
 
         public HathoraServerContext(
             string _envVarProcessId,
+            Region _envVarRegion,
             Process _processInfo,
             List<RoomWithoutAllocations> _activeRoomsForProcess,
             LobbyV3 _lobby)
         {
             this.EnvVarProcessId = _envVarProcessId;
+            this.EnvVarRegion = _envVarRegion;
             this.ProcessInfo = _processInfo;
             this.ActiveRoomsForProcess = _activeRoomsForProcess;
             this.Lobby = _lobby;

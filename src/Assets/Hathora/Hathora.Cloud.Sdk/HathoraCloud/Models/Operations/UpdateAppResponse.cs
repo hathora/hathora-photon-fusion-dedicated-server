@@ -19,11 +19,15 @@ namespace HathoraCloud.Models.Operations
     public class UpdateAppResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// Ok
         /// </summary>
         [SerializeField]
-        public Models.Shared.Application? Application { get; set; }
+        public HathoraCloud.Models.Shared.Application? Application { get; set; }
         
 
         /// <summary>
@@ -44,15 +48,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
-        
-
-        [SerializeField]
-        public string? UpdateApp404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? UpdateApp500ApplicationJSONString { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

@@ -37,8 +37,8 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models.SerializedWrappers
         // }
         
         [SerializeField, JsonProperty("env")] // TODO
-        private List<DeploymentEnv> _env;
-        public List<DeploymentEnv> Env
+        private List<Env> _env;
+        public List<Env> Env
         {
             get => _env;
             set => _env = value;

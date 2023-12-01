@@ -20,26 +20,15 @@ namespace HathoraCloud.Models.Operations
     public class ListActivePublicLobbiesDeprecatedV1Response: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? ListActivePublicLobbiesDeprecatedV1401ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? ListActivePublicLobbiesDeprecatedV1404ApplicationJSONString { get; set; }
-        
-
-        /// <summary>
-        /// Ok
-        /// </summary>
-        [SerializeField]
-        public List<Lobby>? Lobbies { get; set; }
         
 
         /// <summary>
@@ -53,7 +42,14 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
+        
+
+        /// <summary>
+        /// Ok
+        /// </summary>
+        [SerializeField]
+        public List<Lobby>? Classes { get; set; }
         
         public void Dispose() {
             if (RawResponse != null) {

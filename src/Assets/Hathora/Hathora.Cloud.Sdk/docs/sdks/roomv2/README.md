@@ -35,12 +35,12 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.CreateRoomAsync(new CreateRoomRequest() {
-        CreateRoomParams = new CreateRoomParams() {
-            Region = HathoraCloud.Models.Shared.Region.Sydney,
-            RoomConfig = "{\"name\":\"my-room\"}",
-        },
-        RoomId = "2swovpy1fnunu",
-    }))
+    CreateRoomParams = new CreateRoomParams() {
+        Region = Region.Sydney,
+        RoomConfig = "{\"name\":\"my-room\"}",
+    },
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -77,8 +77,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.DestroyRoomAsync(new DestroyRoomRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -115,8 +115,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.GetActiveRoomsForProcessAsync(new GetActiveRoomsForProcessRequest() {
-        ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
-    }))
+    ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
+}))
 {
     // handle response
 }
@@ -153,8 +153,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.GetConnectionInfoAsync(new GetConnectionInfoRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -191,8 +191,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.GetInactiveRoomsForProcessAsync(new GetInactiveRoomsForProcessRequest() {
-        ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
-    }))
+    ProcessId = "cbfcddd2-0006-43ae-996c-995fff7bed2e",
+}))
 {
     // handle response
 }
@@ -229,8 +229,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.GetRoomInfoAsync(new GetRoomInfoRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -267,8 +267,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.SuspendRoomAsync(new SuspendRoomRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -303,11 +303,11 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.RoomV2.UpdateRoomConfigAsync(new UpdateRoomConfigRequest() {
-        UpdateRoomConfigParams = new UpdateRoomConfigParams() {
-            RoomConfig = "{\"name\":\"my-room\"}",
-        },
-        RoomId = "2swovpy1fnunu",
-    }))
+    UpdateRoomConfigParams = new UpdateRoomConfigParams() {
+        RoomConfig = "{\"name\":\"my-room\"}",
+    },
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }

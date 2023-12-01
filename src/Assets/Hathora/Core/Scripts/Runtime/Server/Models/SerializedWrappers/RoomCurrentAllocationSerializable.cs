@@ -59,7 +59,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models.SerializedWrappers
             set => _roomAllocationId = value;
         }
 
-        public RoomCurrentAllocationSerializable(RoomCurrentAllocation _roomAllocation)
+        public RoomCurrentAllocationSerializable(CurrentAllocation _roomAllocation)
         {
             if (_roomAllocation == null)
                 return;
@@ -70,9 +70,9 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models.SerializedWrappers
             this.RoomAllocationId = _roomAllocation.RoomAllocationId;
         }
 
-        public RoomCurrentAllocation ToRoomCurrentAllocationType()
+        public CurrentAllocation ToRoomCurrentAllocationType()
         {
-            RoomCurrentAllocation roomCurrentAllocation = new()
+            CurrentAllocation roomCurrentAllocation = new()
             {
                 UnscheduledAt = UnscheduledAt,
                 ScheduledAt = ScheduledAt,

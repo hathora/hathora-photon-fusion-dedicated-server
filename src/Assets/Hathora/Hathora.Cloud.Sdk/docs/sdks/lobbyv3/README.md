@@ -7,14 +7,14 @@ Operations to create and manage lobbies using our [Lobby Service](https://hathor
 
 ### Available Operations
 
-* [CreateLobby](#createlobby) - Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retreiving a list of public lobbies to display to players.
+* [CreateLobby](#createlobby) - Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retrieving a list of public lobbies to display to players.
 * [GetLobbyInfoByRoomId](#getlobbyinfobyroomid) - Get details for a lobby.
 * [GetLobbyInfoByShortCode](#getlobbyinfobyshortcode) - Get details for a lobby. If 2 or more lobbies have the same `shortCode`, then the most recently created lobby will be returned.
 * [ListActivePublicLobbies](#listactivepubliclobbies) - Get all active lobbies for a given [application](https://hathora.dev/docs/concepts/hathora-entities#application). Filter the array by optionally passing in a `region`. Use this endpoint to display all public lobbies that a player can join in the game client.
 
 ## CreateLobby
 
-Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retreiving a list of public lobbies to display to players.
+Create a new lobby for an [application](https://hathora.dev/docs/concepts/hathora-entities#application). A lobby object is a wrapper around a [room](https://hathora.dev/docs/concepts/hathora-entities#room) object. With a lobby, you get additional functionality like configuring the visibility of the room, managing the state of a match, and retrieving a list of public lobbies to display to players.
 
 ### Example Usage
 
@@ -28,15 +28,16 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.LobbyV3.CreateLobbyAsync(new CreateLobbySecurity() {
-        PlayerAuth = "",
-    }, new CreateLobbyRequest() {
-        CreateLobbyV3Params = new CreateLobbyV3Params() {
-            Region = HathoraCloud.Models.Shared.Region.Seattle,
-            RoomConfig = "{\"name\":\"my-room\"}",
-            Visibility = HathoraCloud.Models.Shared.LobbyVisibility.Private,
-        },
-        ShortCode = "LFG4",
-    }))
+    PlayerAuth = "",
+}, new CreateLobbyRequest() {
+    CreateLobbyV3Params = new CreateLobbyV3Params() {
+        Region = Region.Seattle,
+        RoomConfig = "{\"name\":\"my-room\"}",
+        Visibility = LobbyVisibility.Private,
+    },
+    RoomId = "2swovpy1fnunu",
+    ShortCode = "LFG4",
+}))
 {
     // handle response
 }
@@ -44,10 +45,10 @@ using(var res = await sdk.LobbyV3.CreateLobbyAsync(new CreateLobbySecurity() {
 
 ### Parameters
 
-| Parameter                                                             | Type                                                                  | Required                                                              | Description                                                           |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `request`                                                             | [CreateLobbyRequest](../../models/operations/CreateLobbyRequest.md)   | :heavy_check_mark:                                                    | The request object to use for the request.                            |
-| `security`                                                            | [CreateLobbySecurity](../../models/operations/CreateLobbySecurity.md) | :heavy_check_mark:                                                    | The security requirements to use for the request.                     |
+| Parameter                                                                                            | Type                                                                                                 | Required                                                                                             | Description                                                                                          |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `request`                                                                                            | [CreateLobbyRequest](../../models/operations/CreateLobbyRequest.md)                                  | :heavy_check_mark:                                                                                   | The request object to use for the request.                                                           |
+| `security`                                                                                           | [HathoraCloud.Models.Operations.CreateLobbySecurity](../../models/operations/CreateLobbySecurity.md) | :heavy_check_mark:                                                                                   | The security requirements to use for the request.                                                    |
 
 
 ### Response
@@ -74,8 +75,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.LobbyV3.GetLobbyInfoByRoomIdAsync(new GetLobbyInfoByRoomIdRequest() {
-        RoomId = "2swovpy1fnunu",
-    }))
+    RoomId = "2swovpy1fnunu",
+}))
 {
     // handle response
 }
@@ -112,8 +113,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.LobbyV3.GetLobbyInfoByShortCodeAsync(new GetLobbyInfoByShortCodeRequest() {
-        ShortCode = "LFG4",
-    }))
+    ShortCode = "LFG4",
+}))
 {
     // handle response
 }
@@ -149,9 +150,7 @@ var sdk = new HathoraCloudSDK(
     appId: "app-af469a92-5b45-4565-b3c4-b79878de67d2"
 );
 
-using(var res = await sdk.LobbyV3.ListActivePublicLobbiesAsync(new ListActivePublicLobbiesRequest() {
-        Region = HathoraCloud.Models.Shared.Region.Seattle,
-    }))
+using(var res = await sdk.LobbyV3.ListActivePublicLobbiesAsync(new ListActivePublicLobbiesRequest() {}))
 {
     // handle response
 }

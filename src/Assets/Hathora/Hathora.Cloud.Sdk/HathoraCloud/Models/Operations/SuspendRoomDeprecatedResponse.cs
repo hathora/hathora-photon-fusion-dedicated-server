@@ -10,6 +10,7 @@
 #nullable enable
 namespace HathoraCloud.Models.Operations
 {
+    using HathoraCloud.Models.Shared;
     using System;
     using UnityEngine.Networking;
     using UnityEngine;
@@ -17,6 +18,10 @@ namespace HathoraCloud.Models.Operations
     [Serializable]
     public class SuspendRoomDeprecatedResponse: IDisposable
     {
+
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
 
         /// <summary>
         /// HTTP response content type for this operation
@@ -36,15 +41,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
-        
-
-        [SerializeField]
-        public string? SuspendRoomDeprecated404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? SuspendRoomDeprecated500ApplicationJSONString { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

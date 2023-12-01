@@ -20,7 +20,7 @@ namespace Hathora.Core.Scripts.Runtime.Client.ApiWrapper
     /// </summary>
     public class HathoraClientAuthApiWrapper : HathoraApiWrapperBase
     {
-        protected AuthV1SDK AuthApi { get; }
+        protected AuthV1 AuthApi { get; }
 
         public HathoraClientAuthApiWrapper(HathoraCloudSDK _hathoraSdk)
             : base(_hathoraSdk)
@@ -28,7 +28,7 @@ namespace Hathora.Core.Scripts.Runtime.Client.ApiWrapper
             Debug.Log($"[{nameof(HathoraClientAuthApiWrapper)}.Constructor] " +
                 "Initializing Client API...");
             
-            this.AuthApi = _hathoraSdk.AuthV1 as AuthV1SDK;
+            this.AuthApi = _hathoraSdk.AuthV1 as AuthV1;
         }
 
 

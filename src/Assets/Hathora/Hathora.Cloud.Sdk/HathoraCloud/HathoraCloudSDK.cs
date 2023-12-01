@@ -16,6 +16,8 @@ namespace HathoraCloud
     using System.Threading.Tasks;
     using System;
 
+
+
     /// <summary>
     /// Hathora Cloud API: Welcome to the Hathora Cloud API documentation! Learn how to use the Hathora Cloud APIs to build and scale your game servers globally.
     /// </summary>
@@ -25,38 +27,38 @@ namespace HathoraCloud
         /// <summary>
         /// Operations that allow you manage your <a href="https://hathora.dev/docs/concepts/hathora-entities#application">applications</a>.
         /// </summary>
-        public IAppV1SDK AppV1 { get; }
+        public IAppV1 AppV1 { get; }
 
         /// <summary>
         /// Operations that allow you to generate a Hathora-signed <a href="JWT">JSON web token (JWT)</a> for <a href="https://hathora.dev/docs/lobbies-and-matchmaking/auth-service">player authentication</a>.
         /// </summary>
-        public IAuthV1SDK AuthV1 { get; }
-        public IBillingV1SDK BillingV1 { get; }
+        public IAuthV1 AuthV1 { get; }
+        public IBillingV1 BillingV1 { get; }
 
         /// <summary>
         /// Operations that allow you create and manage your <a href="https://hathora.dev/docs/concepts/hathora-entities#build">builds</a>.
         /// </summary>
-        public IBuildV1SDK BuildV1 { get; }
+        public IBuildV1 BuildV1 { get; }
 
         /// <summary>
         /// Operations that allow you configure and manage an application&apos;s <a href="https://hathora.dev/docs/concepts/hathora-entities#build">build</a> at runtime.
         /// </summary>
-        public IDeploymentV1SDK DeploymentV1 { get; }
+        public IDeploymentV1 DeploymentV1 { get; }
 
         /// <summary>
         /// Service that allows clients to directly ping all Hathora regions to get latency information
         /// </summary>
-        public IDiscoveryV1SDK DiscoveryV1 { get; }
+        public IDiscoveryV1 DiscoveryV1 { get; }
 
         /// <summary>
-        /// Deprecated. Use LobbyV3.
+        /// Deprecated. Use <a href="https://hathora.dev/api#tag/LobbyV3">LobbyV3</a>.
         /// </summary>
-        public ILobbyV1SDK LobbyV1 { get; }
+        public ILobbyV1 LobbyV1 { get; }
 
         /// <summary>
-        /// Deprecated. Use LobbyV3.
+        /// Deprecated. Use <a href="https://hathora.dev/api#tag/LobbyV3">LobbyV3</a>.
         /// </summary>
-        public ILobbyV2SDK LobbyV2 { get; }
+        public ILobbyV2 LobbyV2 { get; }
 
         /// <summary>
         /// Operations to create and manage lobbies using our <a href="https://hathora.dev/docs/lobbies-and-matchmaking/lobby-service">Lobby Service</a>.
@@ -66,33 +68,50 @@ namespace HathoraCloud
         /// <summary>
         /// Operations to get logs by <a href="https://hathora.dev/docs/concepts/hathora-entities#application">applications</a>, <a href="https://hathora.dev/docs/concepts/hathora-entities#process">processes</a>, and <a href="https://hathora.dev/docs/concepts/hathora-entities#deployment">deployments</a>. We store 20GB of logs data.
         /// </summary>
-        public ILogV1SDK LogV1 { get; }
-        public IManagementV1SDK ManagementV1 { get; }
+        public ILogV1 LogV1 { get; }
+        public IManagementV1 ManagementV1 { get; }
 
         /// <summary>
         /// Operations to get metrics by <a href="https://hathora.dev/docs/concepts/hathora-entities#process">process</a>. We store 72 hours of metrics data.
         /// </summary>
-        public IMetricsV1SDK MetricsV1 { get; }
+        public IMetricsV1 MetricsV1 { get; }
 
         /// <summary>
         /// Operations to get data on active and stopped <a href="https://hathora.dev/docs/concepts/hathora-entities#process">processes</a>.
         /// </summary>
-        public IProcessesV1SDK ProcessesV1 { get; }
+        public IProcessesV1 ProcessesV1 { get; }
 
         /// <summary>
-        /// Deprecated. Use RoomV2.
+        /// Deprecated. Use <a href="https://hathora.dev/api#tag/RoomV2">RoomV2</a>.
         /// </summary>
-        public IRoomV1SDK RoomV1 { get; }
+        public IRoomV1 RoomV1 { get; }
 
         /// <summary>
         /// Operations to create, manage, and connect to <a href="https://hathora.dev/docs/concepts/hathora-entities#room">rooms</a>.
         /// </summary>
-        public IRoomV2SDK RoomV2 { get; }
+        public IRoomV2 RoomV2 { get; }
     }
     
     public class SDKConfig
     {
+        public static string[] ServerList = new string[]
+        {
+            "https://api.hathora.dev",
+            "https:///",
+        };
+        /// Contains the list of servers available to the SDK
+        public string serverUrl = "";
+        public int serverIndex = 0;
         public string? AppId;
+
+        public string GetTemplatedServerDetails()
+        {
+            if (!String.IsNullOrEmpty(this.serverUrl))
+            {
+                return Utilities.TemplateUrl(Utilities.RemoveSuffix(this.serverUrl, "/"), new Dictionary<string, string>());
+            }
+            return Utilities.TemplateUrl(SDKConfig.ServerList[this.serverIndex], new Dictionary<string, string>());
+        }
     }
 
     /// <summary>
@@ -101,39 +120,39 @@ namespace HathoraCloud
     public class HathoraCloudSDK: IHathoraCloudSDK
     {
         public SDKConfig Config { get; private set; }
-        public static List<string> ServerList = new List<string>()
-        {
-            "https://api.hathora.dev",
-            "/",
-        };
 
         private const string _target = "unity";
-        private const string _sdkVersion = "0.1.0";
-        private const string _sdkGenVersion = "2.144.7";
+        private const string _sdkVersion = "0.26.0";
+        private const string _sdkGenVersion = "2.195.2";
         private const string _openapiDocVersion = "0.0.1";
-        private const string _userAgent = "speakeasy-sdk/unity 0.1.0 2.144.7 0.0.1 hathora-unity-sdk";
+        private const string _userAgent = "speakeasy-sdk/unity 0.26.0 2.195.2 0.0.1 hathora-cloud";
         private string _serverUrl = "";
         private ISpeakeasyHttpClient _defaultClient;
         private ISpeakeasyHttpClient _securityClient;
-        public IAppV1SDK AppV1 { get; private set; }
-        public IAuthV1SDK AuthV1 { get; private set; }
-        public IBillingV1SDK BillingV1 { get; private set; }
-        public IBuildV1SDK BuildV1 { get; private set; }
-        public IDeploymentV1SDK DeploymentV1 { get; private set; }
-        public IDiscoveryV1SDK DiscoveryV1 { get; private set; }
-        public ILobbyV1SDK LobbyV1 { get; private set; }
-        public ILobbyV2SDK LobbyV2 { get; private set; }
+        public IAppV1 AppV1 { get; private set; }
+        public IAuthV1 AuthV1 { get; private set; }
+        public IBillingV1 BillingV1 { get; private set; }
+        public IBuildV1 BuildV1 { get; private set; }
+        public IDeploymentV1 DeploymentV1 { get; private set; }
+        public IDiscoveryV1 DiscoveryV1 { get; private set; }
+        public ILobbyV1 LobbyV1 { get; private set; }
+        public ILobbyV2 LobbyV2 { get; private set; }
         public ILobbyV3SDK LobbyV3 { get; private set; }
-        public ILogV1SDK LogV1 { get; private set; }
-        public IManagementV1SDK ManagementV1 { get; private set; }
-        public IMetricsV1SDK MetricsV1 { get; private set; }
-        public IProcessesV1SDK ProcessesV1 { get; private set; }
-        public IRoomV1SDK RoomV1 { get; private set; }
-        public IRoomV2SDK RoomV2 { get; private set; }
+        public ILogV1 LogV1 { get; private set; }
+        public IManagementV1 ManagementV1 { get; private set; }
+        public IMetricsV1 MetricsV1 { get; private set; }
+        public IProcessesV1 ProcessesV1 { get; private set; }
+        public IRoomV1 RoomV1 { get; private set; }
+        public IRoomV2 RoomV2 { get; private set; }
 
-        public HathoraCloudSDK(Security? security = null, string? appId = null, string? serverUrl = null, ISpeakeasyHttpClient? client = null)
+        public HathoraCloudSDK(Security? security = null, string? appId = null, int? serverIndex = null, string? serverUrl = null, Dictionary<string, string>? urlParams = null, ISpeakeasyHttpClient? client = null)
         {
-            _serverUrl = serverUrl ?? HathoraCloudSDK.ServerList[0];
+            if (serverUrl != null) {
+                if (urlParams != null) {
+                    serverUrl = Utilities.TemplateUrl(serverUrl, urlParams);
+                }
+                _serverUrl = serverUrl;
+            }
 
             _defaultClient = new SpeakeasyHttpClient(client);
             _securityClient = _defaultClient;
@@ -146,23 +165,24 @@ namespace HathoraCloud
             Config = new SDKConfig()
             {
                 AppId = appId,
+                serverUrl = _serverUrl
             };
 
-            AppV1 = new AppV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            AuthV1 = new AuthV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            BillingV1 = new BillingV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            BuildV1 = new BuildV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            DeploymentV1 = new DeploymentV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            DiscoveryV1 = new DiscoveryV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            LobbyV1 = new LobbyV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            LobbyV2 = new LobbyV2SDK(_defaultClient, _securityClient, _serverUrl, Config);
+            AppV1 = new AppV1(_defaultClient, _securityClient, _serverUrl, Config);
+            AuthV1 = new AuthV1(_defaultClient, _securityClient, _serverUrl, Config);
+            BillingV1 = new BillingV1(_defaultClient, _securityClient, _serverUrl, Config);
+            BuildV1 = new BuildV1(_defaultClient, _securityClient, _serverUrl, Config);
+            DeploymentV1 = new DeploymentV1(_defaultClient, _securityClient, _serverUrl, Config);
+            DiscoveryV1 = new DiscoveryV1(_defaultClient, _securityClient, _serverUrl, Config);
+            LobbyV1 = new LobbyV1(_defaultClient, _securityClient, _serverUrl, Config);
+            LobbyV2 = new LobbyV2(_defaultClient, _securityClient, _serverUrl, Config);
             LobbyV3 = new LobbyV3SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            LogV1 = new LogV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            ManagementV1 = new ManagementV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            MetricsV1 = new MetricsV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            ProcessesV1 = new ProcessesV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            RoomV1 = new RoomV1SDK(_defaultClient, _securityClient, _serverUrl, Config);
-            RoomV2 = new RoomV2SDK(_defaultClient, _securityClient, _serverUrl, Config);
+            LogV1 = new LogV1(_defaultClient, _securityClient, _serverUrl, Config);
+            ManagementV1 = new ManagementV1(_defaultClient, _securityClient, _serverUrl, Config);
+            MetricsV1 = new MetricsV1(_defaultClient, _securityClient, _serverUrl, Config);
+            ProcessesV1 = new ProcessesV1(_defaultClient, _securityClient, _serverUrl, Config);
+            RoomV1 = new RoomV1(_defaultClient, _securityClient, _serverUrl, Config);
+            RoomV2 = new RoomV2(_defaultClient, _securityClient, _serverUrl, Config);
         }
     }
 }

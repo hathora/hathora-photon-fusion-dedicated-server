@@ -21,6 +21,7 @@ Create a new [deployment](https://hathora.dev/docs/concepts/hathora-entities#dep
 using HathoraCloud;
 using HathoraCloud.Models.Shared;
 using HathoraCloud.Models.Operations;
+using System.Collections.Generic;
 
 var sdk = new HathoraCloudSDK(
     security: new Security() {
@@ -30,27 +31,27 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.DeploymentV1.CreateDeploymentAsync(new CreateDeploymentRequest() {
-        DeploymentConfig = new DeploymentConfig() {
-            AdditionalContainerPorts = new List<ContainerPort>() {
-                new ContainerPort() {
-                    Name = "default",
-                    Port = 8000,
-                    TransportType = HathoraCloud.Models.Shared.TransportType.Udp,
-                },
+    DeploymentConfig = new DeploymentConfig() {
+        AdditionalContainerPorts = new List<ContainerPort>() {
+            new ContainerPort() {
+                Name = "default",
+                Port = 8000,
+                TransportType = TransportType.Udp,
             },
-            ContainerPort = 4000,
-            Env = new List<DeploymentConfigEnv>() {
-                new DeploymentConfigEnv() {
-                    Name = "EULA",
-                    Value = "TRUE",
-                },
-            },
-            PlanName = HathoraCloud.Models.Shared.PlanName.Tiny,
-            RoomsPerProcess = 3,
-            TransportType = HathoraCloud.Models.Shared.TransportType.Tcp,
         },
-        BuildId = 1,
-    }))
+        ContainerPort = 4000,
+        Env = new List<DeploymentConfigEnv>() {
+            new DeploymentConfigEnv() {
+                Name = "EULA",
+                Value = "TRUE",
+            },
+        },
+        PlanName = PlanName.Tiny,
+        RoomsPerProcess = 3,
+        TransportType = TransportType.Tcp,
+    },
+    BuildId = 1,
+}))
 {
     // handle response
 }
@@ -87,8 +88,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.DeploymentV1.GetDeploymentInfoAsync(new GetDeploymentInfoRequest() {
-        DeploymentId = 1,
-    }))
+    DeploymentId = 1,
+}))
 {
     // handle response
 }

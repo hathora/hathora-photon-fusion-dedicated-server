@@ -21,13 +21,6 @@ namespace HathoraCloud.Models.Operations
     {
 
         /// <summary>
-        /// Ok
-        /// </summary>
-        [SerializeField]
-        public List<ApplicationWithDeployment>? ApplicationWithDeployments { get; set; }
-        
-
-        /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
@@ -45,7 +38,14 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
+        
+
+        /// <summary>
+        /// Ok
+        /// </summary>
+        [SerializeField]
+        public List<ApplicationWithDeployment>? Classes { get; set; }
         
         public void Dispose() {
             if (RawResponse != null) {

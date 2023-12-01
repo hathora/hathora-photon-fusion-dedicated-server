@@ -35,7 +35,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models.SerializedWrappers
         
         [SerializeField, JsonProperty("currentAllocation")]
         private RoomCurrentAllocationSerializable _currentCurrentAllocationSerializable;
-        public RoomCurrentAllocation CurrentAllocation
+        public CurrentAllocation CurrentAllocation
         {
             get => _currentCurrentAllocationSerializable?.ToRoomCurrentAllocationType();
             set => _currentCurrentAllocationSerializable = new RoomCurrentAllocationSerializable(value);

@@ -10,6 +10,7 @@
 #nullable enable
 namespace HathoraCloud.Models.Operations
 {
+    using HathoraCloud.Models.Shared;
     using System;
     using UnityEngine.Networking;
     using UnityEngine;
@@ -18,26 +19,15 @@ namespace HathoraCloud.Models.Operations
     public class GetLogsForProcessResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        /// <summary>
-        /// Ok
-        /// </summary>
-        [SerializeField]
-        public string? GetLogsForProcess200TextPlainByteString { get; set; }
-        
-
-        [SerializeField]
-        public string? GetLogsForProcess404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? GetLogsForProcess500ApplicationJSONString { get; set; }
         
 
         /// <summary>
@@ -51,7 +41,14 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
+        
+
+        /// <summary>
+        /// Ok
+        /// </summary>
+        [SerializeField]
+        public string? Res { get; set; }
         
         public void Dispose() {
             if (RawResponse != null) {

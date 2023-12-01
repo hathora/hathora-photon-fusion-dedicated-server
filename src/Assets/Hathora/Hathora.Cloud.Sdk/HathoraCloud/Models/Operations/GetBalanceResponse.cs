@@ -10,6 +10,7 @@
 #nullable enable
 namespace HathoraCloud.Models.Operations
 {
+    using HathoraCloud.Models.Shared;
     using System;
     using UnityEngine.Networking;
     using UnityEngine;
@@ -18,22 +19,15 @@ namespace HathoraCloud.Models.Operations
     public class GetBalanceResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        /// <summary>
-        /// Ok
-        /// </summary>
-        [SerializeField]
-        public double? GetBalance200ApplicationJSONDoubleNumber { get; set; }
-        
-
-        [SerializeField]
-        public string? GetBalance404ApplicationJSONString { get; set; }
         
 
         /// <summary>
@@ -47,7 +41,14 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
+        
+
+        /// <summary>
+        /// Ok
+        /// </summary>
+        [SerializeField]
+        public double? Number { get; set; }
         
         public void Dispose() {
             if (RawResponse != null) {

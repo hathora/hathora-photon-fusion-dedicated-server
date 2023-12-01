@@ -105,8 +105,8 @@ var sdk = new HathoraCloudSDK(
 );
 
 using(var res = await sdk.BillingV1.InitStripeCustomerPortalUrlAsync(new CustomerPortalUrl() {
-        ReturnUrl = "ivory",
-    }))
+    ReturnUrl = "string",
+}))
 {
     // handle response
 }

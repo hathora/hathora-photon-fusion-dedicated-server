@@ -30,6 +30,11 @@ namespace HathoraCloud.Models.Operations
         
 
         [SerializeField]
+        [SpeakeasyMetadata("queryParam:style=form,explode=true,name=roomId")]
+        public string? RoomId { get; set; }
+        
+
+        [SerializeField]
         [SpeakeasyMetadata("queryParam:style=form,explode=true,name=shortCode")]
         public string? ShortCode { get; set; }
         

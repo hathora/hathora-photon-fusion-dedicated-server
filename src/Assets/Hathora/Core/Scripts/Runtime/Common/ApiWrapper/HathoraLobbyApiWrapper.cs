@@ -55,7 +55,8 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
         /// - Eg: `MaxNumPlayers`
         /// - Required, since a 'Lobby' without an RoomConfig is just a 'Room'. 
         /// </param>
-        /// <param name="_roomId">Null will auto-generate</param>
+        /// <param name="_shortCode">Ideal for user-defined identifiers for lobbies</param>
+        /// <param name="_roomId">Leave null to auto-generate a globally unique roomId (recommended)</param>
         /// <param name="_cancelToken"></param>
         /// <param name="_region">(!) Index starts at 1 (not 0)</param>
         /// <returns>Lobby on success</returns>
@@ -64,6 +65,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
             object _roomConfigSerializable,
             Region _region = HathoraUtils.DEFAULT_REGION,
             LobbyVisibility _lobbyVisibility = LobbyVisibility.Public,
+            string _shortCode = null,
             string _roomId = null,
             CancellationToken _cancelToken = default)
         {
@@ -79,7 +81,8 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
             CreateLobbyRequest createLobbyRequestWrapper = new()
             {
                 CreateLobbyV3Params = createLobbyParams,
-                ShortCode = _roomId,
+                ShortCode = _shortCode,
+                RoomId = _roomId,
             };
             CreateLobbySecurity createLobbySecurity = new() { PlayerAuth = _playerAuthToken };
 
@@ -136,7 +139,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
             
             if (getLobbyInfoByRoomIdResponse.StatusCode == 404)
             {
-                Debug.LogError($"{logPrefix} 404: {getLobbyInfoByRoomIdResponse.GetLobbyInfoByRoomId404ApplicationJSONString} - " +
+                Debug.LogError($"{logPrefix} 404: {getLobbyInfoByRoomIdResponse.ApiError.Message} - " +
                     "Tip: If a server made a Room without a lobby, instead use the Room api (rather than Lobby api)");
             }
             
@@ -178,7 +181,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
             
             if (getLobbyInfoByShortCodeResponse.StatusCode == 404)
             {
-                Debug.LogError($"{logPrefix} 404: {getLobbyInfoByShortCodeResponse.GetLobbyInfoByShortCode404ApplicationJSONString} - " +
+                Debug.LogError($"{logPrefix} 404: {getLobbyInfoByShortCodeResponse.ApiError?.Message} - " +
                     "Tip: If a server made a Room without a lobby, instead use the Room api (rather than Lobby api)");
             }
             
@@ -222,7 +225,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
                     $"instead use the {nameof(HathoraRoomApiWrapper)} (not {nameof(HathoraLobbyApiWrapper)})");
             }
 
-            List<LobbyV3> lobbies = activePublicLobbiesResponse.LobbyV3s;
+            List<LobbyV3> lobbies = activePublicLobbiesResponse.Classes;
             Debug.Log($"{logPrefix} => numLobbiesFound: {lobbies?.Count ?? 0}");
             
             activePublicLobbiesResponse.RawResponse?.Dispose(); // Prevent mem leaks

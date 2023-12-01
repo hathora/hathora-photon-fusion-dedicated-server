@@ -20,7 +20,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
     /// </summary>
     public class HathoraServerDeployApiWrapper : HathoraServerApiWrapperBase
     {
-        protected DeploymentV1SDK DeployApi { get; }
+        protected DeploymentV1 DeployApi { get; }
         private HathoraDeployOpts deployOpts => HathoraServerConfig.HathoraDeployOpts;
         private volatile bool uploading;
 
@@ -32,7 +32,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             Debug.Log($"[{nameof(HathoraServerDeployApiWrapper)}.Constructor] " +
                 "Initializing Server API...");
             
-            this.DeployApi = _hathoraSdk.DeploymentV1 as DeploymentV1SDK;
+            this.DeployApi = _hathoraSdk.DeploymentV1 as DeploymentV1;
         }
         
         
@@ -53,7 +53,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
         /// <returns>Returns Deployment on success</returns>
         public async Task<Deployment> CreateDeploymentAsync(
             int _buildId,
-            List<DeploymentEnv> _env = null,
+            List<Env> _env = null,
             List<ContainerPort> _additionalContainerPorts = null,
             CancellationToken _cancelToken = default)
         {
@@ -141,7 +141,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
 
             // Process response
-            List<Deployment> deployments = getDeploymentsResponse.Deployments;
+            List<Deployment> deployments = getDeploymentsResponse.Classes;
             Debug.Log($"{logPrefix} <color=yellow>num {nameof(deployments)}: '{deployments?.Count}'</color>");
             
             getDeploymentsResponse.RawResponse?.Dispose(); // Prevent mem leaks

@@ -19,35 +19,15 @@ namespace HathoraCloud.Models.Operations
     public class CreateLocalLobbyResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? CreateLocalLobby400ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLocalLobby401ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLocalLobby404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLocalLobby422ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLocalLobby429ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLocalLobby500ApplicationJSONString { get; set; }
         
 
         [SerializeField]
@@ -65,7 +45,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

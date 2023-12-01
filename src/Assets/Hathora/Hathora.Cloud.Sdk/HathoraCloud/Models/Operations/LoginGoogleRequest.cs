@@ -21,7 +21,7 @@ namespace HathoraCloud.Models.Operations
 
         [SerializeField]
         [SpeakeasyMetadata("request:mediaType=application/json")]
-        public Models.Shared.LoginGoogleRequest LoginGoogleRequestValue { get; set; } = default!;
+        public HathoraCloud.Models.Shared.LoginGoogleRequest LoginGoogleRequestValue { get; set; } = default!;
         
 
         [SerializeField]

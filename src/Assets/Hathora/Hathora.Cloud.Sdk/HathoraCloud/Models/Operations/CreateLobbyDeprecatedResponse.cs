@@ -19,35 +19,15 @@ namespace HathoraCloud.Models.Operations
     public class CreateLobbyDeprecatedResponse: IDisposable
     {
 
+        [SerializeField]
+        public ApiError? ApiError { get; set; }
+        
+
         /// <summary>
         /// HTTP response content type for this operation
         /// </summary>
         [SerializeField]
         public string? ContentType { get; set; } = default!;
-        
-
-        [SerializeField]
-        public string? CreateLobbyDeprecated400ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLobbyDeprecated401ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLobbyDeprecated404ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLobbyDeprecated422ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLobbyDeprecated429ApplicationJSONString { get; set; }
-        
-
-        [SerializeField]
-        public string? CreateLobbyDeprecated500ApplicationJSONString { get; set; }
         
 
         [SerializeField]
@@ -65,7 +45,7 @@ namespace HathoraCloud.Models.Operations
         /// Raw HTTP response; suitable for custom response parsing
         /// </summary>
         [SerializeField]
-        public UnityWebRequest? RawResponse { get; set; }
+        public UnityWebRequest RawResponse { get; set; } = default!;
         
         public void Dispose() {
             if (RawResponse != null) {

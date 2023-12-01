@@ -89,7 +89,7 @@ namespace HathoraCloud.Models.Shared
         /// </summary>
         [SerializeField]
         [JsonProperty("env")]
-        public List<DeploymentEnv> Env { get; set; } = default!;
+        public List<Env> Env { get; set; } = default!;
         
 
         /// <summary>
