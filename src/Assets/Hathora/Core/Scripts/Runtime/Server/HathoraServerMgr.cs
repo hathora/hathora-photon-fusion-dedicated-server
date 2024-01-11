@@ -117,7 +117,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             hathoraRegionEnvVar = getServerDeployedRegion();
 #endif
             
-            _ = GetHathoraServerContextAsync(_throwErrIfNoLobby: false); // !await; sets `HathoraServerContext ServerContext` ^
+            _ = GetHathoraServerContextAsync(); // !await; sets `HathoraServerContext ServerContext` ^
         }
         
         /// <summary>If we were not server || editor, we'd already be destroyed @ Awake</summary>
@@ -321,11 +321,9 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// - Calls automatically @ Awake => triggers `OnInitializedEvent` on success.
         /// - Caches locally @ serverContext; public get via GetCachedServerContextAsync().
         /// </summary>
-        /// <param name="_throwErrIfNoLobby">Be extra sure to try/catch this, if true</param>
         /// <param name="_cancelToken"></param>
         /// <returns>Triggers `OnInitializedEvent` event on success</returns>
         public async Task<HathoraServerContext> GetHathoraServerContextAsync(
-            bool _throwErrIfNoLobby,
             CancellationToken _cancelToken = default)
         {
             string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContextAsync)}]";
@@ -400,9 +398,8 @@ namespace Hathora.Core.Scripts.Runtime.Server
             tempServerContext.ActiveRoomsForProcess = activeRooms;
 			
             // ----------------
-            // We have Room info, but we *may* need Lobby: Get from RoomId =>
-            // TODO: This may soon change, where Room info may include Lobby info.
-            // TODO: When implemented, remove this block (minus validation).
+            // We have Room info, but we *may* need Lobby: Get via RoomId
+            // NOTE: Lobby is expected to be null in cases when room is created via "CreateRoom"
             LobbyV3 lobby = null;
             try
             {
@@ -413,15 +410,8 @@ namespace Hathora.Core.Scripts.Runtime.Server
             }
             catch (Exception e)
             {
-                // Should 404 if !Lobby, returning null
-                if (_throwErrIfNoLobby)
-                {
-                    Debug.LogError($"Error: {e}");
-                    throw;
-                }
-                
-                Debug.Log($"{logPrefix} <b>!Lobby, but likely expected</b> " +
-                    "(since !_throwErrIfNoLobby) - continuing...");
+                Debug.Log($"{logPrefix} <b>Matching Hathora Lobby not found for roomId:{firstActiveRoom.RoomId}," +
+                          $"but expected if room created via CreateRoom</b> (LobbyService not being used) - {e}");
             }
 
             if (_cancelToken.IsCancellationRequested)
