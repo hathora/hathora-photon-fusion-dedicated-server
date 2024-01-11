@@ -67,6 +67,7 @@ namespace HathoraCloud
         [Obsolete("This method will be removed in a future release, please migrate away from it as soon as possible")]
         public async Task<GetLogsForAppResponse> GetLogsForAppAsync(GetLogsForAppRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/logs/v1/{appId}/all", request);
@@ -125,6 +126,7 @@ namespace HathoraCloud
         [Obsolete("This method will be removed in a future release, please migrate away from it as soon as possible")]
         public async Task<GetLogsForDeploymentResponse> GetLogsForDeploymentAsync(GetLogsForDeploymentRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/logs/v1/{appId}/deployment/{deploymentId}", request);
@@ -182,6 +184,7 @@ namespace HathoraCloud
 
         public async Task<GetLogsForProcessResponse> GetLogsForProcessAsync(GetLogsForProcessRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/logs/v1/{appId}/process/{processId}", request);

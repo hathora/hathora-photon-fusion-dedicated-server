@@ -14,8 +14,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
     public class HathoraConfigUI : UnityEditor.Editor
     {
         #region Vars
-        /// <summary>Set false to view the "raw" ScriptableObject</summary>
-        public const bool ENABLE_BODY_STYLE = true;
         
         private HathoraConfigHeaderUI headerUI { get; set; }
         private HathoraConfigPreAuthBodyUI preAuthBodyUI { get; set; }
@@ -64,9 +62,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
         {
             headerUI.Draw();
             
-            if (!ENABLE_BODY_STYLE)
-                base.OnInspectorGUI(); // Show the raw _serverConfig, auto-gen'd by ScriptableObj
-            else if (IsAuthed)
+            if (IsAuthed)
                 postAuthBodyUI.Draw();
             else
                 preAuthBodyUI.Draw();

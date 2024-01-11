@@ -92,7 +92,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
 
         
         #region Init
-        protected virtual async void Awake()
+        protected virtual void Awake()
         {
 #if !UNITY_SERVER && !UNITY_EDITOR
             Debug.Log("(!) [HathoraServerMgr.Awake] Destroying - not a server");
@@ -117,7 +117,7 @@ namespace Hathora.Core.Scripts.Runtime.Server
             hathoraRegionEnvVar = getServerDeployedRegion();
 #endif
             
-            _ = GetHathoraServerContextAsync(); // !await; sets `HathoraServerContext ServerContext` ^
+            _ = GetHathoraServerContextAsync(_throwErrIfNoLobby: false); // !await; sets `HathoraServerContext ServerContext` ^
         }
         
         /// <summary>If we were not server || editor, we'd already be destroyed @ Awake</summary>
@@ -205,11 +205,11 @@ namespace Hathora.Core.Scripts.Runtime.Server
                 Debug.Log($"<color=orange>(!)</color> {logPrefix} !HathoraServerConfig: Np in Editor, " +
                     "but if you want server runtime calls when you build as UNITY_SERVER, " +
                     $"serialize {gameObject.name}.{nameof(HathoraServerMgr)}");
-
+                return false;
 #else
                 // We're probably a Client - just silently stop this. Clients don't have a dev key.
-#endif
                 return false;
+#endif
             }
 
             return true;
@@ -321,9 +321,11 @@ namespace Hathora.Core.Scripts.Runtime.Server
         /// - Calls automatically @ Awake => triggers `OnInitializedEvent` on success.
         /// - Caches locally @ serverContext; public get via GetCachedServerContextAsync().
         /// </summary>
+        /// <param name="_throwErrIfNoLobby">Be extra sure to try/catch this, if true</param>
         /// <param name="_cancelToken"></param>
         /// <returns>Triggers `OnInitializedEvent` event on success</returns>
         public async Task<HathoraServerContext> GetHathoraServerContextAsync(
+            bool _throwErrIfNoLobby,
             CancellationToken _cancelToken = default)
         {
             string logPrefix = $"[{nameof(HathoraServerMgr)}.{nameof(GetHathoraServerContextAsync)}]";
@@ -398,8 +400,9 @@ namespace Hathora.Core.Scripts.Runtime.Server
             tempServerContext.ActiveRoomsForProcess = activeRooms;
 			
             // ----------------
-            // We have Room info, but we *may* need Lobby: Get via RoomId
-            // NOTE: Lobby is expected to be null in cases when room is created via "CreateRoom"
+            // We have Room info, but we *may* need Lobby: Get from RoomId =>
+            // TODO: This may soon change, where Room info may include Lobby info.
+            // TODO: When implemented, remove this block (minus validation).
             LobbyV3 lobby = null;
             try
             {
@@ -410,8 +413,15 @@ namespace Hathora.Core.Scripts.Runtime.Server
             }
             catch (Exception e)
             {
-                Debug.Log($"{logPrefix} <b>Matching Hathora Lobby not found for roomId:{firstActiveRoom.RoomId}," +
-                          $"but expected if room created via CreateRoom</b> (LobbyService not being used) - {e}");
+                // Should 404 if !Lobby, returning null
+                if (_throwErrIfNoLobby)
+                {
+                    Debug.LogError($"Error: {e}");
+                    throw;
+                }
+                
+                Debug.Log($"{logPrefix} <b>!Lobby, but likely expected</b> " +
+                    "(since !_throwErrIfNoLobby) - continuing...");
             }
 
             if (_cancelToken.IsCancellationRequested)

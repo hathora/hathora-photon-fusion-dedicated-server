@@ -67,7 +67,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
                 }
                 catch(Exception e)
                 {
-                    Debug.LogError($"{logPrefix} ");
+                    Debug.LogError($"{logPrefix} {e.Message}");
                     return null; // fail
                 }
 

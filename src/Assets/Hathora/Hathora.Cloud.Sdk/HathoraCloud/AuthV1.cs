@@ -66,6 +66,7 @@ namespace HathoraCloud
 
         public async Task<LoginAnonymousResponse> LoginAnonymousAsync(LoginAnonymousRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/auth/v1/{appId}/login/anonymous", request);
@@ -123,6 +124,7 @@ namespace HathoraCloud
 
         public async Task<LoginGoogleResponse> LoginGoogleAsync(HathoraCloud.Models.Operations.LoginGoogleRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/auth/v1/{appId}/login/google", request);
@@ -190,6 +192,7 @@ namespace HathoraCloud
 
         public async Task<LoginNicknameResponse> LoginNicknameAsync(HathoraCloud.Models.Operations.LoginNicknameRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/auth/v1/{appId}/login/nickname", request);

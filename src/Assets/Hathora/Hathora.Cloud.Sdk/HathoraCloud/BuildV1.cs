@@ -77,6 +77,7 @@ namespace HathoraCloud
 
         public async Task<CreateBuildResponse> CreateBuildAsync(CreateBuildRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/builds/v1/{appId}/create", request);
@@ -144,6 +145,7 @@ namespace HathoraCloud
 
         public async Task<DeleteBuildResponse> DeleteBuildAsync(DeleteBuildRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/builds/v1/{appId}/delete/{buildId}", request);
@@ -197,6 +199,7 @@ namespace HathoraCloud
 
         public async Task<GetBuildInfoResponse> GetBuildInfoAsync(GetBuildInfoRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/builds/v1/{appId}/info/{buildId}", request);
@@ -254,6 +257,7 @@ namespace HathoraCloud
 
         public async Task<GetBuildsResponse> GetBuildsAsync(GetBuildsRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/builds/v1/{appId}/list", request);
@@ -311,6 +315,7 @@ namespace HathoraCloud
 
         public async Task<RunBuildResponse> RunBuildAsync(RunBuildRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/builds/v1/{appId}/run/{buildId}", request);

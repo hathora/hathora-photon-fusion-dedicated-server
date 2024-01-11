@@ -67,6 +67,7 @@ namespace HathoraCloud
 
         public async Task<CreateDeploymentResponse> CreateDeploymentAsync(CreateDeploymentRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/deployments/v1/{appId}/create/{buildId}", request);
@@ -134,6 +135,7 @@ namespace HathoraCloud
 
         public async Task<GetDeploymentInfoResponse> GetDeploymentInfoAsync(GetDeploymentInfoRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/deployments/v1/{appId}/info/{deploymentId}", request);
@@ -191,6 +193,7 @@ namespace HathoraCloud
 
         public async Task<GetDeploymentsResponse> GetDeploymentsAsync(GetDeploymentsRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/deployments/v1/{appId}/list", request);

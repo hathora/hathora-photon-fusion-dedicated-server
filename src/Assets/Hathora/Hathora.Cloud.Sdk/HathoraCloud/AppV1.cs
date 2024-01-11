@@ -143,6 +143,7 @@ namespace HathoraCloud
 
         public async Task<DeleteAppResponse> DeleteAppAsync(DeleteAppRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/apps/v1/delete/{appId}", request);
@@ -196,6 +197,7 @@ namespace HathoraCloud
 
         public async Task<GetAppInfoResponse> GetAppInfoAsync(GetAppInfoRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/apps/v1/info/{appId}", request);
@@ -300,6 +302,7 @@ namespace HathoraCloud
 
         public async Task<UpdateAppResponse> UpdateAppAsync(UpdateAppRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/apps/v1/update/{appId}", request);

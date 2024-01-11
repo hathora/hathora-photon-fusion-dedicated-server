@@ -33,8 +33,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             SerializedObject _serializedConfig)
             : base(_serverConfig, _serializedConfig)
         {
-            if (!HathoraConfigUI.ENABLE_BODY_STYLE)
-                return;
         }
         #endregion // Init
         
@@ -301,9 +299,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 
         private async Task<BuildReport> generateServerBuildAsync()
         {
-            // TODO: Get from ServerConfig (for devs that have a custom Dockerfile they don't want overwritten each build)
-            const bool overwriteExistingDockerfile = true;
-
             // Build headless Linux executable
             cancelBuildTokenSrc = new CancellationTokenSource(TimeSpan.FromMinutes(
                 HathoraServerBuild.DEPLOY_TIMEOUT_MINS));

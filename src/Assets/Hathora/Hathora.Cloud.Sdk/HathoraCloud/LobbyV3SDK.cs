@@ -72,6 +72,7 @@ namespace HathoraCloud
 
         public async Task<CreateLobbyResponse> CreateLobbyAsync(CreateLobbySecurity security, CreateLobbyRequest request)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/lobby/v3/{appId}/create", request);
@@ -139,6 +140,7 @@ namespace HathoraCloud
 
         public async Task<GetLobbyInfoByRoomIdResponse> GetLobbyInfoByRoomIdAsync(GetLobbyInfoByRoomIdRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/lobby/v3/{appId}/info/roomid/{roomId}", request);
@@ -196,6 +198,7 @@ namespace HathoraCloud
 
         public async Task<GetLobbyInfoByShortCodeResponse> GetLobbyInfoByShortCodeAsync(GetLobbyInfoByShortCodeRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/lobby/v3/{appId}/info/shortcode/{shortCode}", request);
@@ -253,6 +256,7 @@ namespace HathoraCloud
 
         public async Task<ListActivePublicLobbiesResponse> ListActivePublicLobbiesAsync(ListActivePublicLobbiesRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/lobby/v3/{appId}/list/public", request);

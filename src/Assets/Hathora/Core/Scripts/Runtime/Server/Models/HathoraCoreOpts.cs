@@ -73,10 +73,11 @@ namespace Hathora.Core.Scripts.Runtime.Server.Models
             get {
 #if UNITY_SERVER || UNITY_EDITOR
                 return _devAuthOpts;
-#endif
+#else
                 
                 // Client >>
                 return null;
+#endif
             }
 #if UNITY_SERVER || UNITY_EDITOR
             set => _devAuthOpts = value;

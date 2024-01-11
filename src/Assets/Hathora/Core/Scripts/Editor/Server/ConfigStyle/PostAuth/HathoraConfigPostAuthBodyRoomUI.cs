@@ -24,8 +24,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
     public class HathoraConfigPostAuthBodyRoomUI : HathoraConfigUIBase
     {
         #region Vars
-        /// <summary>Returns a mock err instead of the real process; reflects in RoomInfo</summary>
-        private const bool MOCK_CREATE_ROOM_ERR = false;
         
         private HathoraConfigPostAuthBodyRoomLobbyUI roomLobbyUI { get; set; }
         public static CancellationTokenSource CreateRoomCancelTokenSrc { get; set; } // TODO
@@ -50,8 +48,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             SerializedObject _serializedConfig)
             : base(_serverConfig, _serializedConfig)
         {
-            if (!HathoraConfigUI.ENABLE_BODY_STYLE)
-                return;
+            
             
             initDrawUtils();
             
@@ -436,14 +433,9 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 
             try
             {
-                if (MOCK_CREATE_ROOM_ERR)
-                {
-                    Debug.LogError("[HathoraConfigPostAuthBodyRoomUI.onCreateRoomBtnClick] " +
-                        "`MOCK_CREATE_ROOM_ERR` == true; simulating error...");
-                    throw new Exception("MOCK_CREATE_ROOM_ERR (Simulated Err)");
-                }
                 
                 roomConnInfoTuple = await serverRoomApiWrapper.ServerCreateRoomAwaitActiveAsync(
+                    _region: ServerConfig.HathoraLobbyRoomOpts.HathoraRegion, 
                     _cancelToken: CreateRoomCancelTokenSrc.Token);
             }
             // catch (TaskCanceledException e)

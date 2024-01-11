@@ -8,6 +8,7 @@ using Hathora.Core.Scripts.Runtime.Server;
 using UnityEditor;
 using UnityEngine;
 
+#pragma warning disable 4014
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
 {
     public class HathoraConfigPreAuthBodyUI : HathoraConfigUIBase
@@ -28,8 +29,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
             SerializedObject _serializedConfig) 
             : base(_serverConfig, _serializedConfig)
         {
-            // if (!HathoraConfigUI.ENABLE_BODY_STYLE)
-            //     return;
         }
         
         
@@ -121,7 +120,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
             InsertSpace3x();
         }
 
-        private async Task insertRegisterLinkLbl()
+        private void insertRegisterLinkLbl()
         {
             InsertCenterLabel("Don't have an account yet?");
         
@@ -224,3 +223,4 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
         #endregion // Utils
     }
 }
+#pragma warning restore 4014
