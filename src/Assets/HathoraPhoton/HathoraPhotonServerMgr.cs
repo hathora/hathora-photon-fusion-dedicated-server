@@ -125,6 +125,10 @@ namespace HathoraPhoton
                 $"2. Photon public config.PublicIp and .PublicPort set to ip:port: `{config.PublicIP}:{config.PublicPort}\n`");
             #endregion // Hathora Edits
             
+            // Get HATHORA_REGION and convert to closest Photon region - and set in start config
+            string matchingPhotonRegion = HathoraRegionUtility.HathoraToPhoton(hathoraServerContext.EnvVarRegion);
+            config.Region = matchingPhotonRegion;
+            
             Debug.Log(config);
 
             // Start a new Runner instance
