@@ -160,7 +160,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
             string _shortCode,
             CancellationToken _cancelToken = default)
         {
-            string logPrefix = $"[{nameof(HathoraLobbyApiWrapper)}.{nameof(GetLobbyInfoByRoomIdAsync)}]";
+            string logPrefix = $"[{nameof(HathoraLobbyApiWrapper)}.{nameof(GetLobbyInfoByShortCodeAsync)}]";
             Debug.Log($"{logPrefix} <color=yellow>_roomId: {_shortCode}</color>");
 
             // Prep request
@@ -175,7 +175,7 @@ namespace Hathora.Core.Scripts.Runtime.Common.ApiWrapper
             }
             catch (Exception e)
             {
-                Debug.LogError($"{logPrefix} {nameof(LobbyApi.GetLobbyInfoByRoomIdAsync)} => Error: {e.Message}");
+                Debug.LogError($"{logPrefix} {nameof(LobbyApi.GetLobbyInfoByShortCodeAsync)} => Error: {e.Message}");
                 return null; // fail
             }
             

@@ -99,12 +99,12 @@ namespace HathoraPhoton
             _ = startPhotonDedicatedServer(hathoraServerContext);   
         }
         
-        /// <summary>Load scene 2 (Game) as Dedicated Server</summary>
+        /// <summary>Start Photon Dedicated Server</summary>
         private async Task startPhotonDedicatedServer(HathoraServerContext hathoraServerContext)
         {
             // Continue with start the Dedicated Server
             string logPrefix = $"[HathoraPhotonServerMgr.{nameof(startPhotonDedicatedServer)}]";
-            Debug.Log($"{logPrefix} `2.Game` scene");
+            Debug.Log($"{logPrefix} Starting dedicated server");
             Application.targetFrameRate = 30;
 
             DedicatedServerConfig config = DedicatedServerConfig.Resolve();
@@ -124,6 +124,10 @@ namespace HathoraPhoton
                 $"1. Internal bind container set to port: {config.Port}\n" +
                 $"2. Photon public config.PublicIp and .PublicPort set to ip:port: `{config.PublicIP}:{config.PublicPort}\n`");
             #endregion // Hathora Edits
+            
+            // Get HATHORA_REGION and convert to closest Photon region - and set in start config
+            string matchingPhotonRegion = HathoraRegionUtility.HathoraToPhoton(hathoraServerContext.EnvVarRegion);
+            config.Region = matchingPhotonRegion;
             
             Debug.Log(config);
 

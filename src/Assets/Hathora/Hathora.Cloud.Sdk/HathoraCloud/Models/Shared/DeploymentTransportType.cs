@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 #nullable enable
+#pragma warning disable 0618
 namespace HathoraCloud.Models.Shared
 {
     using Newtonsoft.Json;
@@ -53,3 +54,4 @@ namespace HathoraCloud.Models.Shared
     }
 
 }
+#pragma warning restore 0618

@@ -15,12 +15,12 @@ using UnityEditor;
 using UnityEngine;
 using Security = HathoraCloud.Models.Shared.Security;
 
+#pragma warning disable 4014
 namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
 {
     public class HathoraConfigPostAuthBodyHeaderUI : HathoraConfigUIBase
     {
         #region Vars
-        private bool devReAuthLoginButtonInteractable;
         private bool isRefreshingExistingApps;
         #endregion // Vars
 
@@ -31,8 +31,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             SerializedObject _serializedConfig)
             : base(_serverConfig, _serializedConfig)
         {
-            // if (!HathoraConfigUI.ENABLE_BODY_STYLE)
-            //     return;
         }
         #endregion // Init
         
@@ -206,7 +204,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             if (!clickedLoginToHathoraConsoleBtn)
                 return;
 
-            onLoginToHathoraConsoleBtnClick();
+            await onLoginToHathoraConsoleBtnClick();
         }
 
         private void insertAuthCancelBtn(CancellationTokenSource _cancelTokenSrc)
@@ -276,7 +274,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         private void resetAuth(CancellationTokenSource _cancelTokenSrc)
         {
             _cancelTokenSrc?.Cancel();
-            devReAuthLoginButtonInteractable = true;
         }
         
         private async Task onRefreshAppsListBtnClick()
@@ -341,15 +338,11 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         
         private async Task onLoginToHathoraConsoleBtnClick()
         {
-            devReAuthLoginButtonInteractable = false;
-            
             bool isSuccess = await HathoraServerAuth.DevAuthLogin(ServerConfig);
             if (!isSuccess)
                 onPostAuthLoginFail();
             else
                 onPostAuthLoginToHathoraSuccess();
-            
-            devReAuthLoginButtonInteractable = true;
         }
 
         private void onPostAuthLoginToHathoraSuccess()
@@ -382,3 +375,4 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
         #endregion // Utils
     }
 }
+#pragma warning restore 4014

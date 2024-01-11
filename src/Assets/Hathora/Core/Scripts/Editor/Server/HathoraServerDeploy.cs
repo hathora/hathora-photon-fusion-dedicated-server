@@ -155,7 +155,7 @@ namespace Hathora.Core.Scripts.Editor.Server
                 }
                 catch (TaskCanceledException e)
                 {
-                    Debug.Log($"{logPrefix} ArchiveFilesAsTarGzToDotHathoraDir => Task Cancelled");
+                    Debug.Log($"{logPrefix} ArchiveFilesAsTarGzToDotHathoraDir => Cancelled {e.Message}");
                     throw;
                 }
                 catch (Exception e)
@@ -178,10 +178,14 @@ namespace Hathora.Core.Scripts.Editor.Server
                 }
                 catch (TaskCanceledException e)
                 {
-                    Debug.Log($"{logPrefix} GetDeploymentsAsync => Task Cancelled");
+                    Debug.Log($"{logPrefix} GetDeploymentsAsync => Cancelled {e.Message}");
                     throw;
                 }
-                catch (Exception e) { return null; }
+                catch (Exception e)
+                {
+                    Debug.LogError($"{logPrefix} {e.Message}");
+                    return null;
+                }
 
                 // Get the most-recent deployments env vars + additional ports, if any
                 List<Env> envVars = null;
@@ -215,7 +219,7 @@ namespace Hathora.Core.Scripts.Editor.Server
                 }
                 catch (TaskCanceledException e)
                 {
-                    Debug.Log($"{logPrefix} CreateBuildAsync => Task Cancelled");
+                    Debug.Log($"{logPrefix} CreateBuildAsync => Cancelled {e.Message}");
                     throw;
                 }
                 catch (Exception e)
@@ -253,11 +257,12 @@ namespace Hathora.Core.Scripts.Editor.Server
                 }
                 catch (TaskCanceledException e)
                 {
-                    Debug.Log($"{logPrefix} uploadAndVerifyBuildAsync => Task Cancelled");
+                    Debug.Log($"{logPrefix} uploadAndVerifyBuildAsync => Cancelled {e.Message}");
                     throw;
                 }
                 catch (Exception e)
                 {
+                    Debug.LogError($"{logPrefix} {e.Message}");
                     return null;
                 }
 
@@ -286,10 +291,14 @@ namespace Hathora.Core.Scripts.Editor.Server
                 }
                 catch (TaskCanceledException e)
                 {
-                    Debug.Log($"{logPrefix} deployBuildAsync => Task Cancelled");
+                    Debug.Log($"{logPrefix} CreateDeploymentAsync => Cancelled {e.Message}");
                     throw;
                 }
-                catch (Exception e) { return null; }
+                catch (Exception e)
+                {
+                    Debug.LogError($"{logPrefix} {e.Message}");
+                    return null;
+                }
 
                 Assert.IsTrue(
                     deployment?.BuildId > 0,
@@ -318,7 +327,7 @@ namespace Hathora.Core.Scripts.Editor.Server
             }
             catch (TaskCanceledException e)
             {
-                Debug.Log($"{logPrefix} Task Cancelled");
+                Debug.Log($"{logPrefix} Cancelled {e.Message}");
                 strb.AppendLine().AppendLine($"<color={HathoraEditorUtils.HATHORA_PINK_CANCEL_COLOR_HEX}>" +
                     "(!) Cancelled by user</color>");
                 throw;
@@ -418,7 +427,7 @@ namespace Hathora.Core.Scripts.Editor.Server
             }
             catch (TaskCanceledException e)
             {
-                Debug.Log("[HathoraServerDeploy.uploadAndVerifyBuildAsync] Task Cancelled");
+                Debug.Log($"[HathoraServerDeploy.uploadAndVerifyBuildAsync] Cancelled {e.Message}");
                 throw;
             }
             catch (Exception e)

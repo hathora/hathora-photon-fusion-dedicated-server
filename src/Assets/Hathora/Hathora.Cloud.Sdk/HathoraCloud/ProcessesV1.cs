@@ -67,6 +67,7 @@ namespace HathoraCloud
 
         public async Task<GetProcessInfoResponse> GetProcessInfoAsync(GetProcessInfoRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/processes/v1/{appId}/info/{processId}", request);
@@ -124,6 +125,7 @@ namespace HathoraCloud
 
         public async Task<GetRunningProcessesResponse> GetRunningProcessesAsync(GetRunningProcessesRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/processes/v1/{appId}/list/running", request);
@@ -181,6 +183,7 @@ namespace HathoraCloud
 
         public async Task<GetStoppedProcessesResponse> GetStoppedProcessesAsync(GetStoppedProcessesRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/processes/v1/{appId}/list/stopped", request);

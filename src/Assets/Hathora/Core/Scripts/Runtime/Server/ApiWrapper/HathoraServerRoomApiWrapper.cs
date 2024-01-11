@@ -81,6 +81,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
             catch (TaskCanceledException e)
             {
+                Debug.Log($"{logPrefix} Cancelled {e.Message}");
                 throw;
             }
             catch (Exception e)
@@ -106,7 +107,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
             catch (TaskCanceledException e)
             {
-                Debug.Log($"{logPrefix} Cancelled");
+                Debug.Log($"{logPrefix} Cancelled {e.Message}");
                 throw;
             }
             catch (Exception e)
@@ -130,6 +131,7 @@ namespace Hathora.Core.Scripts.Runtime.Server.ApiWrapper
             }
             catch (TaskCanceledException e)
             {
+                Debug.Log($"{logPrefix} Cancelled {e.Message}");
                 throw;
             }
             catch (Exception e)

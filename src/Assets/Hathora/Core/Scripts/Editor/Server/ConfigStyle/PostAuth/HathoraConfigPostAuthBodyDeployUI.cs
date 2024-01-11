@@ -34,9 +34,6 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle.PostAuth
             SerializedObject _serializedConfig)
             : base(_serverConfig, _serializedConfig)
         {
-            if (!HathoraConfigUI.ENABLE_BODY_STYLE)
-                return;
-
             initDrawUtils();
         }
 

@@ -84,8 +84,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
                 if (!MOCK_BUILD_LOGS)
                     return;
                 
-                // Fake some logs
-                createFakeLogs(ServerConfig.HathoraDeployOpts.LastDeployLogsStrb);
+                // createFakeLogs(ServerConfig.HathoraDeployOpts.LastDeployLogsStrb);
             }
 
             isDeployLogsFoldoutHeaderOpen = EditorGUILayout.BeginFoldoutHeaderGroup(
@@ -113,8 +112,7 @@ namespace Hathora.Core.Scripts.Editor.Server.ConfigStyle
                 if (!MOCK_BUILD_LOGS)
                     return;
                 
-                // Fake some logs
-                createFakeLogs(ServerConfig.LinuxHathoraAutoBuildOpts.LastBuildLogsStrb);
+                // createFakeLogs(ServerConfig.LinuxHathoraAutoBuildOpts.LastBuildLogsStrb);
             }
 
             isBuildLogsFoldoutHeaderOpen = EditorGUILayout.BeginFoldoutHeaderGroup(

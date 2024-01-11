@@ -56,6 +56,7 @@ namespace HathoraCloud
 
         public async Task<GetMetricsResponse> GetMetricsAsync(GetMetricsRequest? request = null)
         {
+            request ??= new();
             request.AppId ??= Config.AppId;
             string baseUrl = this.Config.GetTemplatedServerDetails();
             var urlString = URLBuilder.Build(baseUrl, "/metrics/v1/{appId}/process/{processId}", request);
