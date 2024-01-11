@@ -99,12 +99,12 @@ namespace HathoraPhoton
             _ = startPhotonDedicatedServer(hathoraServerContext);   
         }
         
-        /// <summary>Load scene 2 (Game) as Dedicated Server</summary>
+        /// <summary>Start Photon Dedicated Server</summary>
         private async Task startPhotonDedicatedServer(HathoraServerContext hathoraServerContext)
         {
             // Continue with start the Dedicated Server
             string logPrefix = $"[HathoraPhotonServerMgr.{nameof(startPhotonDedicatedServer)}]";
-            Debug.Log($"{logPrefix} `2.Game` scene");
+            Debug.Log($"{logPrefix} Starting dedicated server");
             Application.targetFrameRate = 30;
 
             DedicatedServerConfig config = DedicatedServerConfig.Resolve();
